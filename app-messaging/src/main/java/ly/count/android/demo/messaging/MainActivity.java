@@ -15,6 +15,9 @@ import ly.count.android.sdk.messaging.Message;
 
 public class MainActivity extends Activity {
 
+    private static String YOUR_SERVER = "http://ec2-52-7-34-112.compute-1.amazonaws.com/";
+    private static String YOUR_APP_KEY = "d16c92e8de1de959468c8519332f383922fdecac";
+
     private BroadcastReceiver messageReceiver;
 
     /** Called when the activity is first created. */
@@ -25,7 +28,7 @@ public class MainActivity extends Activity {
 
         /** You should use cloud.count.ly instead of YOUR_SERVER for the line below if you are using Countly Cloud service */
         Countly.sharedInstance()
-                .init(this, "YOUR_SERVER", "YOUR_APP_KEY")
+                .init(this, YOUR_SERVER, YOUR_APP_KEY)
                 .initMessaging(this, MainActivity.class, "GCM_PROJECT_ID", Countly.CountlyMessagingMode.TEST);
 //                .setLocation(LATITUDE, LONGITUDE);
 //                .setLoggingEnabled(true);
