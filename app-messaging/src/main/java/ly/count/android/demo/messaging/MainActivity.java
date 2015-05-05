@@ -16,7 +16,7 @@ import ly.count.android.sdk.messaging.Message;
 public class MainActivity extends Activity {
 
     private static String YOUR_SERVER = "http://ec2-52-7-34-112.compute-1.amazonaws.com/";
-    private static String YOUR_APP_KEY = "d16c92e8de1de959468c8519332f383922fdecac";
+    private static String YOUR_APP_KEY = "b1eed6c8bf769ffded7332893b62b8e6f4d73a32";
 
     private BroadcastReceiver messageReceiver;
 
