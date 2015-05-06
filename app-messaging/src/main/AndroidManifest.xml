@@ -23,6 +23,11 @@
             </intent-filter>
         </activity>
 
+        <!-- for in-app messaging -->
+        <activity android:name="ly.count.android.sdk.inappmessaging.RichMediaActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
+            android:hardwareAccelerated="false" />
+
     </application>
 
 </manifest>
