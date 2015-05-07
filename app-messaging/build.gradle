@@ -22,6 +22,7 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(':sdk-messaging')
+    compile 'com.google.android.gms:play-services:7.3.0'
 //    compile 'ly.count:sdk-android:15.02'
 //    compile 'ly.count:sdk-android-messaging:15.02'
 }

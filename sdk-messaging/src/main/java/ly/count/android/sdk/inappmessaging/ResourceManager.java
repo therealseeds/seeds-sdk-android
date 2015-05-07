@@ -2,6 +2,7 @@ package ly.count.android.sdk.inappmessaging;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -30,7 +31,7 @@ public class ResourceManager {
 	public static final int TYPE_UNKNOWN = -1;
 	public static final int TYPE_FILE = 0;
 	public static final int TYPE_ZIP = 1;
-/*	public static boolean sDownloading = false;*/
+	public static boolean sDownloading = false;
 	public static boolean sCancel = false;
 	public static HttpGet sDownloadGet;
 
@@ -204,6 +205,7 @@ public class ResourceManager {
 			sResources.put(resId, d);
 		} else {
 			Log.i("registerImageResource: drawable was null " + name);
+			Log.i("Context was " + ctx);
 		}
 	}
 
@@ -229,6 +231,8 @@ public class ResourceManager {
 							false);
 				}
 				return new BitmapDrawable(ctx.getResources(), b);
+			} else {
+				throw new FileNotFoundException();
 			}
 		} catch (Exception e) {
 			Log.i("ResourceManager cannot find resource " + name);
@@ -244,9 +248,9 @@ public class ResourceManager {
 		return null;
 	}
 
-/*	public static boolean isDownloading() {
+	public static boolean isDownloading() {
 		return sDownloading;
-	}*/
+	}
 
 	public static void cancel() {
 		sCancel = true;
@@ -318,6 +322,9 @@ public class ResourceManager {
 		@Override
 		protected Boolean doInBackground(Void... params) {
 			Drawable d = null;
+
+			Log.i("mUrl: "+mUrl);
+
 			if ((mUrl != null) && (mUrl.length() > 0)) {
 				d = fetchImage(mUrl);
 			}

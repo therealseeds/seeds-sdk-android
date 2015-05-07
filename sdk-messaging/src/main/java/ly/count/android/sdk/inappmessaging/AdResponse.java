@@ -1,7 +1,5 @@
 package ly.count.android.sdk.inappmessaging;
 
-import java.util.List;
-
 public class AdResponse implements Ad {
 
 	public static final String WEB = "web";

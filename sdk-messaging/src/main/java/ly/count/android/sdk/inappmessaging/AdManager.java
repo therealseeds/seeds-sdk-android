@@ -35,6 +35,9 @@ public class AdManager {
 	private int userAge;
 	private List<String> keywords;
 
+	private static final String MOB_FOX_PUB_ID = "86e0aa6e7fbd2cdb02ec15e338d6b722";
+	private static final String MOB_FOX_AD_URL = "http://my.mobfox.com/request.php";
+
 	public static AdManager getAdManager(AdResponse ad) {
 		AdManager adManager = sRunningAds.remove(ad.getTimestamp());
 		if (adManager == null) {
@@ -58,6 +61,10 @@ public class AdManager {
 		if (adManager != null) {
 			adManager.notifyAdClicked();
 		}
+	}
+
+	public AdManager(Context ctx) throws IllegalArgumentException {
+		this(ctx, MOB_FOX_AD_URL, MOB_FOX_PUB_ID, false);
 	}
 
 

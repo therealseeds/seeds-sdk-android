@@ -6,23 +6,19 @@ import static ly.count.android.sdk.inappmessaging.Const.RESPONSE_ENCODING;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.http.Header;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-/*import ly.count.android.sdk.inappmessaging.customevents.CustomEvent;*/
+/*import ly.count.android.sdk.inapp.inappmessaging.customevents.CustomEvent;*/
 
 public class RequestGeneralAd extends RequestAd<AdResponse> {
 

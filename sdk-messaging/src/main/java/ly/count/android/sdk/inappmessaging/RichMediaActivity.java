@@ -38,7 +38,6 @@ import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
 /*import android.webkit.WebChromeClient;
@@ -875,6 +874,7 @@ public class RichMediaActivity extends Activity {
 			final Bundle extras = intent.getExtras();
 			if (extras == null || extras.getSerializable(Const.AD_EXTRA) == null) {
 				this.uri = intent.getData();
+				Log.d("uri " + uri);
 				if (this.uri == null) {
 
 					Log.d("url is null so do not load anything");
