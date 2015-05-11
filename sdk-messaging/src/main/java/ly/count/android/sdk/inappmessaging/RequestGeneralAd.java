@@ -1,3 +1,19 @@
+/*
+ *		Copyright 2015 MobFox
+ *		Licensed under the Apache License, Version 2.0 (the "License");
+ *		you may not use this file except in compliance with the License.
+ *		You may obtain a copy of the License at
+ *
+ *		http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *		Unless required by applicable law or agreed to in writing, software
+ *		distributed under the License is distributed on an "AS IS" BASIS,
+ *		WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *		See the License for the specific language governing permissions and
+ *		limitations under the License.
+ *
+ *		Changes: removed video, custom event and MRAID-related code
+ */
 
 package ly.count.android.sdk.inappmessaging;
 
@@ -18,7 +34,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-/*import ly.count.android.sdk.inapp.inappmessaging.customevents.CustomEvent;*/
 
 public class RequestGeneralAd extends RequestAd<AdResponse> {
 
@@ -73,33 +88,6 @@ public class RequestGeneralAd extends RequestAd<AdResponse> {
 	}
 
 
-/*	private List<CustomEvent> getCustomEvents(Header[] headers) {
-		List<CustomEvent> customEvents = new ArrayList<CustomEvent>();
-		if(headers == null) {
-			return customEvents;
-		}
-
-		for (int i = 0; i < headers.length; i++) {
-			if (headers[i].getName().startsWith("X-CustomEvent")) {
-				String json = headers[i].getValue();
-				JSONObject customEventObject;
-				try {
-					customEventObject = new JSONObject(json);
-					String className = customEventObject.getString("class");
-					String parameter = customEventObject.getString("parameter");
-					String pixel = customEventObject.getString("pixel");
-					CustomEvent event = new CustomEvent(className, parameter, pixel);
-					customEvents.add(event);
-				} catch (JSONException e) {
-					Log.e("Cannot parse json with custom event: "+headers[i].getName());
-				}
-				
-			}
-		}
-
-		return customEvents;
-	}
-*/
 	private boolean getValueAsBoolean(final Document document, final String name) {
 		return "yes".equalsIgnoreCase(this.getValue(document, name));
 	}
@@ -117,30 +105,13 @@ public class RequestGeneralAd extends RequestAd<AdResponse> {
 	}
 
 	@Override
-	AdResponse parse(final InputStream inputStream, Header[] headers/*, boolean isVideo*/) throws RequestException {
+	AdResponse parse(final InputStream inputStream, Header[] headers) throws RequestException {
 
 		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		DocumentBuilder db;
 		final AdResponse response = new AdResponse();
 
 		try {
-/*			List<CustomEvent> customEvents = this.getCustomEvents(headers);
-			response.setCustomEvents(customEvents);*/
-
-/*			if (isVideo) {
-
-				VAST vast = VASTParser.createVastFromStream(inputStream);
-				VideoData video = VASTParser.fillVideoDataFromVast(vast);
-				if (video == null) {
-					response.setType(Const.NO_AD);
-					if (response.getRefresh() <= 0) {
-						response.setRefresh(RELOAD_AFTER_NO_AD);
-					}
-				} else {
-					response.setVideoData(video);
-					response.setType(Const.VIDEO);
-				}*/
-		/*	} else {*/
 				db = dbf.newDocumentBuilder();
 				InputSource src = new InputSource(inputStream);
 				if (Log.LOG_AD_RESPONSES) {
@@ -187,21 +158,7 @@ public class RequestGeneralAd extends RequestAd<AdResponse> {
 					response.setRefresh(this.getValueAsInt(doc, "refresh"));
 					response.setScale(this.getValueAsBoolean(doc, "scale"));
 					response.setSkipPreflight(this.getValueAsBoolean(doc, "skippreflight"));
-				} /*else if ("mraidAd".equalsIgnoreCase(type)) {
-					response.setType(Const.MRAID);
-					response.setText(this.getValue(doc, "htmlString"));
-					String skipOverlay = this.getAttribute(doc, "htmlString", "skipoverlaybutton");
-					if (skipOverlay != null) {
-						response.setSkipOverlay(Integer.parseInt(skipOverlay));
-					}
-					final ClickType clickType = ClickType.getValue(this.getValue(doc, "clicktype"));
-					response.setClickType(clickType);
-					response.setClickUrl(this.getValue(doc, "clickurl"));
-					response.setUrlType(this.getValue(doc, "urltype"));
-					response.setRefresh(0);
-					response.setScale(this.getValueAsBoolean(doc, "scale"));
-					response.setSkipPreflight(this.getValueAsBoolean(doc, "skippreflight"));
-				} */else if ("noAd".equalsIgnoreCase(type)) {
+				} else if ("noAd".equalsIgnoreCase(type)) {
 					response.setType(Const.NO_AD);
 					if (response.getRefresh() <= 0) {
 						response.setRefresh(RELOAD_AFTER_NO_AD);
@@ -211,7 +168,7 @@ public class RequestGeneralAd extends RequestAd<AdResponse> {
 				}
 				//ToDO: remove hard-coded URL
 				response.setClickUrl("farm://store");
-/*			}*/
+
 
 		} catch (final ParserConfigurationException e) {
 			throw new RequestException("Cannot parse Response", e);
@@ -228,6 +185,6 @@ public class RequestGeneralAd extends RequestAd<AdResponse> {
 
 	@Override
 	AdResponse parseTestString() throws RequestException {
-		return parse(is, null/*, false*/);
+		return parse(is, null);
 	}
 }
