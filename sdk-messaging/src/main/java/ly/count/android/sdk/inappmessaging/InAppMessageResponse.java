@@ -12,12 +12,13 @@
  *		See the License for the specific language governing permissions and
  *		limitations under the License.
  *
- *		Changes: removed video and custom ad-specific code
+ *		Changes: 	removed video and custom ad-specific code
+ *				 	renamed from AdResponse
  */
 
 package ly.count.android.sdk.inappmessaging;
 
-public class AdResponse implements Ad {
+public class InAppMessageResponse implements InAppMessage {
 
 	public static final String WEB = "web";
 	public static final String OTHER = "other";

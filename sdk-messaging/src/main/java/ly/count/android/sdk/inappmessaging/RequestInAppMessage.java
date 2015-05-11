@@ -12,6 +12,8 @@
  *		See the License for the specific language governing permissions and
  *		limitations under the License.
  *
+ *		Changes:	renamed from RequestAd
+ *
  */
 
 package ly.count.android.sdk.inappmessaging;
@@ -28,16 +30,16 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpProtocolParams;
 
-public abstract class RequestAd<T> {
+public abstract class RequestInAppMessage<T> {
 
 	InputStream is;
 
-	public T sendRequest(AdRequest request)
+	public T sendRequest(InAppMessageRequest request)
 			throws RequestException {
 		if (is == null) {
 			Log.d("Parse Real");
 			String url = request.toString();
-			Log.d("Ad RequestPerform HTTP Get Url: " + url);
+			Log.d("InAppMessage RequestPerform HTTP Get Url: " + url);
 			DefaultHttpClient client = new DefaultHttpClient();
 			HttpConnectionParams.setSoTimeout(client.getParams(),
 					Const.SOCKET_TIMEOUT);

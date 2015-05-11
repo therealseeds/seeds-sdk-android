@@ -12,13 +12,13 @@ import android.view.View;
 import android.widget.Button;
 
 import ly.count.android.sdk.Countly;
-import ly.count.android.sdk.inappmessaging.Ad;
-import ly.count.android.sdk.inappmessaging.AdListener;
-import ly.count.android.sdk.inappmessaging.AdManager;
+import ly.count.android.sdk.inappmessaging.InAppMessage;
+import ly.count.android.sdk.inappmessaging.InAppMessageListener;
+import ly.count.android.sdk.inappmessaging.InAppMessageManager;
 import ly.count.android.sdk.messaging.CountlyMessaging;
 import ly.count.android.sdk.messaging.Message;
 
-public class MainActivity extends Activity implements AdListener {
+public class MainActivity extends Activity implements InAppMessageListener {
 
     private static String YOUR_SERVER = "http://ec2-52-7-34-112.compute-1.amazonaws.com/";
     private static String YOUR_APP_KEY = "b1eed6c8bf769ffded7332893b62b8e6f4d73a32";
@@ -27,7 +27,7 @@ public class MainActivity extends Activity implements AdListener {
     private BroadcastReceiver messageReceiver;
 
     private Button iamButton;
-    private AdManager manager;
+    private InAppMessageManager manager;
 
     /** Called when the activity is first created. */
     @Override
@@ -37,8 +37,6 @@ public class MainActivity extends Activity implements AdListener {
 
 
         iamButton = (Button) findViewById(R.id.iamButton);
-        manager = new AdManager(this);
-        manager.setListener(this);
 
         /** You should use cloud.count.ly instead of YOUR_SERVER for the line below if you are using Countly Cloud service */
         Countly.sharedInstance()
@@ -62,6 +60,9 @@ public class MainActivity extends Activity implements AdListener {
                 Countly.sharedInstance().recordEvent("test3");
             }
         }, 10000);
+
+        manager = new InAppMessageManager(this);
+        manager.setListener(this);
 
     }
 
@@ -117,7 +118,7 @@ public class MainActivity extends Activity implements AdListener {
 
                     } else {
                         manager.requestAd();
-//                        Toast.makeText(AndroidLauncher.this, "Ad loading...", Toast.LENGTH_LONG)
+//                        Toast.makeText(AndroidLauncher.this, "InAppMessage loading...", Toast.LENGTH_LONG)
 //                                .show();
                     }
                 }
@@ -127,29 +128,28 @@ public class MainActivity extends Activity implements AdListener {
         }
     }
 
-
     @Override
-    public void adClicked() {
+    public void inAppMessageClicked() {
 
     }
 
     @Override
-    public void adClosed(Ad ad, boolean completed) {
+    public void inAppMessageClosed(InAppMessage inAppMessage, boolean completed) {
 
     }
 
     @Override
-    public void adLoadSucceeded(Ad ad) {
+    public void inAppMessageLoadSucceeded(InAppMessage inAppMessage) {
 
     }
 
     @Override
-    public void adShown(Ad ad, boolean succeeded) {
+    public void inAppMessageShown(InAppMessage inAppMessage, boolean succeeded) {
 
     }
 
     @Override
-    public void noAdFound() {
+    public void noInAppMessageFound() {
 
     }
 }

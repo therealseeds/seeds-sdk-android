@@ -12,7 +12,8 @@
  *		See the License for the specific language governing permissions and
  *		limitations under the License.
  *
- *		Changes: moved from banner sub-package
+ *		Changes: 	moved from banner sub-package
+ *					renamed from BannerAdView
  */
 
 package ly.count.android.sdk.inappmessaging;
@@ -47,7 +48,7 @@ import android.webkit.WebViewClient;
 import android.widget.RelativeLayout;
 
 @SuppressLint({ "ViewConstructor", "SetJavaScriptEnabled" })
-public class BannerAdView extends RelativeLayout {
+public class InAppMessageView extends RelativeLayout {
 
 	public static final int LIVE = 0;
 	public static final int TEST = 1;
@@ -57,7 +58,7 @@ public class BannerAdView extends RelativeLayout {
 	private boolean isInternalBrowser = false;
 	private boolean wasUserAction = false;
 
-	private AdResponse response;
+	private InAppMessageResponse response;
 	private Animation fadeInAnimation = null;
 	// private Animation fadeOutAnimation = null;
 	private WebSettings webSettings;
@@ -75,7 +76,7 @@ public class BannerAdView extends RelativeLayout {
 	private static Method mWebView_SetLayerType;
 	private static Field mWebView_LAYER_TYPE_SOFTWARE;
 
-	public BannerAdView(final Context context, final AdResponse response, int width, int height, final boolean animation, final BannerAdViewListener adListener) {
+	public InAppMessageView(final Context context, final InAppMessageResponse response, int width, int height, final boolean animation, final BannerAdViewListener adListener) {
 		super(context);
 		mContext = context;
 		this.response = response;

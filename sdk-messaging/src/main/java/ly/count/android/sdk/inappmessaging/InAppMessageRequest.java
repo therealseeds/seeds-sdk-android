@@ -12,7 +12,8 @@
  *		See the License for the specific language governing permissions and
  *		limitations under the License.
  *
- *		Changes: removed video, MRAID and custom ad-specific code
+ *		Changes: 	removed video, MRAID and custom ad-specific code
+ *					renamed from AdRequest
  */
 
 package ly.count.android.sdk.inappmessaging;
@@ -24,7 +25,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.text.TextUtils;
 
-public class AdRequest {
+public class InAppMessageRequest {
 	private static final String REQUEST_TYPE_ANDROID = "android_app";
 	
 	private String userAgent;
@@ -106,7 +107,7 @@ public class AdRequest {
 	}
 
 	public String getRequestType() {
-		return AdRequest.REQUEST_TYPE_ANDROID;
+		return InAppMessageRequest.REQUEST_TYPE_ANDROID;
 	}
 
 	public long getTimestamp() {

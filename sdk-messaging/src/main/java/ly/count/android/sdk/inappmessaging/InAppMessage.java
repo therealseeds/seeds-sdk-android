@@ -11,22 +11,16 @@
  *		WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *		See the License for the specific language governing permissions and
  *		limitations under the License.
+ *
+ *		Changes: 	renamed from Ad to InAppMessage
  */
-
 
 package ly.count.android.sdk.inappmessaging;
 
+import java.io.Serializable;
 
-public interface AdListener {
+public interface InAppMessage extends Serializable {
+	public int getType();
 
-	public void adClicked();
-
-	public void adClosed(Ad ad, boolean completed);
-
-	public void adLoadSucceeded(Ad ad);
-
-	public void adShown(Ad ad, boolean succeeded);
-
-	public void noAdFound();
-
+	public void setType(int adType);
 }

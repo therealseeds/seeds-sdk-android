@@ -12,7 +12,8 @@
  *		See the License for the specific language governing permissions and
  *		limitations under the License.
  *
- *		Changes: removed video, MRAID and custom ad-specific code
+ *		Changes: 	removed video, MRAID and custom ad-specific code
+ *					renamed from AdManager
  */
 
 package ly.count.android.sdk.inappmessaging;
@@ -30,9 +31,9 @@ import android.content.res.Configuration;
 import android.location.Location;
 import android.os.Handler;
 
-public class AdManager {
+public class InAppMessageManager {
 
-	private static HashMap<Long, AdManager> sRunningAds = new HashMap<Long, AdManager>();
+	private static HashMap<Long, InAppMessageManager> sRunningAds = new HashMap<Long, InAppMessageManager>();
 
 	private String mPublisherId;
 	private String androidAdId;
@@ -41,10 +42,10 @@ public class AdManager {
 	private static Context mContext;
 	private Thread mRequestThread;
 	private Handler mHandler;
-	private AdRequest request = null;
-	private AdListener mListener;
+	private InAppMessageRequest request = null;
+	private InAppMessageListener mListener;
 	private boolean mEnabled = true;
-	private AdResponse mResponse;
+	private InAppMessageResponse mResponse;
 	private String interstitialRequestURL;
 	private boolean alreadyRequestedInterstitial;
 	private boolean requestedHorizontalAd;
@@ -55,39 +56,39 @@ public class AdManager {
 	private static final String MOB_FOX_PUB_ID = "86e0aa6e7fbd2cdb02ec15e338d6b722";
 	private static final String MOB_FOX_AD_URL = "http://my.mobfox.com/request.php";
 
-	public static AdManager getAdManager(AdResponse ad) {
-		AdManager adManager = sRunningAds.remove(ad.getTimestamp());
-		if (adManager == null) {
-			Log.d("Cannot find AdManager with running ad:" + ad.getTimestamp());
+	public static InAppMessageManager getAdManager(InAppMessageResponse ad) {
+		InAppMessageManager inAppMessageManager = sRunningAds.remove(ad.getTimestamp());
+		if (inAppMessageManager == null) {
+			Log.d("Cannot find InAppMessageManager with running ad:" + ad.getTimestamp());
 		}
-		return adManager;
+		return inAppMessageManager;
 	}
 
-	public static void closeRunningAd(AdResponse ad, boolean result) {
-		AdManager adManager = sRunningAds.remove(ad.getTimestamp());
-		if (adManager == null) {
-			Log.d("Cannot find AdManager with running ad:" + ad.getTimestamp());
+	public static void closeRunningAd(InAppMessageResponse ad, boolean result) {
+		InAppMessageManager inAppMessageManager = sRunningAds.remove(ad.getTimestamp());
+		if (inAppMessageManager == null) {
+			Log.d("Cannot find InAppMessageManager with running ad:" + ad.getTimestamp());
 			return;
 		}
-		Log.d("Notify closing event to AdManager with running ad:" + ad.getTimestamp());
-		adManager.notifyAdClose(ad, result);
+		Log.d("Notify closing event to InAppMessageManager with running ad:" + ad.getTimestamp());
+		inAppMessageManager.notifyAdClose(ad, result);
 	}
 
-	public static void notifyAdClick(AdResponse ad) {
-		AdManager adManager = sRunningAds.get(ad.getTimestamp());
-		if (adManager != null) {
-			adManager.notifyAdClicked();
+	public static void notifyAdClick(InAppMessageResponse ad) {
+		InAppMessageManager inAppMessageManager = sRunningAds.get(ad.getTimestamp());
+		if (inAppMessageManager != null) {
+			inAppMessageManager.notifyAdClicked();
 		}
 	}
 
-	public AdManager(Context ctx) throws IllegalArgumentException {
+	public InAppMessageManager(Context ctx) throws IllegalArgumentException {
 		this(ctx, MOB_FOX_AD_URL, MOB_FOX_PUB_ID, false);
 	}
 
 
-	public AdManager(Context ctx, final String interstitialRequestURL, final String publisherId, final boolean includeLocation) throws IllegalArgumentException {
+	public InAppMessageManager(Context ctx, final String interstitialRequestURL, final String publisherId, final boolean includeLocation) throws IllegalArgumentException {
 		Util.prepareAndroidAdId(ctx);
-		AdManager.setmContext(ctx);
+		InAppMessageManager.setmContext(ctx);
 		this.interstitialRequestURL = interstitialRequestURL;
 		this.mPublisherId = publisherId;
 		this.mIncludeLocation = includeLocation;
@@ -96,7 +97,7 @@ public class AdManager {
 		initialize();
 	}
 
-	public void setListener(AdListener listener) {
+	public void setListener(InAppMessageListener listener) {
 		this.mListener = listener;
 	}
 
@@ -114,7 +115,7 @@ public class AdManager {
 		}
 
 		if (mRequestThread == null) {
-			Log.d("Requesting Ad (v" + Const.VERSION + "-" + Const.PROTOCOL_VERSION + ")");
+			Log.d("Requesting InAppMessage (v" + Const.VERSION + "-" + Const.PROTOCOL_VERSION + ")");
 			mResponse = null;
 
 			mRequestThread = new Thread(new Runnable() {
@@ -128,7 +129,7 @@ public class AdManager {
 					}
 					Log.d("starting request thread");
 					try {
-						RequestGeneralAd requestAd = new RequestGeneralAd();
+						RequestGeneralInAppMessage requestAd = new RequestGeneralInAppMessage();
 						if (!alreadyRequestedInterstitial) {
 							request = getInterstitialRequest();
 							alreadyRequestedInterstitial = true;
@@ -162,7 +163,7 @@ public class AdManager {
 							requestAdInternal(true);
 						} else {
 
-							mResponse = new AdResponse();
+							mResponse = new InAppMessageResponse();
 							mResponse.setType(Const.AD_FAILED);
 							notifyNoAdFound();
 						}
@@ -175,7 +176,7 @@ public class AdManager {
 
 				@Override
 				public void uncaughtException(Thread thread, Throwable ex) {
-					mResponse = new AdResponse();
+					mResponse = new InAppMessageResponse();
 					mResponse.setType(Const.AD_FAILED);
 					Log.e("Handling exception in ad request thread", ex);
 					mRequestThread = null;
@@ -200,7 +201,7 @@ public class AdManager {
 
 
 		if (mRequestThread == null) {
-			Log.d("Requesting Ad (v" + Const.VERSION + "-" + Const.PROTOCOL_VERSION + ")");
+			Log.d("Requesting InAppMessage (v" + Const.VERSION + "-" + Const.PROTOCOL_VERSION + ")");
 			mResponse = null;
 			mRequestThread = new Thread(new Runnable() {
 				@Override
@@ -213,7 +214,7 @@ public class AdManager {
 					}
 					Log.d("starting request thread");
 					try {
-						RequestGeneralAd requestAd = new RequestGeneralAd(xml);
+						RequestGeneralInAppMessage requestAd = new RequestGeneralInAppMessage(xml);
 						request = getInterstitialRequest();
 						mResponse = requestAd.sendRequest(request);
 
@@ -230,7 +231,7 @@ public class AdManager {
 							notifyAdLoaded(mResponse);
 						} 
 					} catch (Throwable t) {
-						mResponse = new AdResponse();
+						mResponse = new InAppMessageResponse();
 						mResponse.setType(Const.AD_FAILED);
 						notifyNoAdFound();
 					}
@@ -242,7 +243,7 @@ public class AdManager {
 
 				@Override
 				public void uncaughtException(Thread thread, Throwable ex) {
-					mResponse = new AdResponse();
+					mResponse = new InAppMessageResponse();
 					mResponse.setType(Const.AD_FAILED);
 					Log.e("Handling exception in ad request thread", ex);
 					mRequestThread = null;
@@ -259,7 +260,7 @@ public class AdManager {
 	}
 
 	public void requestAdAndShow(long timeout) {
-		AdListener l = mListener;
+		InAppMessageListener l = mListener;
 
 		mListener = null;
 		requestAd();
@@ -282,13 +283,13 @@ public class AdManager {
 			notifyAdShown(mResponse, false);
 			return;
 		}
-		AdResponse ad = mResponse;
+		InAppMessageResponse ad = mResponse;
 		boolean result = false;
 		try {
 			if (Util.isNetworkAvailable(getContext())) {
 				ad.setTimestamp(System.currentTimeMillis());
 				ad.setHorizontalOrientationRequested(requestedHorizontalAd);
-				Log.v("Showing Ad:" + ad);
+				Log.v("Showing InAppMessage:" + ad);
 
 				Intent intent = new Intent(getContext(), RichMediaActivity.class);
 				intent.putExtra(AD_EXTRA, ad);
@@ -297,17 +298,17 @@ public class AdManager {
 				result = true;
 				sRunningAds.put(ad.getTimestamp(), this);
 			} else {
-				Log.d("No network available. Cannot show Ad.");
+				Log.d("No network available. Cannot show InAppMessage.");
 			}
 		} catch (Exception e) {
-			Log.e("Unknown exception when showing Ad", e);
+			Log.e("Unknown exception when showing InAppMessage", e);
 		} finally {
 			notifyAdShown(ad, result);
 		}
 	}
 
 	private void initialize() throws IllegalArgumentException {
-		Log.d("Ad SDK Version:" + Const.VERSION);
+		Log.d("InAppMessage SDK Version:" + Const.VERSION);
 
 		this.androidAdId = Util.getAndroidAdId();
 		this.adDoNotTrack = Util.hasAdDoNotTrack();
@@ -317,7 +318,7 @@ public class AdManager {
 			throw new IllegalArgumentException("User Id cannot be null or empty");
 		}
 
-		Log.d("AdManager Publisher Id:" + mPublisherId + " Advertising Id:" + androidAdId);
+		Log.d("InAppMessageManager Publisher Id:" + mPublisherId + " Advertising Id:" + androidAdId);
 		mEnabled = (Util.getMemoryClass(getContext()) > 16);
 	}
 
@@ -327,20 +328,20 @@ public class AdManager {
 			mHandler.post(new Runnable() {
 				@Override
 				public void run() {
-					mListener.noAdFound();
+					mListener.noInAppMessageFound();
 				}
 			});
 		}
 		this.mResponse = null;
 	}
 
-	private void notifyAdLoaded(final AdResponse ad) {
+	private void notifyAdLoaded(final InAppMessageResponse ad) {
 		if (mListener != null) {
 			mHandler.post(new Runnable() {
 
 				@Override
 				public void run() {
-					mListener.adLoadSucceeded(ad);
+					mListener.inAppMessageLoadSucceeded(ad);
 				}
 			});
 		}
@@ -352,40 +353,40 @@ public class AdManager {
 
 				@Override
 				public void run() {
-					mListener.adClicked();
+					mListener.inAppMessageClicked();
 				}
 			});
 		}
 	}
 
-	private void notifyAdShown(final AdResponse ad, final boolean ok) {
+	private void notifyAdShown(final InAppMessageResponse ad, final boolean ok) {
 		if (mListener != null) {
-			Log.d("Ad Shown. Result:" + ok);
+			Log.d("InAppMessage Shown. Result:" + ok);
 			mHandler.post(new Runnable() {
 				@Override
 				public void run() {
-					mListener.adShown(ad, ok);
+					mListener.inAppMessageShown(ad, ok);
 				}
 			});
 		}
 		this.mResponse = null;
 	}
 
-	private void notifyAdClose(final AdResponse ad, final boolean ok) {
+	private void notifyAdClose(final InAppMessageResponse ad, final boolean ok) {
 		if (mListener != null) {
-			Log.d("Ad Close. Result:" + ok);
+			Log.d("InAppMessage Close. Result:" + ok);
 			mHandler.post(new Runnable() {
 				@Override
 				public void run() {
-					mListener.adClosed(ad, ok);
+					mListener.inAppMessageClosed(ad, ok);
 				}
 			});
 		}
 	}
 
-	private AdRequest getInterstitialRequest() {
+	private InAppMessageRequest getInterstitialRequest() {
 		if (this.request == null) {
-			this.request = new AdRequest();
+			this.request = new InAppMessageRequest();
 			request.setAndroidAdId(androidAdId);
 			request.setAdDoNotTrack(adDoNotTrack);
 			this.request.setPublisherId(this.mPublisherId);
@@ -393,7 +394,6 @@ public class AdManager {
 			this.request.setUserAgent2(Util.buildUserAgent());
 		}
 		Location location = null;
-/*		request.setVideoRequest(false);*/
 		request.setGender(userGender);
 		request.setUserAge(userAge);
 		request.setKeywords(keywords);
@@ -437,7 +437,7 @@ public class AdManager {
 	}
 
 	private static void setmContext(Context mContext) {
-		AdManager.mContext = mContext;
+		InAppMessageManager.mContext = mContext;
 	}
 
 	public void setUserGender(Gender userGender) {

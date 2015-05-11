@@ -12,7 +12,8 @@
  *		See the License for the specific language governing permissions and
  *		limitations under the License.
  *
- *		Changes: removed video, custom event and MRAID-related code
+ *		Changes: 	removed video, custom event and MRAID-related code
+ *					renamed from RequestGeneralAd
  */
 
 package ly.count.android.sdk.inappmessaging;
@@ -35,14 +36,14 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 
-public class RequestGeneralAd extends RequestAd<AdResponse> {
+public class RequestGeneralInAppMessage extends RequestInAppMessage<InAppMessageResponse> {
 
 	private final static int RELOAD_AFTER_NO_AD = 20;
 
-	public RequestGeneralAd() {
+	public RequestGeneralInAppMessage() {
 	}
 
-	public RequestGeneralAd(InputStream xmlArg) {
+	public RequestGeneralInAppMessage(InputStream xmlArg) {
 		is = xmlArg;
 		Log.d("Parse is null" + (is == null));
 	}
@@ -105,18 +106,18 @@ public class RequestGeneralAd extends RequestAd<AdResponse> {
 	}
 
 	@Override
-	AdResponse parse(final InputStream inputStream, Header[] headers) throws RequestException {
+	InAppMessageResponse parse(final InputStream inputStream, Header[] headers) throws RequestException {
 
 		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		DocumentBuilder db;
-		final AdResponse response = new AdResponse();
+		final InAppMessageResponse response = new InAppMessageResponse();
 
 		try {
 				db = dbf.newDocumentBuilder();
 				InputSource src = new InputSource(inputStream);
 				if (Log.LOG_AD_RESPONSES) {
 					String sResponse = convertStreamToString(inputStream);
-					Log.d("Ad RequestPerform HTTP Response: " + sResponse);
+					Log.d("InAppMessage RequestPerform HTTP Response: " + sResponse);
 					byte[] bytes = sResponse.getBytes(RESPONSE_ENCODING);
 					src = new InputSource(new ByteArrayInputStream(bytes));
 				}
@@ -184,7 +185,7 @@ public class RequestGeneralAd extends RequestAd<AdResponse> {
 	}
 
 	@Override
-	AdResponse parseTestString() throws RequestException {
+	InAppMessageResponse parseTestString() throws RequestException {
 		return parse(is, null);
 	}
 }

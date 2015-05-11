@@ -54,7 +54,7 @@ import android.widget.ImageView;
 
 
 
-import ly.count.android.sdk.inappmessaging.BannerAdView.BannerAdViewListener;
+import ly.count.android.sdk.inappmessaging.InAppMessageView.BannerAdViewListener;
 
 public class RichMediaActivity extends Activity {
 
@@ -93,7 +93,7 @@ public class RichMediaActivity extends Activity {
 	private FrameLayout mRootLayout;
 
 	private ImageView mSkipButton;
-	private AdResponse mAd;
+	private InAppMessageResponse mAd;
 
 
 	private Uri uri;
@@ -172,7 +172,7 @@ public class RichMediaActivity extends Activity {
 
 		if (this.mAd != null) {
 			Log.d("Finish Activity type:" + this.mType + " ad Type:" + this.mAd.getType());
-			AdManager.closeRunningAd(this.mAd, this.mResult);
+			InAppMessageManager.closeRunningAd(this.mAd, this.mResult);
 		}
 		super.finish();
 	}
@@ -213,7 +213,7 @@ public class RichMediaActivity extends Activity {
 				height = 480;
 			}
 
-			BannerAdView banner = new BannerAdView(this, mAd, width, height, false, createLocalAdListener());
+			InAppMessageView banner = new InAppMessageView(this, mAd, width, height, false, createLocalAdListener());
 			banner.setLayoutParams(new FrameLayout.LayoutParams((int) (width * scale + 0.5f), (int) (height * scale + 0.5f), Gravity.CENTER));
 			banner.showContent();
 			layout.addView(banner);
@@ -264,7 +264,7 @@ public class RichMediaActivity extends Activity {
 
 	private void notifyAdClicked() {
 		wasClicked = true;
-		AdManager.notifyAdClick(mAd);
+		InAppMessageManager.notifyAdClick(mAd);
 	}
 
 	private void initRootLayout() {
@@ -345,7 +345,7 @@ public class RichMediaActivity extends Activity {
 				this.initWebBrowserView(true);
 				this.mWebBrowserView.loadUrl(this.uri.toString());
 			} else {*/
-				this.mAd = (AdResponse) extras.getSerializable(Const.AD_EXTRA);
+				this.mAd = (InAppMessageResponse) extras.getSerializable(Const.AD_EXTRA);
 
 				this.mCanClose = false;
 				this.mType = extras.getInt(Const.AD_TYPE_EXTRA, -1);
