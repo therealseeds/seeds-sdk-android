@@ -64,7 +64,7 @@ public class InAppMessageManager {
 		return inAppMessageManager;
 	}
 
-	public static void closeRunningAd(InAppMessageResponse ad, boolean result) {
+	public static void closeRunningInAppMessage(InAppMessageResponse ad, boolean result) {
 		InAppMessageManager inAppMessageManager = sRunningAds.remove(ad.getTimestamp());
 		if (inAppMessageManager == null) {
 			Log.d("Cannot find InAppMessageManager with running ad:" + ad.getTimestamp());
@@ -74,7 +74,7 @@ public class InAppMessageManager {
 		inAppMessageManager.notifyAdClose(ad, result);
 	}
 
-	public static void notifyAdClick(InAppMessageResponse ad) {
+	public static void notifyInAppMessageClick(InAppMessageResponse ad) {
 		InAppMessageManager inAppMessageManager = sRunningAds.get(ad.getTimestamp());
 		if (inAppMessageManager != null) {
 			inAppMessageManager.notifyAdClicked();
@@ -101,11 +101,11 @@ public class InAppMessageManager {
 		this.mListener = listener;
 	}
 
-	public void requestAd() {
-		requestAdInternal(false);
+	public void requestInAppMessage() {
+		requestInAppMessageInternal(false);
 	}
 
-	private void requestAdInternal(boolean keepFlags) {
+	private void requestInAppMessageInternal(boolean keepFlags) {
 		if (!mEnabled) {
 			Log.w("Cannot request rich adds on low memory devices");
 			return;
@@ -160,7 +160,7 @@ public class InAppMessageManager {
 					} catch (Throwable t) {
 						if (!alreadyRequestedInterstitial) {
 							mRequestThread = null;
-							requestAdInternal(true);
+							requestInAppMessageInternal(true);
 						} else {
 
 							mResponse = new InAppMessageResponse();
@@ -192,7 +192,7 @@ public class InAppMessageManager {
 		this.interstitialRequestURL = requestURL;
 	}
 
-	public void requestAd(final InputStream xml) {
+	public void requestInAppMessage(final InputStream xml) {
 		if (!mEnabled) {
 			Log.w("Cannot request rich adds on low memory devices");
 			return;
@@ -255,18 +255,18 @@ public class InAppMessageManager {
 		}
 	}
 
-	public boolean isAdLoaded() {
+	public boolean isInAppMessageLoaded() {
 		return (mResponse != null);
 	}
 
-	public void requestAdAndShow(long timeout) {
+	public void requestInAppMessageAndShow(long timeout) {
 		InAppMessageListener l = mListener;
 
 		mListener = null;
-		requestAd();
+		requestInAppMessage();
 		long now = System.currentTimeMillis();
 		long timeoutTime = now + timeout;
-		while ((!isAdLoaded()) && (now < timeoutTime)) {
+		while ((!isInAppMessageLoaded()) && (now < timeoutTime)) {
 			try {
 				Thread.sleep(200);
 			} catch (InterruptedException e) {
@@ -274,10 +274,10 @@ public class InAppMessageManager {
 			now = System.currentTimeMillis();
 		}
 		mListener = l;
-		showAd();
+		showInAppMessage();
 	}
 
-	public void showAd() {
+	public void showInAppMessage() {
 
 		if (((mResponse == null) || (mResponse.getType() == Const.NO_AD) || (mResponse.getType() == Const.AD_FAILED))) {
 			notifyAdShown(mResponse, false);

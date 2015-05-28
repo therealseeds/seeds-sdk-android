@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 
 import ly.count.android.sdk.Countly;
+import ly.count.android.sdk.DeviceId;
 import ly.count.android.sdk.inappmessaging.InAppMessage;
 import ly.count.android.sdk.inappmessaging.InAppMessageListener;
 import ly.count.android.sdk.inappmessaging.InAppMessageManager;
@@ -20,8 +21,9 @@ import ly.count.android.sdk.messaging.Message;
 
 public class MainActivity extends Activity implements InAppMessageListener {
 
-    private static String YOUR_SERVER = "http://ec2-52-7-34-112.compute-1.amazonaws.com/";
-    private static String YOUR_APP_KEY = "b1eed6c8bf769ffded7332893b62b8e6f4d73a32";
+    private static String YOUR_SERVER = "http://ec2-52-7-175-75.compute-1.amazonaws.com"; // don't include trailing slash
+    private static String YOUR_APP_KEY = "aa1fd1f255b25fb89b413f216f11e8719188129d";
+    private static String GCM_PROJECT_NUM = "1079042128983";
 
 
     private BroadcastReceiver messageReceiver;
@@ -40,10 +42,10 @@ public class MainActivity extends Activity implements InAppMessageListener {
 
         /** You should use cloud.count.ly instead of YOUR_SERVER for the line below if you are using Countly Cloud service */
         Countly.sharedInstance()
-                .init(this, YOUR_SERVER, YOUR_APP_KEY)
-                .initMessaging(this, MainActivity.class, "GCM_PROJECT_ID", Countly.CountlyMessagingMode.TEST);
+                .init(this, YOUR_SERVER, YOUR_APP_KEY, null, DeviceId.Type.ADVERTISING_ID)
+                .initMessaging(this, MainActivity.class, GCM_PROJECT_NUM, Countly.CountlyMessagingMode.TEST)
 //                .setLocation(LATITUDE, LONGITUDE);
-//                .setLoggingEnabled(true);
+                .setLoggingEnabled(true);
 
         Countly.sharedInstance().recordEvent("test", 1);
 
@@ -63,6 +65,7 @@ public class MainActivity extends Activity implements InAppMessageListener {
 
         manager = new InAppMessageManager(this);
         manager.setListener(this);
+        manager.requestInAppMessage();
 
     }
 
@@ -112,12 +115,12 @@ public class MainActivity extends Activity implements InAppMessageListener {
         try {
             runOnUiThread(new Runnable() {
                 public void run() {
-                    if (manager.isAdLoaded()) {
-                        manager.showAd();
+                    if (manager.isInAppMessageLoaded()) {
+                        manager.showInAppMessage();
 
 
                     } else {
-                        manager.requestAd();
+                        manager.requestInAppMessage();
 //                        Toast.makeText(AndroidLauncher.this, "InAppMessage loading...", Toast.LENGTH_LONG)
 //                                .show();
                     }

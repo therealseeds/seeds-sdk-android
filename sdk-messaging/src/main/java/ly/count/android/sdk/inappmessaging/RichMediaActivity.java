@@ -172,7 +172,7 @@ public class RichMediaActivity extends Activity {
 
 		if (this.mAd != null) {
 			Log.d("Finish Activity type:" + this.mType + " ad Type:" + this.mAd.getType());
-			InAppMessageManager.closeRunningAd(this.mAd, this.mResult);
+			InAppMessageManager.closeRunningInAppMessage(this.mAd, this.mResult);
 		}
 		super.finish();
 	}
@@ -264,7 +264,7 @@ public class RichMediaActivity extends Activity {
 
 	private void notifyAdClicked() {
 		wasClicked = true;
-		InAppMessageManager.notifyAdClick(mAd);
+		InAppMessageManager.notifyInAppMessageClick(mAd);
 	}
 
 	private void initRootLayout() {
