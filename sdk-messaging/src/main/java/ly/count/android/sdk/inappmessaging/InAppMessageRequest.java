@@ -178,6 +178,10 @@ public class InAppMessageRequest {
 		return this.toUri().toString();
 	}
 
+	public String countlyUriToString() {
+		return this.toCountlyUri().toString();
+	}
+
 	public Uri toUri() {
 		final Uri.Builder b = Uri.parse(this.getRequestURL()).buildUpon();
 		Random r = new Random();
@@ -239,6 +243,19 @@ public class InAppMessageRequest {
 			b.appendQueryParameter("adspace_width", Integer.toString(adspaceWidth));
 			b.appendQueryParameter("adspace_height", Integer.toString(adspaceHeight));
 		}
+
+		return b.build();
+	}
+
+	public Uri toCountlyUri() {
+		String countlyURL = "http://ec2-52-7-175-75.compute-1.amazonaws.com";
+		String path = "/o/test";
+		final Uri.Builder b = Uri.parse((countlyURL + path)).buildUpon();
+
+		// api_key=f1d1a9e29c0689bb9591389f46f275e7&app_id=55524a8eea08b2c432086d32
+
+		b.appendQueryParameter("api_key", "f1d1a9e29c0689bb9591389f46f275e7");
+		b.appendQueryParameter("app_id", "55524a8eea08b2c432086d32");
 
 		return b.build();
 	}

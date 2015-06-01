@@ -188,4 +188,27 @@ public class RequestGeneralInAppMessage extends RequestInAppMessage<InAppMessage
 	InAppMessageResponse parseTestString() throws RequestException {
 		return parse(is, null);
 	}
+
+	public InAppMessageResponse parseCountlyUri(final InputStream inputStream, Header[] headers) throws RequestException {
+
+		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		DocumentBuilder db;
+		final InAppMessageResponse response = new InAppMessageResponse();
+
+		try {
+			db = dbf.newDocumentBuilder();
+			InputSource src = new InputSource(inputStream);
+
+			String sResponse = convertStreamToString(inputStream);
+			Log.i("InAppMessage RequestPerform HTTP Response: " + sResponse);
+
+		} catch (final ParserConfigurationException e) {
+			throw new RequestException("Cannot parse Response", e);
+		} catch (final Throwable t) {
+			throw new RequestException("Cannot read Response", t);
+		}
+
+		return response;
+	}
+
 }
