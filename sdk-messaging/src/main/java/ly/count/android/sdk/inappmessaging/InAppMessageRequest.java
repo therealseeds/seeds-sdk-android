@@ -172,84 +172,85 @@ public class InAppMessageRequest {
 		this.userAgent2 = userAgent;
 	}
 
-	@Override
-	public String toString() {
-
-		return this.toUri().toString();
-	}
+//	@Override
+//	public String toString() {
+//
+//		return this.toUri().toString();
+//	}
 
 	public String countlyUriToString() {
 		return this.toCountlyUri().toString();
 	}
 
-	public Uri toUri() {
-		final Uri.Builder b = Uri.parse(this.getRequestURL()).buildUpon();
-		Random r = new Random();
-		int random = r.nextInt(50000);
-		
-		b.appendQueryParameter("rt", this.getRequestType());
-		b.appendQueryParameter("v", this.getProtocolVersion());
-		b.appendQueryParameter("i", this.getIpAddress());
-		b.appendQueryParameter("u", this.getUserAgent());
-		b.appendQueryParameter("u2", this.getUserAgent2());
-		b.appendQueryParameter("s", this.getPublisherId());
-		b.appendQueryParameter("o_andadvid", androidAdId);
-		b.appendQueryParameter("o_andadvdnt", (adDoNotTrack ? "1" : "0"));
-		b.appendQueryParameter("r_random", Integer.toString(random));
-		b.appendQueryParameter("t", Long.toString(this.getTimestamp()));
-		b.appendQueryParameter("connection_type", this.getConnectionType());
-		b.appendQueryParameter("listads", this.getListAds());
-		b.appendQueryParameter("c_customevents", "1");
-/*		b.appendQueryParameter("c_mraid", "1");*/
-/*		if(isVideoRequest) {
-			b.appendQueryParameter("r_type", "video");
-			b.appendQueryParameter("r_resp", "vast20");
-			if(videoMaxDuration != 0) {
-				b.appendQueryParameter("v_dur_max", Integer.toString(videoMaxDuration));
-			}
-			if(videoMinDuration != 0) {
-				b.appendQueryParameter("v_dur_min", Integer.toString(videoMinDuration));
-			}
-		} else {*/
-			b.appendQueryParameter("r_type", "banner");
-/*		}*/
-		
-		if(userAge != 0) {
-			b.appendQueryParameter("demo_age", Integer.toString(userAge));
-		}
-		
-		if (gender != null) {
-			b.appendQueryParameter("demo_gender", gender.getServerParam());
-		}
-		
-		if(keywords != null && !keywords.isEmpty()) {
-			String parameter = TextUtils.join(", ", keywords);
-			b.appendQueryParameter("demo_keywords", parameter);
-		}
-		
-		b.appendQueryParameter("u_wv", this.getUserAgent());
-		b.appendQueryParameter("u_br", this.getUserAgent());
-		if(longitude != 0 && latitude != 0) {
-			b.appendQueryParameter("longitude", Double.toString(longitude));
-			b.appendQueryParameter("latitude", Double.toString(latitude));
-		}
-		
-		if(adspaceHeight > 0 && adspaceWidth > 0) {
-			if(adspaceStrict) {
-				b.appendQueryParameter("adspace_strict", "1");
-			} else {
-				b.appendQueryParameter("adspace_strict", "0");
-			}
-			b.appendQueryParameter("adspace_width", Integer.toString(adspaceWidth));
-			b.appendQueryParameter("adspace_height", Integer.toString(adspaceHeight));
-		}
+//	public Uri toUri() {
+//		final Uri.Builder b = Uri.parse(this.getRequestURL()).buildUpon();
+//		Random r = new Random();
+//		int random = r.nextInt(50000);
+//
+//		b.appendQueryParameter("rt", this.getRequestType());
+//		b.appendQueryParameter("v", this.getProtocolVersion());
+//		b.appendQueryParameter("i", this.getIpAddress());
+//		b.appendQueryParameter("u", this.getUserAgent());
+//		b.appendQueryParameter("u2", this.getUserAgent2());
+//		b.appendQueryParameter("s", this.getPublisherId());
+//		b.appendQueryParameter("o_andadvid", androidAdId);
+//		b.appendQueryParameter("o_andadvdnt", (adDoNotTrack ? "1" : "0"));
+//		b.appendQueryParameter("r_random", Integer.toString(random));
+//		b.appendQueryParameter("t", Long.toString(this.getTimestamp()));
+//		b.appendQueryParameter("connection_type", this.getConnectionType());
+//		b.appendQueryParameter("listads", this.getListAds());
+//		b.appendQueryParameter("c_customevents", "1");
+///*		b.appendQueryParameter("c_mraid", "1");*/
+///*		if(isVideoRequest) {
+//			b.appendQueryParameter("r_type", "video");
+//			b.appendQueryParameter("r_resp", "vast20");
+//			if(videoMaxDuration != 0) {
+//				b.appendQueryParameter("v_dur_max", Integer.toString(videoMaxDuration));
+//			}
+//			if(videoMinDuration != 0) {
+//				b.appendQueryParameter("v_dur_min", Integer.toString(videoMinDuration));
+//			}
+//		} else {*/
+//			b.appendQueryParameter("r_type", "banner");
+///*		}*/
+//
+//		if(userAge != 0) {
+//			b.appendQueryParameter("demo_age", Integer.toString(userAge));
+//		}
+//
+//		if (gender != null) {
+//			b.appendQueryParameter("demo_gender", gender.getServerParam());
+//		}
+//
+//		if(keywords != null && !keywords.isEmpty()) {
+//			String parameter = TextUtils.join(", ", keywords);
+//			b.appendQueryParameter("demo_keywords", parameter);
+//		}
+//
+//		b.appendQueryParameter("u_wv", this.getUserAgent());
+//		b.appendQueryParameter("u_br", this.getUserAgent());
+//		if(longitude != 0 && latitude != 0) {
+//			b.appendQueryParameter("longitude", Double.toString(longitude));
+//			b.appendQueryParameter("latitude", Double.toString(latitude));
+//		}
+//
+//		if(adspaceHeight > 0 && adspaceWidth > 0) {
+//			if(adspaceStrict) {
+//				b.appendQueryParameter("adspace_strict", "1");
+//			} else {
+//				b.appendQueryParameter("adspace_strict", "0");
+//			}
+//			b.appendQueryParameter("adspace_width", Integer.toString(adspaceWidth));
+//			b.appendQueryParameter("adspace_height", Integer.toString(adspaceHeight));
+//		}
+//
+//		return b.build();
+//	}
 
-		return b.build();
-	}
-
+	//TODO: replace hardcoded parameters
 	public Uri toCountlyUri() {
 		String countlyURL = "http://ec2-52-7-175-75.compute-1.amazonaws.com";
-		String path = "/o/test";
+		String path = "/o/messages";
 		final Uri.Builder b = Uri.parse((countlyURL + path)).buildUpon();
 
 		// api_key=f1d1a9e29c0689bb9591389f46f275e7&app_id=55524a8eea08b2c432086d32

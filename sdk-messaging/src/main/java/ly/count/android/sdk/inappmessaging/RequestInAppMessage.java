@@ -34,97 +34,137 @@ public abstract class RequestInAppMessage<T> {
 
 	InputStream is;
 
+//	public T sendRequest(InAppMessageRequest request)
+//			throws RequestException {
+//
+//		sendCountlyRequest(request);
+//
+//		if (is == null) {
+//			Log.d("Parse Real");
+//			String url = request.toString();
+//			Log.d("InAppMessage RequestPerform HTTP Get Url: " + url);
+//			DefaultHttpClient client = new DefaultHttpClient();
+//			HttpConnectionParams.setSoTimeout(client.getParams(),
+//					Const.SOCKET_TIMEOUT);
+//			HttpConnectionParams.setConnectionTimeout(client.getParams(),
+//					Const.CONNECTION_TIMEOUT);
+//			HttpProtocolParams.setUserAgent(client.getParams(),
+//					request.getUserAgent());
+//			HttpGet get = new HttpGet(url);
+//			get.setHeader("User-Agent", System.getProperty("http.agent"));
+//			HttpResponse response;
+//			try {
+//				response = client.execute(get);
+//				int responseCode = response.getStatusLine().getStatusCode();
+//				if (responseCode == HttpURLConnection.HTTP_OK) {
+//					return parse(response.getEntity().getContent(), response.getAllHeaders()/*, request.isVideoRequest()*/);
+//				} else {
+//					throw new RequestException("Server Error. Response code:"
+//							+ responseCode);
+//				}
+//			} catch (RequestException e) {
+//				throw e;
+//			} catch (ClientProtocolException e) {
+//				throw new RequestException("Error in HTTP request", e);
+//			} catch (IOException e) {
+//				throw new RequestException("Error in HTTP request", e);
+//			} catch (Throwable t) {
+//				throw new RequestException("Error in HTTP request", t);
+//			}
+//		} else {
+//			Log.d("Parse Injected");
+//			return parseTestString();
+//		}
+//
+//	}
+
+
 	public T sendRequest(InAppMessageRequest request)
-			throws RequestException {
-
-		sendCountlyRequest(request);
-
-		if (is == null) {
-			Log.d("Parse Real");
-			String url = request.toString();
-			Log.d("InAppMessage RequestPerform HTTP Get Url: " + url);
-			DefaultHttpClient client = new DefaultHttpClient();
-			HttpConnectionParams.setSoTimeout(client.getParams(),
-					Const.SOCKET_TIMEOUT);
-			HttpConnectionParams.setConnectionTimeout(client.getParams(),
-					Const.CONNECTION_TIMEOUT);
-			HttpProtocolParams.setUserAgent(client.getParams(),
-					request.getUserAgent());
-			HttpGet get = new HttpGet(url);
-			get.setHeader("User-Agent", System.getProperty("http.agent"));
-			HttpResponse response;
-			try {
-				response = client.execute(get);
-				int responseCode = response.getStatusLine().getStatusCode();
-				if (responseCode == HttpURLConnection.HTTP_OK) {
-					return parse(response.getEntity().getContent(), response.getAllHeaders()/*, request.isVideoRequest()*/);
-				} else {
-					throw new RequestException("Server Error. Response code:"
-							+ responseCode);
-				}
-			} catch (RequestException e) {
-				throw e;
-			} catch (ClientProtocolException e) {
-				throw new RequestException("Error in HTTP request", e);
-			} catch (IOException e) {
-				throw new RequestException("Error in HTTP request", e);
-			} catch (Throwable t) {
-				throw new RequestException("Error in HTTP request", t);
-			}
-		} else {
-			Log.d("Parse Injected");
-			return parseTestString();
-		}
-
-	}
-
-
-	public T sendCountlyRequest(InAppMessageRequest request)
 			throws RequestException {
 
 		Log.i("sendCountlyRequest");
 
-			Log.d("Parse Real"); // log.d not working?
-			String url = request.countlyUriToString();
+		Log.d("Parse Real"); // log.d not working?
+		String url = request.countlyUriToString();
 
-			Log.i("InAppMessage RequestPerform HTTP Get Url: " + url);
-			DefaultHttpClient client = new DefaultHttpClient();
-			HttpConnectionParams.setSoTimeout(client.getParams(),
-					Const.SOCKET_TIMEOUT);
-			HttpConnectionParams.setConnectionTimeout(client.getParams(),
-					Const.CONNECTION_TIMEOUT);
-			HttpProtocolParams.setUserAgent(client.getParams(),
-					request.getUserAgent());
-			HttpGet get = new HttpGet(url);
-			get.setHeader("User-Agent", System.getProperty("http.agent"));
-			HttpResponse response;
-			try {
-				response = client.execute(get);
-				int responseCode = response.getStatusLine().getStatusCode();
-				if (responseCode == HttpURLConnection.HTTP_OK) {
-					return parseCountlyUri(response.getEntity().getContent(), response.getAllHeaders()/*, request.isVideoRequest()*/);
-				} else {
-					throw new RequestException("Server Error. Response code:"
-							+ responseCode);
-				}
-			} catch (RequestException e) {
-				throw e;
-			} catch (ClientProtocolException e) {
-				throw new RequestException("Error in HTTP request", e);
-			} catch (IOException e) {
-				throw new RequestException("Error in HTTP request", e);
-			} catch (Throwable t) {
-				throw new RequestException("Error in HTTP request", t);
+		Log.i("InAppMessage RequestPerform HTTP Get Url: " + url);
+		DefaultHttpClient client = new DefaultHttpClient();
+		HttpConnectionParams.setSoTimeout(client.getParams(),
+				Const.SOCKET_TIMEOUT);
+		HttpConnectionParams.setConnectionTimeout(client.getParams(),
+				Const.CONNECTION_TIMEOUT);
+		HttpProtocolParams.setUserAgent(client.getParams(),
+				request.getUserAgent());
+		HttpGet get = new HttpGet(url);
+		get.setHeader("User-Agent", System.getProperty("http.agent"));
+		HttpResponse response;
+		try {
+			response = client.execute(get);
+			int responseCode = response.getStatusLine().getStatusCode();
+			if (responseCode == HttpURLConnection.HTTP_OK) {
+				return parseCountlyJSON(response.getEntity().getContent(), response.getAllHeaders());
+			} else {
+				throw new RequestException("Server Error. Response code:"
+						+ responseCode);
 			}
-
+		} catch (RequestException e) {
+			throw e;
+		} catch (ClientProtocolException e) {
+			throw new RequestException("Error in HTTP request", e);
+		} catch (IOException e) {
+			throw new RequestException("Error in HTTP request", e);
+		} catch (Throwable t) {
+			throw new RequestException("Error in HTTP request", t);
+		}
 
 	}
+
+//	public T sendCountlyRequest(InAppMessageRequest request)
+//			throws RequestException {
+//
+//		Log.i("sendCountlyRequest");
+//
+//		Log.d("Parse Real"); // log.d not working?
+//		String url = request.countlyUriToString();
+//
+//		Log.i("InAppMessage RequestPerform HTTP Get Url: " + url);
+//		DefaultHttpClient client = new DefaultHttpClient();
+//		HttpConnectionParams.setSoTimeout(client.getParams(),
+//				Const.SOCKET_TIMEOUT);
+//		HttpConnectionParams.setConnectionTimeout(client.getParams(),
+//				Const.CONNECTION_TIMEOUT);
+//		HttpProtocolParams.setUserAgent(client.getParams(),
+//				request.getUserAgent());
+//		HttpGet get = new HttpGet(url);
+//		get.setHeader("User-Agent", System.getProperty("http.agent"));
+//		HttpResponse response;
+//		try {
+//			response = client.execute(get);
+//			int responseCode = response.getStatusLine().getStatusCode();
+//			if (responseCode == HttpURLConnection.HTTP_OK) {
+//				return parseCountlyUri(response.getEntity().getContent(), response.getAllHeaders()/*, request.isVideoRequest()*/);
+//			} else {
+//				throw new RequestException("Server Error. Response code:"
+//						+ responseCode);
+//			}
+//		} catch (RequestException e) {
+//			throw e;
+//		} catch (ClientProtocolException e) {
+//			throw new RequestException("Error in HTTP request", e);
+//		} catch (IOException e) {
+//			throw new RequestException("Error in HTTP request", e);
+//		} catch (Throwable t) {
+//			throw new RequestException("Error in HTTP request", t);
+//		}
+//
+//
+//	}
 
 
 	abstract T parseTestString() throws RequestException;
 
 	abstract T parse(InputStream inputStream, Header[] headers/*, boolean isVideo*/) throws RequestException;
 
-	abstract T parseCountlyUri(InputStream inputStream, Header[] headers) throws RequestException;
+	abstract T parseCountlyJSON(InputStream inputStream, Header[] headers) throws RequestException;
 
 }

@@ -28,6 +28,10 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import javax.json.Json;
+import javax.json.JsonReader;
+import javax.json.JsonObject;
+
 import org.apache.http.Header;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -115,6 +119,7 @@ public class RequestGeneralInAppMessage extends RequestInAppMessage<InAppMessage
 		try {
 				db = dbf.newDocumentBuilder();
 				InputSource src = new InputSource(inputStream);
+
 				if (Log.LOG_AD_RESPONSES) {
 					String sResponse = convertStreamToString(inputStream);
 					Log.d("InAppMessage RequestPerform HTTP Response: " + sResponse);
@@ -181,6 +186,10 @@ public class RequestGeneralInAppMessage extends RequestInAppMessage<InAppMessage
 			throw new RequestException("Cannot read Response", t);
 		}
 
+		response.setText("<body style=\"text-align:center;margin:0;padding:0;\"><a href=\"http://account.mobfox.com/activation-info.php\" target=\"_self\"><img src=\"http://ec2-52-7-175-75.compute-1.amazonaws.com/o/image?api_key=f1d1a9e29c0689bb9591389f46f275e7&app_id=55524a8eea08b2c432086d32\" border=\"0\"/></a></body>");
+		Log.i("InAppMessage getText: " + response.getText());
+		Log.i("InAppMessage getImageURL: " + response.getImageUrl());
+		Log.i("InAppMessage return response: " + response);
 		return response;
 	}
 
@@ -189,25 +198,57 @@ public class RequestGeneralInAppMessage extends RequestInAppMessage<InAppMessage
 		return parse(is, null);
 	}
 
-	public InAppMessageResponse parseCountlyUri(final InputStream inputStream, Header[] headers) throws RequestException {
+//	public InAppMessageResponse parseCountlyUri(final InputStream inputStream, Header[] headers) throws RequestException {
+//
+//		final InAppMessageResponse response = new InAppMessageResponse();
+//
+//		try {
+//
+//			String sResponse = convertStreamToString(inputStream);
+//			//Log.i("InAppMessage RequestPerform HTTP Response: " + sResponse);
+//
+//		} catch (final Throwable t) {
+//			throw new RequestException("Cannot read Response", t);
+//		}
+//
+//		return response;
+//	}
 
-		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		DocumentBuilder db;
+	public InAppMessageResponse parseCountlyJSON(final InputStream inputStream, Header[] headers) throws RequestException {
+
+		Log.i("Starting parseCountlyJSON");
+
 		final InAppMessageResponse response = new InAppMessageResponse();
 
+		response.setType(Const.TEXT);
+
+//		String skipOverlay = this.getAttribute(doc, "htmlString", "skipoverlaybutton");
+//		if (skipOverlay != null) {
+//			response.setSkipOverlay(Integer.parseInt(skipOverlay));
+//		}
+		final ClickType clickType = ClickType.getValue("inapp");
+		response.setClickType(clickType);
+		response.setRefresh(60);
+		response.setScale(false);
+		response.setSkipPreflight(true);
 		try {
-			db = dbf.newDocumentBuilder();
-			InputSource src = new InputSource(inputStream);
 
-			String sResponse = convertStreamToString(inputStream);
-			Log.i("InAppMessage RequestPerform HTTP Response: " + sResponse);
+			//String sResponse = convertStreamToString(inputStream);
+			//Log.i("InAppMessage RequestPerform HTTP Response: " + sResponse);
+			JsonReader jsonReader = Json.createReader(inputStream);
+			JsonObject jsonObject = jsonReader.readObject();
 
-		} catch (final ParserConfigurationException e) {
-			throw new RequestException("Cannot parse Response", e);
+			response.setText(jsonObject.getString("htmlString"));
+			response.setClickUrl(jsonObject.getString("clickurl"));
+
+			jsonReader.close();
+
 		} catch (final Throwable t) {
+			Log.e(t.toString());
 			throw new RequestException("Cannot read Response", t);
 		}
 
+		Log.i("InAppMessageResponse: " + response);
 		return response;
 	}
 

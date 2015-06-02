@@ -28,7 +28,8 @@ public final class Log {
 	public static final boolean LOG_AD_RESPONSES = false;
 
 	public static boolean isLoggable(int logLevel) {
-		return android.util.Log.isLoggable(TAG, logLevel);
+//		return android.util.Log.isLoggable(TAG, logLevel);
+		return true;
 	}
 
 	public static void d(final String msg) {

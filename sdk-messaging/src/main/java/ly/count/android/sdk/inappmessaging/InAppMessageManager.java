@@ -53,6 +53,8 @@ public class InAppMessageManager {
 	private int userAge;
 	private List<String> keywords;
 
+
+	//TODO: remove these later
 	private static final String MOB_FOX_PUB_ID = "86e0aa6e7fbd2cdb02ec15e338d6b722";
 	private static final String MOB_FOX_AD_URL = "http://my.mobfox.com/request.php";
 
@@ -148,7 +150,10 @@ public class InAppMessageManager {
 								mResponse = requestAd.sendRequest(request);
 							}
 						}
-						
+
+						//TODO: remove debug code
+						Log.i("mResponse is: " + mResponse);
+
 						if (mResponse.getType() == Const.TEXT ||  mResponse.getType() == Const.IMAGE) {
 							notifyAdLoaded(mResponse);
 						} else if (mResponse.getType() == Const.NO_AD) {
