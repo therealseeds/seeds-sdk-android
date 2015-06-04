@@ -44,10 +44,6 @@ public class InAppMessageRequest {
 	private int userAge;
 	private List<String> keywords;
 	
-/*	private int videoMinDuration;
-	private int videoMaxDuration;
-	private boolean isVideoRequest;*/
-
 	private String ipAddress;
 	private String androidAdId = "";
 	private boolean adDoNotTrack = false;
@@ -253,10 +249,10 @@ public class InAppMessageRequest {
 		String path = "/o/messages";
 		final Uri.Builder b = Uri.parse((countlyURL + path)).buildUpon();
 
-		// api_key=f1d1a9e29c0689bb9591389f46f275e7&app_id=55524a8eea08b2c432086d32
-
 		b.appendQueryParameter("api_key", "f1d1a9e29c0689bb9591389f46f275e7");
 		b.appendQueryParameter("app_id", "55524a8eea08b2c432086d32");
+		b.appendQueryParameter("orientation", "portrait");
+		b.appendQueryParameter("deviceCategory", "AndroidPhone");
 
 		return b.build();
 	}
