@@ -63,7 +63,7 @@ public class MainActivity extends Activity implements InAppMessageListener {
             }
         }, 10000);
 
-        manager = new InAppMessageManager(this);
+        manager = new InAppMessageManager(this, YOUR_SERVER, YOUR_APP_KEY);
         manager.setListener(this);
         manager.requestInAppMessage();
 

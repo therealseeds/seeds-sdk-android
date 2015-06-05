@@ -35,7 +35,7 @@ public class InAppMessageManager {
 
 	private static HashMap<Long, InAppMessageManager> sRunningAds = new HashMap<Long, InAppMessageManager>();
 
-	private String mPublisherId;
+	private String mAppKey;
 	private String androidAdId;
 	private boolean adDoNotTrack;
 	private boolean mIncludeLocation;
@@ -54,9 +54,6 @@ public class InAppMessageManager {
 	private List<String> keywords;
 
 
-	//TODO: remove these later
-	private static final String MOB_FOX_PUB_ID = "86e0aa6e7fbd2cdb02ec15e338d6b722";
-	private static final String MOB_FOX_AD_URL = "http://my.mobfox.com/request.php";
 
 	public static InAppMessageManager getAdManager(InAppMessageResponse ad) {
 		InAppMessageManager inAppMessageManager = sRunningAds.remove(ad.getTimestamp());
@@ -83,16 +80,16 @@ public class InAppMessageManager {
 		}
 	}
 
-	public InAppMessageManager(Context ctx) throws IllegalArgumentException {
-		this(ctx, MOB_FOX_AD_URL, MOB_FOX_PUB_ID, false);
+	public InAppMessageManager(Context ctx, String serverUrl, String appKey) throws IllegalArgumentException {
+		this(ctx, serverUrl, appKey, false);
 	}
 
 
-	public InAppMessageManager(Context ctx, final String interstitialRequestURL, final String publisherId, final boolean includeLocation) throws IllegalArgumentException {
+	public InAppMessageManager(Context ctx, final String interstitialRequestURL, final String appKey, final boolean includeLocation) throws IllegalArgumentException {
 		Util.prepareAndroidAdId(ctx);
 		InAppMessageManager.setmContext(ctx);
 		this.interstitialRequestURL = interstitialRequestURL;
-		this.mPublisherId = publisherId;
+		this.mAppKey = appKey;
 		this.mIncludeLocation = includeLocation;
 		this.mRequestThread = null;
 		this.mHandler = new Handler();
@@ -318,12 +315,12 @@ public class InAppMessageManager {
 		this.androidAdId = Util.getAndroidAdId();
 		this.adDoNotTrack = Util.hasAdDoNotTrack();
 
-		if ((mPublisherId == null) || (mPublisherId.length() == 0)) {
+		if ((mAppKey == null) || (mAppKey.length() == 0)) {
 			Log.e("Publisher Id cannot be null or empty");
 			throw new IllegalArgumentException("User Id cannot be null or empty");
 		}
 
-		Log.d("InAppMessageManager Publisher Id:" + mPublisherId + " Advertising Id:" + androidAdId);
+		Log.d("InAppMessageManager Publisher Id:" + mAppKey + " Advertising Id:" + androidAdId);
 		mEnabled = (Util.getMemoryClass(getContext()) > 16);
 	}
 
@@ -394,7 +391,7 @@ public class InAppMessageManager {
 			this.request = new InAppMessageRequest();
 			request.setAndroidAdId(androidAdId);
 			request.setAdDoNotTrack(adDoNotTrack);
-			this.request.setPublisherId(this.mPublisherId);
+			this.request.setAppKey(this.mAppKey);
 			this.request.setUserAgent(Util.getDefaultUserAgentString(mContext));
 			this.request.setUserAgent2(Util.buildUserAgent());
 		}

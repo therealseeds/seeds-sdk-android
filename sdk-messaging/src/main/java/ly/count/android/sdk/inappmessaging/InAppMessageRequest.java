@@ -19,11 +19,9 @@
 package ly.count.android.sdk.inappmessaging;
 
 import java.util.List;
-import java.util.Random;
 
 import android.net.Uri;
 import android.os.Build;
-import android.text.TextUtils;
 
 public class InAppMessageRequest {
 	private static final String REQUEST_TYPE_ANDROID = "android_app";
@@ -34,7 +32,7 @@ public class InAppMessageRequest {
 	private String listAds;
 	private String requestURL;
 	private String protocolVersion;
-	private String publisherId;
+	private String appKey;
 	private double longitude = 0.0;
 	private double latitude = 0.0;
 	private boolean adspaceStrict;
@@ -43,7 +41,7 @@ public class InAppMessageRequest {
 	private Gender gender;
 	private int userAge;
 	private List<String> keywords;
-	
+
 	private String ipAddress;
 	private String androidAdId = "";
 	private boolean adDoNotTrack = false;
@@ -96,10 +94,10 @@ public class InAppMessageRequest {
 			return this.protocolVersion;
 	}
 
-	public String getPublisherId() {
-		if (this.publisherId == null)
+	public String getAppKey() {
+		if (this.appKey == null)
 			return "";
-		return this.publisherId;
+		return this.appKey;
 	}
 
 	public String getRequestType() {
@@ -152,8 +150,8 @@ public class InAppMessageRequest {
 		this.protocolVersion = protocolVersion;
 	}
 
-	public void setPublisherId(final String publisherId) {
-		this.publisherId = publisherId;
+	public void setAppKey(final String appKey) {
+		this.appKey = appKey;
 	}
 
 	public void setTimestamp(final long timestamp) {
@@ -188,7 +186,7 @@ public class InAppMessageRequest {
 //		b.appendQueryParameter("i", this.getIpAddress());
 //		b.appendQueryParameter("u", this.getUserAgent());
 //		b.appendQueryParameter("u2", this.getUserAgent2());
-//		b.appendQueryParameter("s", this.getPublisherId());
+//		b.appendQueryParameter("s", this.getAppKey());
 //		b.appendQueryParameter("o_andadvid", androidAdId);
 //		b.appendQueryParameter("o_andadvdnt", (adDoNotTrack ? "1" : "0"));
 //		b.appendQueryParameter("r_random", Integer.toString(random));
@@ -245,14 +243,13 @@ public class InAppMessageRequest {
 
 	//TODO: replace hardcoded parameters
 	public Uri toCountlyUri() {
-		String countlyURL = "http://ec2-52-7-175-75.compute-1.amazonaws.com";
+		String countlyURL = requestURL;
 		String path = "/o/messages";
 		final Uri.Builder b = Uri.parse((countlyURL + path)).buildUpon();
 
-		b.appendQueryParameter("api_key", "f1d1a9e29c0689bb9591389f46f275e7");
-		b.appendQueryParameter("app_id", "55524a8eea08b2c432086d32");
+		b.appendQueryParameter("app_key", appKey);
 		b.appendQueryParameter("orientation", "portrait");
-		b.appendQueryParameter("deviceCategory", "AndroidPhone");
+		b.appendQueryParameter("deviceCategory", "androidPhone");
 
 		return b.build();
 	}
