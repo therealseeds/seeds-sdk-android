@@ -13,11 +13,14 @@ import android.widget.Button;
 
 import ly.count.android.sdk.Countly;
 import ly.count.android.sdk.DeviceId;
+
+import ly.count.android.sdk.messaging.CountlyMessaging;
+import ly.count.android.sdk.messaging.Message;
+
 import ly.count.android.sdk.inappmessaging.InAppMessage;
 import ly.count.android.sdk.inappmessaging.InAppMessageListener;
 import ly.count.android.sdk.inappmessaging.InAppMessageManager;
-import ly.count.android.sdk.messaging.CountlyMessaging;
-import ly.count.android.sdk.messaging.Message;
+
 
 public class MainActivity extends Activity implements InAppMessageListener {
 
@@ -44,8 +47,15 @@ public class MainActivity extends Activity implements InAppMessageListener {
         Countly.sharedInstance()
                 .init(this, YOUR_SERVER, YOUR_APP_KEY, null, DeviceId.Type.ADVERTISING_ID)
                 .initMessaging(this, MainActivity.class, GCM_PROJECT_NUM, Countly.CountlyMessagingMode.TEST)
+                .initInAppMessaging(this)
 //                .setLocation(LATITUDE, LONGITUDE);
                 .setLoggingEnabled(true);
+
+
+        //InAppMessageManager.sharedInstance().init(this, YOUR_SERVER, YOUR_APP_KEY);
+        manager = InAppMessageManager.sharedInstance();
+        manager.setListener(this);
+        //manager.requestInAppMessage();
 
         Countly.sharedInstance().recordEvent("test", 1);
 
@@ -62,10 +72,6 @@ public class MainActivity extends Activity implements InAppMessageListener {
                 Countly.sharedInstance().recordEvent("test3");
             }
         }, 10000);
-
-        manager = new InAppMessageManager(this, YOUR_SERVER, YOUR_APP_KEY);
-        manager.setListener(this);
-        manager.requestInAppMessage();
 
     }
 

@@ -25,11 +25,14 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.HashMap;
 import java.util.List;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.location.Location;
 import android.os.Handler;
+
+import ly.count.android.sdk.DeviceId;
 
 public class InAppMessageManager {
 
@@ -54,6 +57,28 @@ public class InAppMessageManager {
 	private List<String> keywords;
 
 
+	// see http://stackoverflow.com/questions/7048198/thread-safe-singletons-in-java
+	private static class SingletonHolder {
+		static final InAppMessageManager instance = new InAppMessageManager();
+	}
+
+	/**
+	 * Returns the Countly singleton.
+	 */
+	public static InAppMessageManager sharedInstance() {
+		return SingletonHolder.instance;
+	}
+
+	public void init(Context ctx, final String interstitialRequestURL, final String appKey, String deviceID, DeviceId.Type idMode) {
+		//Util.prepareAndroidAdId(ctx);
+		InAppMessageManager.setmContext(ctx);
+		sharedInstance().interstitialRequestURL = interstitialRequestURL;
+		sharedInstance().mAppKey = appKey;
+		//this.mIncludeLocation = includeLocation;
+		sharedInstance().mRequestThread = null;
+		sharedInstance().mHandler = new Handler();
+		//return this;
+	}
 
 	public static InAppMessageManager getAdManager(InAppMessageResponse ad) {
 		InAppMessageManager inAppMessageManager = sRunningAds.remove(ad.getTimestamp());
@@ -78,6 +103,9 @@ public class InAppMessageManager {
 		if (inAppMessageManager != null) {
 			inAppMessageManager.notifyAdClicked();
 		}
+	}
+
+	public InAppMessageManager() {
 	}
 
 	public InAppMessageManager(Context ctx, String serverUrl, String appKey) throws IllegalArgumentException {
@@ -427,7 +455,19 @@ public class InAppMessageManager {
 		request.setTimestamp(System.currentTimeMillis());
 
 		this.request.setRequestURL(interstitialRequestURL);
+		this.request.setOrientation(getOrientation());
 		return this.request;
+	}
+
+	private String getOrientation() {
+		if (mContext.getResources().getConfiguration().orientation == mContext.getResources().getConfiguration().ORIENTATION_LANDSCAPE) {
+			return "landscape";
+		} else if (mContext.getResources().getConfiguration().orientation == mContext.getResources().getConfiguration().ORIENTATION_PORTRAIT) {
+			return "portrait";
+		} else {
+			Log.e("Unable to get orientation");
+			return "";
+		}
 	}
 
 	private Context getContext() {

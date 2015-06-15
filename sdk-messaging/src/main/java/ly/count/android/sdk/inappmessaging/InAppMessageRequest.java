@@ -20,8 +20,14 @@ package ly.count.android.sdk.inappmessaging;
 
 import java.util.List;
 
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
+
+import 	android.content.res.Resources;
+
+import ly.count.android.sdk.Countly;
+import ly.count.android.sdk.DeviceId;
 
 public class InAppMessageRequest {
 	private static final String REQUEST_TYPE_ANDROID = "android_app";
@@ -47,6 +53,8 @@ public class InAppMessageRequest {
 	private boolean adDoNotTrack = false;
 	private String connectionType;
 	private long timestamp;
+
+	private String orientation;
 
 	public String getAndroidVersion() {
 		return Build.VERSION.RELEASE;
@@ -241,15 +249,15 @@ public class InAppMessageRequest {
 //		return b.build();
 //	}
 
-	//TODO: replace hardcoded parameters
+	//TODO: make sure "deviceCategory" gets to server code
 	public Uri toCountlyUri() {
 		String countlyURL = requestURL;
 		String path = "/o/messages";
 		final Uri.Builder b = Uri.parse((countlyURL + path)).buildUpon();
 
 		b.appendQueryParameter("app_key", appKey);
-		b.appendQueryParameter("orientation", "portrait");
-		b.appendQueryParameter("deviceCategory", "androidPhone");
+		//b.appendQueryParameter("device_id", Countly.sharedInstance())
+		b.appendQueryParameter("orientation", orientation);
 
 		return b.build();
 	}
@@ -302,30 +310,38 @@ public class InAppMessageRequest {
 		this.adDoNotTrack = adDoNotTrack;
 	}
 
-/*	public boolean isVideoRequest() {
-		return isVideoRequest;
+	public String getOrientation() {
+		return orientation;
 	}
 
-	public void setVideoRequest(boolean isVideoRequest) {
-		this.isVideoRequest = isVideoRequest;
+	public void setOrientation(String orientation) {
+		this.orientation = orientation;
 	}
 
-	public int getVideoMinDuration() {
-		return videoMinDuration;
-	}
+	/*	public boolean isVideoRequest() {
+            return isVideoRequest;
+        }
 
-	public void setVideoMinDuration(int videoMinDuration) {
-		this.videoMinDuration = videoMinDuration;
-	}
+        public void setVideoRequest(boolean isVideoRequest) {
+            this.isVideoRequest = isVideoRequest;
+        }
 
-	public int getVideoMaxDuration() {
-		return videoMaxDuration;
-	}
+        public int getVideoMinDuration() {
+            return videoMinDuration;
+        }
 
-	public void setVideoMaxDuration(int videoMaxDuration) {
-		this.videoMaxDuration = videoMaxDuration;
-	}
-*/
+        public void setVideoMinDuration(int videoMinDuration) {
+            this.videoMinDuration = videoMinDuration;
+        }
+
+        public int getVideoMaxDuration() {
+            return videoMaxDuration;
+        }
+
+        public void setVideoMaxDuration(int videoMaxDuration) {
+            this.videoMaxDuration = videoMaxDuration;
+        }
+    */
 	public void setGender(Gender gender) {
 		this.gender = gender;
 	}

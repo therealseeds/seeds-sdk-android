@@ -34,6 +34,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+
 /**
  * This class is the public API for the Countly Android SDK.
  * Get more details <a href="https://github.com/Countly/countly-sdk-android">here</a>.
@@ -265,6 +266,23 @@ public class Countly {
 
         if (MessagingAdapter.isMessagingAvailable()) {
             MessagingAdapter.storeConfiguration(connectionQueue_.getContext(), connectionQueue_.getServerURL(), connectionQueue_.getAppKey(), connectionQueue_.getDeviceId().getId(), connectionQueue_.getDeviceId().getType());
+        }
+
+        return this;
+    }
+
+    /**
+     * Initializes the Countly InAppMessaging part of the MessagingSDK. Call from your main Activity's onCreate() method.
+     * @param activity application activity which acts as a final destination for notifications
+     * @return Countly instance for easy method chaining
+     */
+
+    public synchronized Countly initInAppMessaging(Activity activity) {
+
+        if (!InAppMessagingAdapter.isInAppMessagingAvailable()) {
+            throw new IllegalStateException("you need to include countly-messaging-sdk-android library instead of countly-sdk-android if you want to use Countly Messaging");
+        } else {
+            InAppMessagingAdapter.init(connectionQueue_.getContext(), connectionQueue_.getServerURL(), connectionQueue_.getAppKey(), connectionQueue_.getDeviceId().getId(), connectionQueue_.getDeviceId().getType());
         }
 
         return this;
