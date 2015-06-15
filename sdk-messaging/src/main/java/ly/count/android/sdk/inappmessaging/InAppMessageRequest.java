@@ -39,6 +39,25 @@ public class InAppMessageRequest {
 	private String requestURL;
 	private String protocolVersion;
 	private String appKey;
+	private String deviceId;
+	private DeviceId.Type idMode;
+
+	public String getDeviceId() {
+		return deviceId;
+	}
+
+	public void setDeviceId(String deviceId) {
+		this.deviceId = deviceId;
+	}
+
+	public DeviceId.Type getIdMode() {
+		return idMode;
+	}
+
+	public void setIdMode(DeviceId.Type idMode) {
+		this.idMode = idMode;
+	}
+
 	private double longitude = 0.0;
 	private double latitude = 0.0;
 	private boolean adspaceStrict;
@@ -55,6 +74,10 @@ public class InAppMessageRequest {
 	private long timestamp;
 
 	private String orientation;
+
+	public InAppMessageRequest() {
+
+	}
 
 	public String getAndroidVersion() {
 		return Build.VERSION.RELEASE;
@@ -256,8 +279,9 @@ public class InAppMessageRequest {
 		final Uri.Builder b = Uri.parse((countlyURL + path)).buildUpon();
 
 		b.appendQueryParameter("app_key", appKey);
-		//b.appendQueryParameter("device_id", Countly.sharedInstance())
 		b.appendQueryParameter("orientation", orientation);
+		b.appendQueryParameter("device_id", deviceId);
+		b.appendQueryParameter("device_id_type", idMode.toString());
 
 		return b.build();
 	}

@@ -50,6 +50,8 @@ public class InAppMessageManager {
 	private boolean mEnabled = true;
 	private InAppMessageResponse mResponse;
 	private String interstitialRequestURL;
+	private String mDeviceID;
+	private DeviceId.Type mIdMode;
 	private boolean alreadyRequestedInterstitial;
 	private boolean requestedHorizontalAd;
 	private Gender userGender;
@@ -63,17 +65,19 @@ public class InAppMessageManager {
 	}
 
 	/**
-	 * Returns the Countly singleton.
+	 * Returns the InAppMessageManager singleton.
 	 */
 	public static InAppMessageManager sharedInstance() {
 		return SingletonHolder.instance;
 	}
 
-	public void init(Context ctx, final String interstitialRequestURL, final String appKey, String deviceID, DeviceId.Type idMode) {
+	public void init(Context ctx, final String interstitialRequestURL, final String appKey, final String deviceID, final DeviceId.Type idMode) {
 		//Util.prepareAndroidAdId(ctx);
 		InAppMessageManager.setmContext(ctx);
-		sharedInstance().interstitialRequestURL = interstitialRequestURL;
-		sharedInstance().mAppKey = appKey;
+		this.interstitialRequestURL = interstitialRequestURL;
+		mAppKey = appKey;
+		mDeviceID= deviceID;
+		mIdMode = idMode;
 		//this.mIncludeLocation = includeLocation;
 		sharedInstance().mRequestThread = null;
 		sharedInstance().mHandler = new Handler();
@@ -105,24 +109,24 @@ public class InAppMessageManager {
 		}
 	}
 
-	public InAppMessageManager() {
+	private InAppMessageManager() {
 	}
 
-	public InAppMessageManager(Context ctx, String serverUrl, String appKey) throws IllegalArgumentException {
-		this(ctx, serverUrl, appKey, false);
-	}
+//	public InAppMessageManager(Context ctx, String serverUrl, String appKey) throws IllegalArgumentException {
+//		this(ctx, serverUrl, appKey, false);
+//	}
 
 
-	public InAppMessageManager(Context ctx, final String interstitialRequestURL, final String appKey, final boolean includeLocation) throws IllegalArgumentException {
-		Util.prepareAndroidAdId(ctx);
-		InAppMessageManager.setmContext(ctx);
-		this.interstitialRequestURL = interstitialRequestURL;
-		this.mAppKey = appKey;
-		this.mIncludeLocation = includeLocation;
-		this.mRequestThread = null;
-		this.mHandler = new Handler();
-		initialize();
-	}
+//	public InAppMessageManager(Context ctx, final String interstitialRequestURL, final String appKey, final boolean includeLocation) throws IllegalArgumentException {
+//		Util.prepareAndroidAdId(ctx);
+//		InAppMessageManager.setmContext(ctx);
+//		this.interstitialRequestURL = interstitialRequestURL;
+//		this.mAppKey = appKey;
+//		this.mIncludeLocation = includeLocation;
+//		this.mRequestThread = null;
+//		this.mHandler = new Handler();
+//		initialize();
+//	}
 
 	public void setListener(InAppMessageListener listener) {
 		this.mListener = listener;
@@ -419,9 +423,8 @@ public class InAppMessageManager {
 			this.request = new InAppMessageRequest();
 			request.setAndroidAdId(androidAdId);
 			request.setAdDoNotTrack(adDoNotTrack);
-			this.request.setAppKey(this.mAppKey);
-			this.request.setUserAgent(Util.getDefaultUserAgentString(mContext));
-			this.request.setUserAgent2(Util.buildUserAgent());
+			request.setUserAgent(Util.getDefaultUserAgentString(mContext));
+			request.setUserAgent2(Util.buildUserAgent());
 		}
 		Location location = null;
 		request.setGender(userGender);
@@ -454,9 +457,12 @@ public class InAppMessageManager {
 		request.setIpAddress(Util.getLocalIpAddress());
 		request.setTimestamp(System.currentTimeMillis());
 
-		this.request.setRequestURL(interstitialRequestURL);
-		this.request.setOrientation(getOrientation());
-		return this.request;
+		request.setRequestURL(interstitialRequestURL);
+		request.setOrientation(getOrientation());
+		request.setAppKey(mAppKey);
+		request.setDeviceId(mDeviceID);
+		request.setIdMode(mIdMode);
+		return request;
 	}
 
 	private String getOrientation() {
