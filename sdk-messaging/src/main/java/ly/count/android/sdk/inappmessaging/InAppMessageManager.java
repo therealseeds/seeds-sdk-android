@@ -72,7 +72,7 @@ public class InAppMessageManager {
 	}
 
 	public void init(Context ctx, final String interstitialRequestURL, final String appKey, final String deviceID, final DeviceId.Type idMode) {
-		//Util.prepareAndroidAdId(ctx);
+		Util.prepareAndroidAdId(ctx);
 		InAppMessageManager.setmContext(ctx);
 		this.interstitialRequestURL = interstitialRequestURL;
 		mAppKey = appKey;
@@ -421,7 +421,7 @@ public class InAppMessageManager {
 	private InAppMessageRequest getInterstitialRequest() {
 		if (this.request == null) {
 			this.request = new InAppMessageRequest();
-			request.setAndroidAdId(androidAdId);
+
 			request.setAdDoNotTrack(adDoNotTrack);
 			request.setUserAgent(Util.getDefaultUserAgentString(mContext));
 			request.setUserAgent2(Util.buildUserAgent());

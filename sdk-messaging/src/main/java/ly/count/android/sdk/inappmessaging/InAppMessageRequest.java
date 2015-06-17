@@ -42,22 +42,6 @@ public class InAppMessageRequest {
 	private String deviceId;
 	private DeviceId.Type idMode;
 
-	public String getDeviceId() {
-		return deviceId;
-	}
-
-	public void setDeviceId(String deviceId) {
-		this.deviceId = deviceId;
-	}
-
-	public DeviceId.Type getIdMode() {
-		return idMode;
-	}
-
-	public void setIdMode(DeviceId.Type idMode) {
-		this.idMode = idMode;
-	}
-
 	private double longitude = 0.0;
 	private double latitude = 0.0;
 	private boolean adspaceStrict;
@@ -75,9 +59,22 @@ public class InAppMessageRequest {
 
 	private String orientation;
 
-	public InAppMessageRequest() {
-
+	public String getDeviceId() {
+		return deviceId;
 	}
+
+	public void setDeviceId(String deviceId) {
+		this.deviceId = deviceId;
+	}
+
+	public DeviceId.Type getIdMode() {
+		return idMode;
+	}
+
+	public void setIdMode(DeviceId.Type idMode) {
+		this.idMode = idMode;
+	}
+
 
 	public String getAndroidVersion() {
 		return Build.VERSION.RELEASE;
@@ -155,8 +152,6 @@ public class InAppMessageRequest {
 		this.connectionType = connectionType;
 	}
 
-
-
 	public void setHeaders(final String headers) {
 		this.headers = headers;
 	}
@@ -207,70 +202,6 @@ public class InAppMessageRequest {
 		return this.toCountlyUri().toString();
 	}
 
-//	public Uri toUri() {
-//		final Uri.Builder b = Uri.parse(this.getRequestURL()).buildUpon();
-//		Random r = new Random();
-//		int random = r.nextInt(50000);
-//
-//		b.appendQueryParameter("rt", this.getRequestType());
-//		b.appendQueryParameter("v", this.getProtocolVersion());
-//		b.appendQueryParameter("i", this.getIpAddress());
-//		b.appendQueryParameter("u", this.getUserAgent());
-//		b.appendQueryParameter("u2", this.getUserAgent2());
-//		b.appendQueryParameter("s", this.getAppKey());
-//		b.appendQueryParameter("o_andadvid", androidAdId);
-//		b.appendQueryParameter("o_andadvdnt", (adDoNotTrack ? "1" : "0"));
-//		b.appendQueryParameter("r_random", Integer.toString(random));
-//		b.appendQueryParameter("t", Long.toString(this.getTimestamp()));
-//		b.appendQueryParameter("connection_type", this.getConnectionType());
-//		b.appendQueryParameter("listads", this.getListAds());
-//		b.appendQueryParameter("c_customevents", "1");
-///*		b.appendQueryParameter("c_mraid", "1");*/
-///*		if(isVideoRequest) {
-//			b.appendQueryParameter("r_type", "video");
-//			b.appendQueryParameter("r_resp", "vast20");
-//			if(videoMaxDuration != 0) {
-//				b.appendQueryParameter("v_dur_max", Integer.toString(videoMaxDuration));
-//			}
-//			if(videoMinDuration != 0) {
-//				b.appendQueryParameter("v_dur_min", Integer.toString(videoMinDuration));
-//			}
-//		} else {*/
-//			b.appendQueryParameter("r_type", "banner");
-///*		}*/
-//
-//		if(userAge != 0) {
-//			b.appendQueryParameter("demo_age", Integer.toString(userAge));
-//		}
-//
-//		if (gender != null) {
-//			b.appendQueryParameter("demo_gender", gender.getServerParam());
-//		}
-//
-//		if(keywords != null && !keywords.isEmpty()) {
-//			String parameter = TextUtils.join(", ", keywords);
-//			b.appendQueryParameter("demo_keywords", parameter);
-//		}
-//
-//		b.appendQueryParameter("u_wv", this.getUserAgent());
-//		b.appendQueryParameter("u_br", this.getUserAgent());
-//		if(longitude != 0 && latitude != 0) {
-//			b.appendQueryParameter("longitude", Double.toString(longitude));
-//			b.appendQueryParameter("latitude", Double.toString(latitude));
-//		}
-//
-//		if(adspaceHeight > 0 && adspaceWidth > 0) {
-//			if(adspaceStrict) {
-//				b.appendQueryParameter("adspace_strict", "1");
-//			} else {
-//				b.appendQueryParameter("adspace_strict", "0");
-//			}
-//			b.appendQueryParameter("adspace_width", Integer.toString(adspaceWidth));
-//			b.appendQueryParameter("adspace_height", Integer.toString(adspaceHeight));
-//		}
-//
-//		return b.build();
-//	}
 
 	//TODO: make sure "deviceCategory" gets to server code
 	public Uri toCountlyUri() {
@@ -278,10 +209,17 @@ public class InAppMessageRequest {
 		String path = "/o/messages";
 		final Uri.Builder b = Uri.parse((countlyURL + path)).buildUpon();
 
+		if (deviceId == null) {
+			deviceId = Util.getAndroidAdId();
+		}
+		if (deviceId == null) {
+			Log.e("Device Id could not be set");
+		}
+
 		b.appendQueryParameter("app_key", appKey);
 		b.appendQueryParameter("orientation", orientation);
 		b.appendQueryParameter("device_id", deviceId);
-		b.appendQueryParameter("device_id_type", idMode.toString());
+		//b.appendQueryParameter("device_id_type", idMode.toString()); //currently unused
 
 		return b.build();
 	}
@@ -342,30 +280,6 @@ public class InAppMessageRequest {
 		this.orientation = orientation;
 	}
 
-	/*	public boolean isVideoRequest() {
-            return isVideoRequest;
-        }
-
-        public void setVideoRequest(boolean isVideoRequest) {
-            this.isVideoRequest = isVideoRequest;
-        }
-
-        public int getVideoMinDuration() {
-            return videoMinDuration;
-        }
-
-        public void setVideoMinDuration(int videoMinDuration) {
-            this.videoMinDuration = videoMinDuration;
-        }
-
-        public int getVideoMaxDuration() {
-            return videoMaxDuration;
-        }
-
-        public void setVideoMaxDuration(int videoMaxDuration) {
-            this.videoMaxDuration = videoMaxDuration;
-        }
-    */
 	public void setGender(Gender gender) {
 		this.gender = gender;
 	}

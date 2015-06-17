@@ -234,6 +234,7 @@ public class Util {
 	public static void prepareAndroidAdId(final Context context) {
 
 		if (androidAdId == null && GooglePlayServicesUtil.isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS) {
+			Log.d("GooglePlayServices connected");
 			AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
 
 				@Override
@@ -241,7 +242,9 @@ public class Util {
 					Info adInfo = null;
 					try {
 						adInfo = AdvertisingIdClient.getAdvertisingIdInfo(context);
+						Log.d("adInfo " + adInfo);
 						androidAdId = adInfo.getId();
+						Log.d("adId " + androidAdId);
 						adDoNotTrack = adInfo.isLimitAdTrackingEnabled();
 					} catch (IOException e) {
 						e.printStackTrace();

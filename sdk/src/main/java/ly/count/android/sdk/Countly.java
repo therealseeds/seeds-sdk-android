@@ -265,6 +265,7 @@ public class Countly {
         messagingMode_ = mode;
 
         if (MessagingAdapter.isMessagingAvailable()) {
+            Log.d(Countly.TAG, "deviceId in initMessaging: " + connectionQueue_.getDeviceId() +  connectionQueue_.getDeviceId().getId() + connectionQueue_.getDeviceId().getType());
             MessagingAdapter.storeConfiguration(connectionQueue_.getContext(), connectionQueue_.getServerURL(), connectionQueue_.getAppKey(), connectionQueue_.getDeviceId().getId(), connectionQueue_.getDeviceId().getType());
         }
 
@@ -282,6 +283,7 @@ public class Countly {
         if (!InAppMessagingAdapter.isInAppMessagingAvailable()) {
             throw new IllegalStateException("you need to include countly-messaging-sdk-android library instead of countly-sdk-android if you want to use Countly Messaging");
         } else {
+            Log.d(Countly.TAG, "deviceId: " + connectionQueue_.getDeviceId() +  connectionQueue_.getDeviceId().getId() + connectionQueue_.getDeviceId().getType());
             InAppMessagingAdapter.init(connectionQueue_.getContext(), connectionQueue_.getServerURL(), connectionQueue_.getAppKey(), connectionQueue_.getDeviceId().getId(), connectionQueue_.getDeviceId().getType());
         }
 

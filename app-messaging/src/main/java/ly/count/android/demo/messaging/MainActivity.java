@@ -55,7 +55,7 @@ public class MainActivity extends Activity implements InAppMessageListener {
         //InAppMessageManager.sharedInstance().init(this, YOUR_SERVER, YOUR_APP_KEY);
         manager = InAppMessageManager.sharedInstance();
         manager.setListener(this);
-        //manager.requestInAppMessage();
+        //manager.requestInAppMessage(); // preload Ad
 
         Countly.sharedInstance().recordEvent("test", 1);
 
