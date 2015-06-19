@@ -31,6 +31,7 @@ import ly.count.android.sdk.DeviceId;
 
 public class InAppMessageRequest {
 	private static final String REQUEST_TYPE_ANDROID = "android_app";
+	private static final int DEVICE_ID_MS_DELAY = 500;  // sleep in ms if device_id not loaded yet
 	
 	private String userAgent;
 	private String userAgent2;
@@ -209,15 +210,24 @@ public class InAppMessageRequest {
 		String path = "/o/messages";
 		final Uri.Builder b = Uri.parse((countlyURL + path)).buildUpon();
 
-		if (deviceId == null) {
-			deviceId = Util.getAndroidAdId();
-		}
-		if (deviceId == null) {
-			Log.e("Device Id could not be set");
-		}
-
 		b.appendQueryParameter("app_key", appKey);
 		b.appendQueryParameter("orientation", orientation);
+
+		if (deviceId == null || deviceId == "") {
+			deviceId = Util.getAndroidAdId();
+			if (deviceId == null || deviceId == "") {
+				try {
+					Thread.sleep(DEVICE_ID_MS_DELAY);
+				} catch (InterruptedException e) {
+					Log.e("Sleep interrupted: " + e);
+				}
+				deviceId = Util.getAndroidAdId();
+			}
+		}
+
+		if (deviceId == null || deviceId == "") {
+			Log.e("Device Id could not be set");
+		}
 		b.appendQueryParameter("device_id", deviceId);
 		//b.appendQueryParameter("device_id_type", idMode.toString()); //currently unused
 

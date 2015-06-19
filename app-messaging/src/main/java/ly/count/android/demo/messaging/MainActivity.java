@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import ly.count.android.sdk.Countly;
 import ly.count.android.sdk.DeviceId;
@@ -51,11 +52,9 @@ public class MainActivity extends Activity implements InAppMessageListener {
 //                .setLocation(LATITUDE, LONGITUDE);
                 .setLoggingEnabled(true);
 
-
-        //InAppMessageManager.sharedInstance().init(this, YOUR_SERVER, YOUR_APP_KEY);
         manager = InAppMessageManager.sharedInstance();
         manager.setListener(this);
-        //manager.requestInAppMessage(); // preload Ad
+        manager.requestInAppMessage(); // preload Ad
 
         Countly.sharedInstance().recordEvent("test", 1);
 
@@ -149,7 +148,8 @@ public class MainActivity extends Activity implements InAppMessageListener {
 
     @Override
     public void inAppMessageLoadSucceeded(InAppMessage inAppMessage) {
-
+        Toast.makeText(this, "InAppMessage loaded", Toast.LENGTH_LONG)
+                                .show();
     }
 
     @Override

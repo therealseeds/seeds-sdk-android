@@ -137,6 +137,7 @@ public class InAppMessageManager {
 	}
 
 	private void requestInAppMessageInternal(boolean keepFlags) {
+
 		if (!mEnabled) {
 			Log.w("Cannot request rich adds on low memory devices");
 			return;
@@ -427,9 +428,9 @@ public class InAppMessageManager {
 			request.setUserAgent2(Util.buildUserAgent());
 		}
 		Location location = null;
-		request.setGender(userGender);
-		request.setUserAge(userAge);
-		request.setKeywords(keywords);
+//		request.setGender(userGender);
+//		request.setUserAge(userAge);
+//		request.setKeywords(keywords);
 
 		if (this.mIncludeLocation)
 			location = Util.getLocation(mContext);
@@ -466,13 +467,10 @@ public class InAppMessageManager {
 	}
 
 	private String getOrientation() {
-		if (mContext.getResources().getConfiguration().orientation == mContext.getResources().getConfiguration().ORIENTATION_LANDSCAPE) {
+		if (requestedHorizontalAd) {
 			return "landscape";
-		} else if (mContext.getResources().getConfiguration().orientation == mContext.getResources().getConfiguration().ORIENTATION_PORTRAIT) {
-			return "portrait";
 		} else {
-			Log.e("Unable to get orientation");
-			return "";
+			return "portrait";
 		}
 	}
 
