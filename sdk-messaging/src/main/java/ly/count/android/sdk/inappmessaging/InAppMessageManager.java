@@ -444,12 +444,12 @@ public class InAppMessageManager {
 		}
 		if (mContext.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
 			requestedHorizontalAd = true;
-			this.request.setAdspaceHeight(320);
-			this.request.setAdspaceWidth(480);
+ 			//this.request.setAdspaceHeight(320);
+			//this.request.setAdspaceWidth(480);
 		} else {
 			requestedHorizontalAd = false;
-			this.request.setAdspaceHeight(480);
-			this.request.setAdspaceWidth(320);
+			//this.request.setAdspaceHeight(480);
+			//this.request.setAdspaceWidth(320);
 		}
 
 		this.request.setAdspaceStrict(false);

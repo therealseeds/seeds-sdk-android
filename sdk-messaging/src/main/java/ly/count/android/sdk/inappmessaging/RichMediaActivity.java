@@ -200,10 +200,16 @@ public class RichMediaActivity extends Activity {
 
 	}
 
+
+
 	private void initInterstitialFromBannerView() {
 		final FrameLayout layout = new FrameLayout(this);
 		if (mAd.getType() == Const.TEXT || mAd.getType() == Const.IMAGE) {
 			final float scale = this.getResources().getDisplayMetrics().density;
+
+			int deviceWidth = this.getResources().getDisplayMetrics().widthPixels;
+			int deviceHeight = this.getResources().getDisplayMetrics().heightPixels;
+
 			int width, height;
 			if (mAd.isHorizontalOrientationRequested()) {
 				width = 480;
@@ -213,8 +219,17 @@ public class RichMediaActivity extends Activity {
 				height = 480;
 			}
 
+			Log.d("scale " + scale);
+
+			Log.d("device width, height " + deviceWidth + ", " + deviceHeight);
+
+			// Sungwon's scaling code
+			width = width * (int) (deviceWidth / width / scale);
+			height = height * (int) (deviceHeight / height / scale);
+
 			InAppMessageView banner = new InAppMessageView(this, mAd, width, height, false, createLocalAdListener());
-			banner.setLayoutParams(new FrameLayout.LayoutParams((int) (width * scale + 0.5f), (int) (height * scale + 0.5f), Gravity.CENTER));
+
+			banner.setLayoutParams(new FrameLayout.LayoutParams((int) (width * scale + 0.5f ), (int) (height * scale + 0.5f ), Gravity.CENTER));
 			banner.showContent();
 			layout.addView(banner);
 		}

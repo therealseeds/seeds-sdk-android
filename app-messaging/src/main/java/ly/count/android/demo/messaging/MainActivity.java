@@ -26,7 +26,7 @@ import ly.count.android.sdk.inappmessaging.InAppMessageManager;
 public class MainActivity extends Activity implements InAppMessageListener {
 
     private static String YOUR_SERVER = "http://ec2-52-7-175-75.compute-1.amazonaws.com"; // don't include trailing slash
-    private static String YOUR_APP_KEY = "aa1fd1f255b25fb89b413f216f11e8719188129d";
+    private static String YOUR_APP_KEY = "f04df490114e12ccd358d28b84920faf788104f2"; //"test"; //"aa1fd1f255b25fb89b413f216f11e8719188129d";
     private static String GCM_PROJECT_NUM = "1079042128983";
 
 
