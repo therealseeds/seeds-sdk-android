@@ -11,6 +11,7 @@ import java.util.HashMap;
 
 
 public class UserDataTests extends AndroidTestCase {
+
 	public void testSetData(){
         HashMap<String, String> data = new HashMap<String, String>();
         data.put("name", "Test Test");
@@ -55,6 +56,7 @@ public class UserDataTests extends AndroidTestCase {
         assertEquals("http://domain.com/test.png", json.getString("picture"));
         assertEquals("2000", json.getInt("byear"));
 	}
+
 	
 	public void testPicturePath() throws MalformedURLException{
 		String path = "http://test.com/?key1=val1&picturePath=%2Fmnt%2Fsdcard%2Fpic.jpg&key2=val2";

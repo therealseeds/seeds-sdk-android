@@ -21,6 +21,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    //TODO: remove
+    lintOptions {
+        abortOnError false
+    }
+
 }
 
 dependencies {
@@ -28,4 +34,6 @@ dependencies {
     compile project(':sdk-messaging')
 //    compile 'ly.count.android:sdk:15.06'
 //    compile 'ly.count.android:sdk-messaging:15.06'
+    compile 'com.google.android.gms:play-services:7.3.0'
+
 }

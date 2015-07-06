@@ -51,3 +51,4 @@ publish {
     description = 'Android SDK for Countly mobile analytics'
     website = 'https://github.com/Countly/countly-sdk-android'
 }
+

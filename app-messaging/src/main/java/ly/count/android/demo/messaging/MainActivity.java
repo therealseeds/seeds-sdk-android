@@ -8,17 +8,32 @@ import android.content.IntentFilter;
 import android.os.Handler;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
 
 import ly.count.android.sdk.Countly;
+import ly.count.android.sdk.DeviceId;
+
 import ly.count.android.sdk.messaging.CountlyMessaging;
 import ly.count.android.sdk.messaging.Message;
 
-public class MainActivity extends Activity {
+import ly.count.android.sdk.inappmessaging.InAppMessage;
+import ly.count.android.sdk.inappmessaging.InAppMessageListener;
+import ly.count.android.sdk.inappmessaging.InAppMessageManager;
 
-    private static String YOUR_SERVER = "http://ec2-52-7-34-112.compute-1.amazonaws.com/";
-    private static String YOUR_APP_KEY = "d16c92e8de1de959468c8519332f383922fdecac";
+
+public class MainActivity extends Activity implements InAppMessageListener {
+
+    private static String YOUR_SERVER = "http://ec2-52-7-175-75.compute-1.amazonaws.com"; // don't include trailing slash
+    private static String YOUR_APP_KEY = "f04df490114e12ccd358d28b84920faf788104f2"; //"test"; //"aa1fd1f255b25fb89b413f216f11e8719188129d";
+    private static String GCM_PROJECT_NUM = "1079042128983";
+
 
     private BroadcastReceiver messageReceiver;
+
+    private Button iamButton;
+    private InAppMessageManager manager;
 
     /** Called when the activity is first created. */
     @Override
@@ -26,12 +41,20 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+        iamButton = (Button) findViewById(R.id.iamButton);
+
         /** You should use cloud.count.ly instead of YOUR_SERVER for the line below if you are using Countly Cloud service */
         Countly.sharedInstance()
-                .init(this, YOUR_SERVER, YOUR_APP_KEY)
-                .initMessaging(this, MainActivity.class, "GCM_PROJECT_ID", Countly.CountlyMessagingMode.TEST);
+                .init(this, YOUR_SERVER, YOUR_APP_KEY, null, DeviceId.Type.ADVERTISING_ID)
+                .initMessaging(this, MainActivity.class, GCM_PROJECT_NUM, Countly.CountlyMessagingMode.TEST)
+                .initInAppMessaging(this)
 //                .setLocation(LATITUDE, LONGITUDE);
-//                .setLoggingEnabled(true);
+                .setLoggingEnabled(true);
+
+        manager = InAppMessageManager.sharedInstance();
+        manager.setListener(this);
+        manager.requestInAppMessage(); // preload Ad
 
         Countly.sharedInstance().recordEvent("test", 1);
 
@@ -86,5 +109,56 @@ public class MainActivity extends Activity {
     protected void onPause() {
         super.onPause();
         unregisterReceiver(messageReceiver);
+    }
+
+    public void iamButtonClicked(View view) {
+        showInAppMessage();
+    }
+
+
+    public void showInAppMessage() {
+        try {
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    if (manager.isInAppMessageLoaded()) {
+                        manager.showInAppMessage();
+
+
+                    } else {
+                        manager.requestInAppMessage();
+//                        Toast.makeText(AndroidLauncher.this, "InAppMessage loading...", Toast.LENGTH_LONG)
+//                                .show();
+                    }
+                }
+            });
+        } catch (Exception e) {
+            System.out.println("Exception: " + e);
+        }
+    }
+
+    @Override
+    public void inAppMessageClicked() {
+
+    }
+
+    @Override
+    public void inAppMessageClosed(InAppMessage inAppMessage, boolean completed) {
+
+    }
+
+    @Override
+    public void inAppMessageLoadSucceeded(InAppMessage inAppMessage) {
+        Toast.makeText(this, "InAppMessage loaded", Toast.LENGTH_LONG)
+                                .show();
+    }
+
+    @Override
+    public void inAppMessageShown(InAppMessage inAppMessage, boolean succeeded) {
+
+    }
+
+    @Override
+    public void noInAppMessageFound() {
+
     }
 }
