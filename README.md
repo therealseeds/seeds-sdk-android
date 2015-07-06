@@ -18,18 +18,20 @@ Check Countly Server source code here:
 
 There are also other Countly SDK repositories below:
 
-- [Countly iOS SDK](https://github.com/Countly/countly-sdk-ios)
+- [Countly iOS & Mac OS X SDK](https://github.com/Countly/countly-sdk-ios)
 - [Countly Android SDK](https://github.com/Countly/countly-sdk-android)
 - [Countly Windows Phone SDK](https://github.com/Countly/countly-sdk-windows-phone)
-- [Countly Blackberry Webworks SDK](https://github.com/Countly/countly-sdk-blackberry-webworks)
-- [Countly Blackberry Cascades SDK](https://github.com/craigmj/countly-sdk-blackberry10-cascades) (Community supported)
 - [Countly Mac OS X SDK](https://github.com/mrballoon/countly-sdk-osx) (Community supported)
 - [Countly Appcelerator Titanium SDK](https://github.com/euforic/Titanium-Count.ly) (Community supported)
 - [Countly Unity3D SDK](https://github.com/Countly/countly-sdk-unity) (Community supported)
 
 ##How can I help you with your efforts?
-Glad you asked. We need ideas, feedbacks and constructive comments. All your suggestions will be taken care with upmost importance. 
+Glad you asked. We need ideas, feedbacks and constructive comments. All your suggestions will be taken care with upmost importance. We are on [Twitter](http://twitter.com/gocountly) and [Facebook](http://www.facebook.com/Countly) if you would like to keep up with our fast progress!
 
-We are on [Twitter](http://twitter.com/gocountly) and [Facebook](http://www.facebook.com/Countly) if you would like to keep up with our fast progress!
+And, if you liked Countly, [why not use one of our badges](https://count.ly/brand-assets/) and give a link back to us, so others know about this wonderful platform? 
+
+![Light badge](https://count.ly/wp-content/uploads/2014/10/countly_badge_5.png)  ![Dark badge](https://count.ly/wp-content/uploads/2014/10/countly_badge_6.png)
+
+### Support
 
 For community support page, see [http://support.count.ly](http://support.count.ly "Countly Support").
