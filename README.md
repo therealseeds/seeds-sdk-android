@@ -22,7 +22,7 @@ Please let us know your name,  email address and game name so we can set up the 
 
 Add to your build.gradle in Android Studio:
 
-`
+```gradle
 repositories {
    maven {
        url  "http://dl.bintray.com/seedsinc/maven"
@@ -32,7 +32,7 @@ repositories {
 dependencies {
    compile('com.playseeds:android-sdk-messaging:0.1.1')
 }
-`
+```
 
 ####Eclipse
 
@@ -49,13 +49,13 @@ Download the following jars and add them to to your libs directory:
 
 1) Implement the InAppMessageListener in your main activity, eg.:
 
-`
+```java
 ...implements InAppMessageListener
-`
+```
 
 which requires adding the following methods to your main activity:
 
-`
+```java
 @Override
 public void inAppMessageClicked() {
    Countly.sharedInstance().recordEvent("message clicked");
@@ -80,24 +80,24 @@ public void inAppMessageShown(InAppMessage inAppMessage, boolean b) {
 public void noInAppMessageFound() {
 
 }
-`
+```
 
 Please include the additional event recording method calls as shown above for `inAppMessageClicked()` and `inAppMessageShown()`.
 
 2) Add the following to your main activity onCreate method. Please use your app_key as a String in place of YOUR_APP_KEY.
 
-`
+```java
 Countly.sharedInstance()
                .init(this, http://dashdev.playseeds.com/, “YOUR_APP_KEY”, null, “YOUR_DEVICE_ID”)
                .initInAppMessaging(this)
                .setLoggingEnabled(true);  //optional
-`
+```
 
 You can specify device ID by yourself if you have one (it has to be unique per device):
 
 `Countly.sharedInstance().init(this, "https://YOUR_SERVER", "YOUR_APP_KEY", "YOUR_DEVICE_ID").`
 
-You can rely on Google Advertising ID for device ID generation (recommended) which also requires setting up Google Play Services.
+You can rely on Google Advertising ID for device ID generation (recommended) which also requires setting up [Google Play Services](https://developers.google.com/android/guides/setup).
 
 `Countly.sharedInstance().init(this, "https://YOUR_SERVER", "YOUR_APP_KEY", null, DeviceId.Type.ADVERTISING_ID)`
 
@@ -106,27 +106,27 @@ Or you can use OpenUDID:
 
 In the case of OpenUDID you'll need to include the following declaration in your AndroidManifest.xml:
 
-`
+```xml
 <service android:name="org.openudid.OpenUDID_service">
     <intent-filter>
         <action android:name="org.openudid.GETUDID" />
     </intent-filter>
 </service>
-`
+```
 
 3) Next, add a member InAppMessageManager  variable in your main activity, e.g. :
 
-`
+```java
 private InAppMessageManager manager;
-`
+```
 
 And then initialize it in your onCreate method e.g.:
 
-`
+```java
 manager = InAppMessageManager.sharedInstance();
 manager.setListener(this);
 manager.requestInAppMessage(); //  recommended to preload the promo
-`
+```
 
 4) Then add the following calls to all your activities:
 - Call `Countly.sharedInstance().onStart()` in onStart.
@@ -134,34 +134,34 @@ manager.requestInAppMessage(); //  recommended to preload the promo
 
 5) Finally, make sure that the INTERNET permission is set if it isn’t already in your manifest file and include the following in your AndroidManifest.xml:
 
-`
+```xml
 <!-- for Seeds promo -->
 <activity android:name="ly.count.android.sdk.inappmessaging.RichMediaActivity"
    android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
    android:hardwareAccelerated="false" />
 <activity android:name="ly.count.android.sdk.inappmessaging.InAppWebView"
    android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
-`
+```
 
 ###3. Display the Seeds promo interstitial
 
 Use the InAppMessageManager instance to load:
 
-`
+```java
 manager.requestInAppMessage();
-`
+```
 
 and show:
 
-`
+```java
 manager.showInAppMessage();
-`
+```
 
 the interstitial promo.
 
 You may wish to add a helper method to your activity to accomplish these functions, e.g.:
 
-`
+```java
 public void showSeedsPromo() {
        try {
            runOnUiThread(new Runnable() {
@@ -177,15 +177,15 @@ public void showSeedsPromo() {
            System.out.println("Exception: " + e);
        }
 }
-`
+```
 
 4. Track the item purchase
 
 In your item store code, please include the following tracking code after a purchase of the Seeds-promoted item:
 
-`
+```java
 Countly.sharedInstance().recordEvent("[item] purchased");
-`
+```
 
 where [item] is the name or SKU of the item.
 
