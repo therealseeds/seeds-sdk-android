@@ -1,37 +1,194 @@
-##What's Countly?
-[Countly](http://count.ly) is an innovative, real-time, open source mobile analytics application. 
-It collects data from mobile devices, and visualizes this information to analyze mobile application 
-usage and end-user behavior. There are two parts of Countly: the server that collects and analyzes data, 
-and mobile SDK that sends this data. Both parts are open source with different licensing terms.
+#Seeds
+[Seeds](http://www.playseeds.com) increases paying user conversion for freemium mobile games motivating users to make their first purchase by letting them know that their purchase will help finance microloans in the developing world. The SDK implements this with an interstitial ad and event tracking analytics.
 
-##About
+##Integrating the Seeds SDK
 
-This repository includes the Countly Android SDK.
+Note the Seeds Android SDK is built with open source components, extending the [Countly Android SDK](https://github.com/Countly/countly-sdk-android) with in-app messaging functionality from the [MobFox Android SDK](https://github.com/mobfox/MobFox-Android-SDK).
 
-Need help? See [Countly SDK for Android](http://resources.count.ly/v1.0/docs/countly-sdk-for-android) documentation at [Countly Resources](http://resources.count.ly).
+##Preparation
+Please make a deep link to the in-app purchase item you’d like to promote and let us know what that deep link is.
 
-###Other Github resources
+If you haven't already received an app_key.
 
-Check Countly Server source code here: 
+Please let us know your name,  email address and game name so we can set up the web dashboard. Please send this info to [sungwon@playseeds.com](sungwon@playseeds.com)
 
-- [Countly Server (countly-server)](https://github.com/Countly/countly-server)
+(Note, if you would like to test just the in-app message functionality to display a test image promo, you may use the special app_key “test”)
 
-There are also other Countly SDK repositories below:
+##Installation
 
-- [Countly iOS & Mac OS X SDK](https://github.com/Countly/countly-sdk-ios)
-- [Countly Android SDK](https://github.com/Countly/countly-sdk-android)
-- [Countly Windows Phone SDK](https://github.com/Countly/countly-sdk-windows-phone)
-- [Countly Mac OS X SDK](https://github.com/mrballoon/countly-sdk-osx) (Community supported)
-- [Countly Appcelerator Titanium SDK](https://github.com/euforic/Titanium-Count.ly) (Community supported)
-- [Countly Unity3D SDK](https://github.com/Countly/countly-sdk-unity) (Community supported)
+###1. Add the SDK to your project
 
-##How can I help you with your efforts?
-Glad you asked. We need ideas, feedbacks and constructive comments. All your suggestions will be taken care with upmost importance. We are on [Twitter](http://twitter.com/gocountly) and [Facebook](http://www.facebook.com/Countly) if you would like to keep up with our fast progress!
+####Android Studio
 
-And, if you liked Countly, [why not use one of our badges](https://count.ly/brand-assets/) and give a link back to us, so others know about this wonderful platform? 
+Add to your build.gradle in Android Studio:
 
-![Light badge](https://count.ly/wp-content/uploads/2014/10/countly_badge_5.png)  ![Dark badge](https://count.ly/wp-content/uploads/2014/10/countly_badge_6.png)
+`
+repositories {
+   maven {
+       url  "http://dl.bintray.com/seedsinc/maven"
+   }
+}
 
-### Support
+dependencies {
+   compile('com.playseeds:android-sdk-messaging:0.1.1')
+}
+`
 
-For community support page, see [http://support.count.ly](http://support.count.ly "Countly Support").
+####Eclipse
+
+Download the following jars and add them to to your libs directory:
+
+
+[https://bintray.com/artifact/download/seedsinc/android_sdk/seeds-android-sdk-0.1.1.jar](https://bintray.com/artifact/download/seedsinc/android_sdk/seeds-android-sdk-0.1.1.jar)
+
+[https://bintray.com/artifact/download/seedsinc/android_sdk/seeds-android-sdk-messaging-0.1.1.jar]([https://bintray.com/artifact/download/seedsinc/android_sdk/seeds-android-sdk-messaging-0.1.1.jar)
+
+
+
+###2. Set up the SDK
+
+1) Implement the InAppMessageListener in your main activity, eg.:
+
+`
+...implements InAppMessageListener
+`
+
+which requires adding the following methods to your main activity:
+
+`
+@Override
+public void inAppMessageClicked() {
+   Countly.sharedInstance().recordEvent("message clicked");
+}
+
+@Override
+public void inAppMessageClosed(InAppMessage inAppMessage, boolean b) {
+
+}
+
+@Override
+public void inAppMessageLoadSucceeded(InAppMessage inAppMessage) {
+
+}
+
+@Override
+public void inAppMessageShown(InAppMessage inAppMessage, boolean b) {
+   Countly.sharedInstance().recordEvent("message shown");
+}
+
+@Override
+public void noInAppMessageFound() {
+
+}
+`
+
+Please include the additional event recording method calls as shown above for `inAppMessageClicked()` and `inAppMessageShown()`.
+
+2) Add the following to your main activity onCreate method. Please use your app_key as a String in place of YOUR_APP_KEY.
+
+`
+Countly.sharedInstance()
+               .init(this, http://dashdev.playseeds.com/, “YOUR_APP_KEY”, null, “YOUR_DEVICE_ID”)
+               .initInAppMessaging(this)
+               .setLoggingEnabled(true);  //optional
+`
+
+You can specify device ID by yourself if you have one (it has to be unique per device):
+
+`Countly.sharedInstance().init(this, "https://YOUR_SERVER", "YOUR_APP_KEY", "YOUR_DEVICE_ID").`
+
+You can rely on Google Advertising ID for device ID generation (recommended) which also requires setting up Google Play Services.
+
+`Countly.sharedInstance().init(this, "https://YOUR_SERVER", "YOUR_APP_KEY", null, DeviceId.Type.ADVERTISING_ID)`
+
+Or you can use OpenUDID:
+`Countly.sharedInstance().init(this, "https://YOUR_SERVER", "YOUR_APP_KEY", null, DeviceId.Type.OPEN_UDID)`
+
+In the case of OpenUDID you'll need to include the following declaration in your AndroidManifest.xml:
+
+`
+<service android:name="org.openudid.OpenUDID_service">
+    <intent-filter>
+        <action android:name="org.openudid.GETUDID" />
+    </intent-filter>
+</service>
+`
+
+3) Next, add a member InAppMessageManager  variable in your main activity, e.g. :
+
+`
+private InAppMessageManager manager;
+`
+
+And then initialize it in your onCreate method e.g.:
+
+`
+manager = InAppMessageManager.sharedInstance();
+manager.setListener(this);
+manager.requestInAppMessage(); //  recommended to preload the promo
+`
+
+4) Then add the following calls to all your activities:
+- Call `Countly.sharedInstance().onStart()` in onStart.
+- Call `Countly.sharedInstance().onStop()` in onStop.
+
+5) Finally, make sure that the INTERNET permission is set if it isn’t already in your manifest file and include the following in your AndroidManifest.xml:
+
+`
+<!-- for Seeds promo -->
+<activity android:name="ly.count.android.sdk.inappmessaging.RichMediaActivity"
+   android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
+   android:hardwareAccelerated="false" />
+<activity android:name="ly.count.android.sdk.inappmessaging.InAppWebView"
+   android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
+`
+
+###3. Display the Seeds promo interstitial
+
+Use the InAppMessageManager instance to load:
+
+`
+manager.requestInAppMessage();
+`
+
+and show:
+
+`
+manager.showInAppMessage();
+`
+
+the interstitial promo.
+
+You may wish to add a helper method to your activity to accomplish these functions, e.g.:
+
+`
+public void showSeedsPromo() {
+       try {
+           runOnUiThread(new Runnable() {
+               public void run() {
+                   if (manager.isInAppMessageLoaded()) {
+                       manager.showInAppMessage();
+                   } else {
+                       manager.requestInAppMessage();
+                   }
+               }
+           });
+       } catch (Exception e) {
+           System.out.println("Exception: " + e);
+       }
+}
+`
+
+4. Track the item purchase
+
+In your item store code, please include the following tracking code after a purchase of the Seeds-promoted item:
+
+`
+Countly.sharedInstance().recordEvent("[item] purchased");
+`
+
+where [item] is the name or SKU of the item.
+
+## Support
+
+Open an issue or email [sungwon@playseeds.com](sungwon@playseeds.com)
