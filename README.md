@@ -88,14 +88,14 @@ Please include the additional event recording method calls as shown above for `i
 
 ```java
 Countly.sharedInstance()
-               .init(this, http://dashdev.playseeds.com/, “YOUR_APP_KEY”, null, “YOUR_DEVICE_ID”)
+               .init(this, http://dash.playseeds.com/, “YOUR_APP_KEY”, null, “YOUR_DEVICE_ID”)
                .initInAppMessaging(this)
                .setLoggingEnabled(true);  //optional
 ```
 
 You can specify device ID by yourself if you have one (it has to be unique per device):
 
-`Countly.sharedInstance().init(this, "https://YOUR_SERVER", "YOUR_APP_KEY", "YOUR_DEVICE_ID").`
+`Countly.sharedInstance().init(this, "https://YOUR_SERVER", "YOUR_APP_KEY", "YOUR_DEVICE_ID")`
 
 You can rely on Google Advertising ID for device ID generation (recommended) which also requires setting up [Google Play Services](https://developers.google.com/android/guides/setup).
 
