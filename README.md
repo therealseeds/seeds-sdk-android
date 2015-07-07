@@ -8,9 +8,9 @@ Note the Seeds Android SDK is built with open source components, extending the [
 ##Preparation
 Please make a deep link to the in-app purchase item you’d like to promote and let us know what that deep link is.
 
-If you haven't already received an app_key.
+If you haven't already, please also let us know your name,  email address and game name so we can get you set up. Please send this info to [sungwon@playseeds.com](sungwon@playseeds.com)
 
-Please let us know your name,  email address and game name so we can set up the web dashboard. Please send this info to [sungwon@playseeds.com](sungwon@playseeds.com)
+We will then set you up with an app_key so you can get started. 
 
 (Note, if you would like to test just the in-app message functionality to display a test image promo, you may use the special app_key “test”)
 
