@@ -30,7 +30,7 @@ repositories {
 }
 
 dependencies {
-   compile('com.playseeds:android-sdk-messaging:0.1.1')
+   compile('com.playseeds:android-sdk-messaging:0.1.2')
 }
 ```
 
