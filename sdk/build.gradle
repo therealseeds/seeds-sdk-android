@@ -44,11 +44,11 @@ dependencies {
 }
 
 publish {
-    userOrg = 'countly'
-    groupId = 'ly.count.android'
-    artifactId = 'sdk'
-    version = '15.06'
-    description = 'Countly Android SDK with GCM Support'
-    website = 'https://github.com/Countly/countly-sdk-android'
+    userOrg = 'seedsinc'
+    groupId = 'com.playseeds'
+    artifactId = 'android-sdk'
+    version = '0.1.3'
+    description = 'Android SDK for Countly mobile analytics forked to add In-App Messaging'
+    website = 'https://github.com/therealseeds/countly-sdk-android'
 }
 
