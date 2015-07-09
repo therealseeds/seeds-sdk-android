@@ -47,7 +47,7 @@ publish {
     userOrg = 'seedsinc'
     groupId = 'com.playseeds'
     artifactId = 'android-sdk'
-    version = '0.1.1'
+    version = '0.1.2'
     description = 'Android SDK for Countly mobile analytics forked to add In-App Messaging'
     website = 'https://github.com/therealseeds/countly-sdk-android'
 }

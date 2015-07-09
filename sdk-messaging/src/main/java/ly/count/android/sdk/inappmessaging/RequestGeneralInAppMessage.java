@@ -18,26 +18,18 @@
 
 package ly.count.android.sdk.inappmessaging;
 
-import static ly.count.android.sdk.inappmessaging.Const.RESPONSE_ENCODING;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import javax.json.Json;
-import javax.json.JsonReader;
-import javax.json.JsonObject;
-
 import org.apache.http.Header;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
+
+import java.io.InputStream;
+
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
+
+import ly.count.android.sdk.Countly;
 
 
 public class RequestGeneralInAppMessage extends RequestInAppMessage<InAppMessageResponse> {
@@ -109,110 +101,7 @@ public class RequestGeneralInAppMessage extends RequestInAppMessage<InAppMessage
 		}
 	}
 
-	@Override
-	InAppMessageResponse parse(final InputStream inputStream, Header[] headers) throws RequestException {
 
-		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		DocumentBuilder db;
-		final InAppMessageResponse response = new InAppMessageResponse();
-
-		try {
-				db = dbf.newDocumentBuilder();
-				InputSource src = new InputSource(inputStream);
-
-				if (Log.LOG_AD_RESPONSES) {
-					String sResponse = convertStreamToString(inputStream);
-					Log.d("InAppMessage RequestPerform HTTP Response: " + sResponse);
-					byte[] bytes = sResponse.getBytes(RESPONSE_ENCODING);
-					src = new InputSource(new ByteArrayInputStream(bytes));
-				}
-				src.setEncoding(Const.RESPONSE_ENCODING);
-				final Document doc = db.parse(src);
-
-				final Element element = doc.getDocumentElement();
-
-				if (element == null)
-					throw new RequestException("Document is not an xml");
-
-				final String errorValue = this.getValue(doc, "error");
-				if (errorValue != null)
-					throw new RequestException("Error Response received: " + errorValue);
-
-				final String type = element.getAttribute("type");
-				element.normalize();
-				if ("imageAd".equalsIgnoreCase(type)) {
-					response.setType(Const.IMAGE);
-					response.setBannerWidth(this.getValueAsInt(doc, "bannerwidth"));
-					response.setBannerHeight(this.getValueAsInt(doc, "bannerheight"));
-					final ClickType clickType = ClickType.getValue(this.getValue(doc, "clicktype"));
-					response.setClickType(clickType);
-					response.setClickUrl(this.getValue(doc, "clickurl"));
-					response.setImageUrl(this.getValue(doc, "imageurl"));
-					response.setRefresh(this.getValueAsInt(doc, "refresh"));
-					response.setScale(this.getValueAsBoolean(doc, "scale"));
-					response.setSkipPreflight(this.getValueAsBoolean(doc, "skippreflight"));
-				} else if ("textAd".equalsIgnoreCase(type)) {
-					response.setType(Const.TEXT);
-					response.setText(this.getValue(doc, "htmlString"));
-					String skipOverlay = this.getAttribute(doc, "htmlString", "skipoverlaybutton");
-					if (skipOverlay != null) {
-						response.setSkipOverlay(Integer.parseInt(skipOverlay));
-					}
-					final ClickType clickType = ClickType.getValue(this.getValue(doc, "clicktype"));
-					response.setClickType(clickType);
-					response.setClickUrl(this.getValue(doc, "clickurl"));
-					response.setRefresh(this.getValueAsInt(doc, "refresh"));
-					response.setScale(this.getValueAsBoolean(doc, "scale"));
-					response.setSkipPreflight(this.getValueAsBoolean(doc, "skippreflight"));
-				} else if ("noAd".equalsIgnoreCase(type)) {
-					response.setType(Const.NO_AD);
-					if (response.getRefresh() <= 0) {
-						response.setRefresh(RELOAD_AFTER_NO_AD);
-					}
-				} else {
-					throw new RequestException("Unknown response type " + type);
-				}
-				//ToDO: remove hard-coded URL
-				response.setClickUrl("farm://store");
-
-
-		} catch (final ParserConfigurationException e) {
-			throw new RequestException("Cannot parse Response", e);
-		} catch (final SAXException e) {
-			throw new RequestException("Cannot parse Response", e);
-		} catch (final IOException e) {
-			throw new RequestException("Cannot read Response", e);
-		} catch (final Throwable t) {
-			throw new RequestException("Cannot read Response", t);
-		}
-
-		response.setText("<body style=\"text-align:center;margin:0;padding:0;\"><a href=\"http://account.mobfox.com/activation-info.php\" target=\"_self\"><img src=\"http://ec2-52-7-175-75.compute-1.amazonaws.com/o/image?api_key=f1d1a9e29c0689bb9591389f46f275e7&app_id=55524a8eea08b2c432086d32\" border=\"0\"/></a></body>");
-		Log.i("InAppMessage getText: " + response.getText());
-		Log.i("InAppMessage getImageURL: " + response.getImageUrl());
-		Log.i("InAppMessage return response: " + response);
-		return response;
-	}
-
-	@Override
-	InAppMessageResponse parseTestString() throws RequestException {
-		return parse(is, null);
-	}
-
-//	public InAppMessageResponse parseCountlyUri(final InputStream inputStream, Header[] headers) throws RequestException {
-//
-//		final InAppMessageResponse response = new InAppMessageResponse();
-//
-//		try {
-//
-//			String sResponse = convertStreamToString(inputStream);
-//			//Log.i("InAppMessage RequestPerform HTTP Response: " + sResponse);
-//
-//		} catch (final Throwable t) {
-//			throw new RequestException("Cannot read Response", t);
-//		}
-//
-//		return response;
-//	}
 
 	public InAppMessageResponse parseCountlyJSON(final InputStream inputStream, Header[] headers) throws RequestException {
 
@@ -240,6 +129,14 @@ public class RequestGeneralInAppMessage extends RequestInAppMessage<InAppMessage
 
 			response.setText(jsonObject.getString("htmlString"));
 			response.setClickUrl(jsonObject.getString("clickurl"));
+
+			String messageVariant = jsonObject.getString("messageVariant");
+
+
+			if (messageVariant != null && !messageVariant.equals("false")) {
+				Countly.sharedInstance().recordEvent(messageVariant);
+			}
+
 
 			jsonReader.close();
 
