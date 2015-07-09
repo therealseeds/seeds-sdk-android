@@ -32,6 +32,7 @@ import android.content.res.Configuration;
 import android.location.Location;
 import android.os.Handler;
 
+import ly.count.android.sdk.Countly;
 import ly.count.android.sdk.DeviceId;
 
 public class InAppMessageManager {
@@ -58,6 +59,11 @@ public class InAppMessageManager {
 	private int userAge;
 	private List<String> keywords;
 
+	private String messageVariantName;
+
+	public void setMessageVariantName(String messageVariantName) {
+		this.messageVariantName = messageVariantName;
+	}
 
 	// see http://stackoverflow.com/questions/7048198/thread-safe-singletons-in-java
 	private static class SingletonHolder {
@@ -318,6 +324,12 @@ public class InAppMessageManager {
 			notifyAdShown(mResponse, false);
 			return;
 		}
+
+		// special event for A/B testing
+		if (messageVariantName != null) {
+			Countly.sharedInstance().recordEvent(messageVariantName);
+		}
+
 		InAppMessageResponse ad = mResponse;
 		boolean result = false;
 		try {

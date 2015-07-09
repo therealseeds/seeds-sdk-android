@@ -134,7 +134,7 @@ public class RequestGeneralInAppMessage extends RequestInAppMessage<InAppMessage
 
 
 			if (messageVariant != null && !messageVariant.equals("false")) {
-				Countly.sharedInstance().recordEvent(messageVariant);
+				InAppMessageManager.sharedInstance().setMessageVariantName(messageVariant);
 			}
 
 
