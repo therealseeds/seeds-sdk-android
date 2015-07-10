@@ -138,7 +138,7 @@ public class MainActivity extends Activity implements InAppMessageListener {
 
     @Override
     public void inAppMessageClicked() {
-
+        Countly.sharedInstance().recordEvent("message clicked");
     }
 
     @Override
@@ -154,7 +154,7 @@ public class MainActivity extends Activity implements InAppMessageListener {
 
     @Override
     public void inAppMessageShown(InAppMessage inAppMessage, boolean succeeded) {
-
+        Countly.sharedInstance().recordEvent("message shown");
     }
 
     @Override
