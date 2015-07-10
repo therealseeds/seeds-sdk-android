@@ -325,11 +325,6 @@ public class InAppMessageManager {
 			return;
 		}
 
-		// special event for A/B testing
-		if (messageVariantName != null) {
-			Countly.sharedInstance().recordEvent(messageVariantName);
-		}
-
 		InAppMessageResponse ad = mResponse;
 		boolean result = false;
 		try {
