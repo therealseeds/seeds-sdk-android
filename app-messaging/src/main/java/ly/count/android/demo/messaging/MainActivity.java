@@ -12,6 +12,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.util.HashMap;
+
 import ly.count.android.sdk.Countly;
 import ly.count.android.sdk.DeviceId;
 
@@ -34,6 +36,7 @@ public class MainActivity extends Activity implements InAppMessageListener {
 
     private Button iamButton;
     private InAppMessageManager manager;
+
 
     /** Called when the activity is first created. */
     @Override
@@ -138,7 +141,6 @@ public class MainActivity extends Activity implements InAppMessageListener {
 
     @Override
     public void inAppMessageClicked() {
-        Countly.sharedInstance().recordEvent("message clicked");
     }
 
     @Override
@@ -154,11 +156,12 @@ public class MainActivity extends Activity implements InAppMessageListener {
 
     @Override
     public void inAppMessageShown(InAppMessage inAppMessage, boolean succeeded) {
-        Countly.sharedInstance().recordEvent("message shown");
     }
 
     @Override
     public void noInAppMessageFound() {
 
     }
+
+
 }

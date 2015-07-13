@@ -132,8 +132,8 @@ public class RequestGeneralInAppMessage extends RequestInAppMessage<InAppMessage
 
 			String messageVariant = jsonObject.getString("messageVariant");
 
-
 			if (messageVariant != null && !messageVariant.equals("false")) {
+				InAppMessageManager.sharedInstance().setA_bTestingOn(true);
 				InAppMessageManager.sharedInstance().setMessageVariantName(messageVariant);
 			}
 

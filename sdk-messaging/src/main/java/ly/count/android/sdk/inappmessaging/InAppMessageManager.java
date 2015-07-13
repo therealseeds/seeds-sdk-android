@@ -59,10 +59,25 @@ public class InAppMessageManager {
 	private int userAge;
 	private List<String> keywords;
 
+	private boolean a_bTestingOn = false;
 	private String messageVariantName;
+
+	private HashMap<String, String> segmentation;
+
+	public boolean isA_bTestingOn() {
+		return a_bTestingOn;
+	}
+
+	public void setA_bTestingOn(boolean a_bTestingOn) {
+		this.a_bTestingOn = a_bTestingOn;
+	}
 
 	public void setMessageVariantName(String messageVariantName) {
 		this.messageVariantName = messageVariantName;
+	}
+
+	public String getMessageVariantName() {
+		return messageVariantName;
 	}
 
 	// see http://stackoverflow.com/questions/7048198/thread-safe-singletons-in-java
@@ -117,22 +132,6 @@ public class InAppMessageManager {
 
 	private InAppMessageManager() {
 	}
-
-//	public InAppMessageManager(Context ctx, String serverUrl, String appKey) throws IllegalArgumentException {
-//		this(ctx, serverUrl, appKey, false);
-//	}
-
-
-//	public InAppMessageManager(Context ctx, final String interstitialRequestURL, final String appKey, final boolean includeLocation) throws IllegalArgumentException {
-//		Util.prepareAndroidAdId(ctx);
-//		InAppMessageManager.setmContext(ctx);
-//		this.interstitialRequestURL = interstitialRequestURL;
-//		this.mAppKey = appKey;
-//		this.mIncludeLocation = includeLocation;
-//		this.mRequestThread = null;
-//		this.mHandler = new Handler();
-//		initialize();
-//	}
 
 	public void setListener(InAppMessageListener listener) {
 		this.mListener = listener;
@@ -325,11 +324,6 @@ public class InAppMessageManager {
 			return;
 		}
 
-		// special event for A/B testing
-		if (messageVariantName != null) {
-			Countly.sharedInstance().recordEvent(messageVariantName);
-		}
-
 		InAppMessageResponse ad = mResponse;
 		boolean result = false;
 		try {
@@ -417,6 +411,14 @@ public class InAppMessageManager {
 			});
 		}
 		this.mResponse = null;
+		if (isA_bTestingOn()) {
+			setSegmentation();
+			Countly.sharedInstance().recordEvent("message shown", segmentation, 1);
+			android.util.Log.d("Main", "message shown: " + segmentation);
+		} else {
+			Countly.sharedInstance().recordEvent("message shown");
+			android.util.Log.d("Main", "message shown: no segmentation");
+		}
 	}
 
 	private void notifyAdClose(final InAppMessageResponse ad, final boolean ok) {
@@ -508,6 +510,11 @@ public class InAppMessageManager {
 
 	public void setKeywords(List<String> keywords) {
 		this.keywords = keywords;
+	}
+
+	private void setSegmentation() {
+		segmentation = new HashMap<String, String>();
+		segmentation.put("message", getMessageVariantName());
 	}
 
 }
