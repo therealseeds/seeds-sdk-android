@@ -20,7 +20,7 @@ android {
     buildToolsVersion "22"
 
     defaultConfig {
-        applicationId "ly.count.android.demo"
+        applicationId "com.playseeds.android.demo"
         minSdkVersion 12
         targetSdkVersion 22
         versionCode 1

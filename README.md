@@ -3,7 +3,7 @@
 
 ##Integrating the Seeds SDK
 
-Note the Seeds Android SDK is built with open source components, extending the [Countly Android SDK](https://github.com/Countly/countly-sdk-android) with in-app messaging functionality from the [MobFox Android SDK](https://github.com/mobfox/MobFox-Android-SDK).
+Note the Seeds Android SDK is built with open source components, extending the [Countly Android SDK](https://github.com/Countly/seeds-sdk-android) with in-app messaging functionality from the [MobFox Android SDK](https://github.com/mobfox/MobFox-Android-SDK).
 
 ##Preparation
 Please make a deep link to the in-app purchase item you’d like to promote and let us know what that deep link is.
@@ -136,10 +136,10 @@ manager.requestInAppMessage(); //  recommended to preload the promo
 
 ```xml
 <!-- for Seeds promo -->
-<activity android:name="ly.count.android.sdk.inappmessaging.RichMediaActivity"
+<activity android:name="com.playseeds.android.sdk.inappmessaging.RichMediaActivity"
    android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
    android:hardwareAccelerated="false" />
-<activity android:name="ly.count.android.sdk.inappmessaging.InAppWebView"
+<activity android:name="com.playseeds.android.sdk.inappmessaging.InAppWebView"
    android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
 ```
 
