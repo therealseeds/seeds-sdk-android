@@ -35,6 +35,7 @@ public class MainActivity extends Activity implements InAppMessageListener {
     private BroadcastReceiver messageReceiver;
 
     private Button iamButton;
+    private Button purchaseEventButton;
     private InAppMessageManager manager;
 
 
@@ -46,8 +47,8 @@ public class MainActivity extends Activity implements InAppMessageListener {
 
 
         iamButton = (Button) findViewById(R.id.iamButton);
+        purchaseEventButton = (Button) findViewById(R.id.purchaseEventButton);
 
-        /** You should use cloud.count.ly instead of YOUR_SERVER for the line below if you are using Seeds Cloud service */
         Seeds.sharedInstance()
                 .init(this, YOUR_SERVER, YOUR_APP_KEY, null, DeviceId.Type.ADVERTISING_ID)
                 .initMessaging(this, MainActivity.class, GCM_PROJECT_NUM, Seeds.CountlyMessagingMode.TEST)
@@ -118,6 +119,10 @@ public class MainActivity extends Activity implements InAppMessageListener {
         showInAppMessage();
     }
 
+    public void purchaseEventButtonClicked(View view) {
+        Log.d("Main", "purchase button clicked");
+        Seeds.sharedInstance().recordIAPEvent("item1", 0.99);
+    }
 
     public void showInAppMessage() {
         try {

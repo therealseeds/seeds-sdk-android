@@ -29,6 +29,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -432,6 +433,27 @@ public class Seeds {
     }
 
     /**
+     * Records an IAP event
+     * @param key name of the custom event, required, must not be the empty string
+     * @param price sum to associate with the event
+     * @throws IllegalStateException if Seeds SDK has not been initialized
+     * @throws IllegalArgumentException if key is null or empty
+     */
+    public void recordIAPEvent(String key, final double price) {
+        Log.d(TAG, "what's going on here");
+        if (isA_bTestingOn()) {
+            HashMap<String, String> segmentation = new HashMap<String, String>();
+            segmentation.put("message", getMessageVariantName());
+            recordEvent("IAP: " + key, segmentation, 1, price);
+            Log.d(TAG, "IAP: " + key + " segment: " + segmentation);
+        } else {
+            recordEvent("IAP: key", null, 1, price);
+            Log.d(TAG, "IAP: " + key + " no segmentation");
+        }
+    }
+
+
+    /**
      * Records a custom event with the specified segmentation values and count, and a sum of zero.
      * @param key name of the custom event, required, must not be the empty string
      * @param segmentation segmentation dictionary to associate with the event, can be null
@@ -760,4 +782,30 @@ public class Seeds {
     void setPrevSessionDurationStartTime(final long prevSessionDurationStartTime) { prevSessionDurationStartTime_ = prevSessionDurationStartTime; }
     int getActivityCount() { return activityCount_; }
     boolean getDisableUpdateSessionRequests() { return disableUpdateSessionRequests_; }
+
+
+    //// Seeds A/B testing stuff
+
+    private boolean a_bTestingOn = false;
+    private String messageVariantName;
+
+
+    public boolean isA_bTestingOn() {
+        return a_bTestingOn;
+    }
+
+    public void setA_bTestingOn(boolean a_bTestingOn) {
+        this.a_bTestingOn = a_bTestingOn;
+    }
+
+    public void setMessageVariantName(String messageVariantName) {
+        this.messageVariantName = messageVariantName;
+    }
+
+    public String getMessageVariantName() {
+        return messageVariantName;
+    }
+
+
+
 }

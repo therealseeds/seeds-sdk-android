@@ -20,4 +20,13 @@
         android:layout_marginBottom="50dp"
         android:onClick="iamButtonClicked" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Track Purchase Event"
+        android:id="@+id/purchaseEventButton"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:onClick="purchaseEventButtonClicked" />
+
 </RelativeLayout>

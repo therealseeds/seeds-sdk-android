@@ -58,26 +58,7 @@ public class InAppMessageManager {
 	private int userAge;
 	private List<String> keywords;
 
-	private boolean a_bTestingOn = false;
-	private String messageVariantName;
-
 	private HashMap<String, String> segmentation;
-
-	public boolean isA_bTestingOn() {
-		return a_bTestingOn;
-	}
-
-	public void setA_bTestingOn(boolean a_bTestingOn) {
-		this.a_bTestingOn = a_bTestingOn;
-	}
-
-	public void setMessageVariantName(String messageVariantName) {
-		this.messageVariantName = messageVariantName;
-	}
-
-	public String getMessageVariantName() {
-		return messageVariantName;
-	}
 
 	// see http://stackoverflow.com/questions/7048198/thread-safe-singletons-in-java
 	private static class SingletonHolder {
@@ -397,6 +378,14 @@ public class InAppMessageManager {
 				}
 			});
 		}
+		if (Seeds.sharedInstance().isA_bTestingOn()) {
+			setSegmentation();
+			Seeds.sharedInstance().recordEvent("message clicked", segmentation, 1);
+			android.util.Log.d("Main", "message shown: " + segmentation);
+		} else {
+			Seeds.sharedInstance().recordEvent("message clicked");
+			android.util.Log.d("Main", "message shown: no segmentation");
+		}
 	}
 
 	private void notifyAdShown(final InAppMessageResponse ad, final boolean ok) {
@@ -410,7 +399,7 @@ public class InAppMessageManager {
 			});
 		}
 		this.mResponse = null;
-		if (isA_bTestingOn()) {
+		if (Seeds.sharedInstance().isA_bTestingOn()) {
 			setSegmentation();
 			Seeds.sharedInstance().recordEvent("message shown", segmentation, 1);
 			android.util.Log.d("Main", "message shown: " + segmentation);
@@ -511,9 +500,9 @@ public class InAppMessageManager {
 		this.keywords = keywords;
 	}
 
-	private void setSegmentation() {
+	public void setSegmentation() {
 		segmentation = new HashMap<String, String>();
-		segmentation.put("message", getMessageVariantName());
+		segmentation.put("message", Seeds.sharedInstance().getMessageVariantName());
 	}
 
 }
