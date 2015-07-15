@@ -9,7 +9,7 @@ android {
     buildToolsVersion "22"
 
     defaultConfig {
-        applicationId "com.playseeds.android.demo.messaging"
+        applicationId "ly.count.android.demo.messaging"
         minSdkVersion 12
         targetSdkVersion 22
         versionCode 1

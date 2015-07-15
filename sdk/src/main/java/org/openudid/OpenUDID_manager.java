@@ -111,7 +111,7 @@ public class OpenUDID_manager implements ServiceConnection{
             catch (SecurityException e) {
                 startService();	// ignore this one, and start next one
             }
-		} else { //No more service to test
+		} else { //No more service to ly.count.android.sdk.test
 			
 			getMostFrequentOpenUDID(); //Choose the most frequent
 	
