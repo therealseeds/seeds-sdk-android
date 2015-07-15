@@ -3,7 +3,7 @@
 
 ##Integrating the Seeds SDK
 
-Note the Seeds Android SDK is built with open source components, extending the [Countly Android SDK](https://github.com/Countly/seeds-sdk-android) with in-app messaging functionality from the [MobFox Android SDK](https://github.com/mobfox/MobFox-Android-SDK).
+Note the Seeds Android SDK is built with production-tested open source components, including [Countly Android SDK](https://github.com/Countly/seeds-sdk-android) for analytics and in-app messaging functionality from the [MobFox Android SDK](https://github.com/mobfox/MobFox-Android-SDK).
 
 ##Preparation
 Please make a deep link to the in-app purchase item you’d like to promote and let us know what that deep link is.
@@ -30,7 +30,7 @@ repositories {
 }
 
 dependencies {
-   compile('com.playseeds:android-sdk-messaging:0.1.2')
+   compile('com.playseeds:android-sdk-messaging:0.1.3')
 }
 ```
 
@@ -39,9 +39,9 @@ dependencies {
 Download the following jars and add them to to your libs directory:
 
 
-[https://bintray.com/artifact/download/seedsinc/android_sdk/seeds-android-sdk-0.1.1.jar](https://bintray.com/artifact/download/seedsinc/android_sdk/seeds-android-sdk-0.1.1.jar)
+[https://bintray.com/artifact/download/seedsinc/android_sdk/seeds-android-sdk-0.1.3.jar](https://bintray.com/artifact/download/seedsinc/android_sdk/seeds-android-sdk-0.1.1.jar)
 
-[https://bintray.com/artifact/download/seedsinc/android_sdk/seeds-android-sdk-messaging-0.1.1.jar]([https://bintray.com/artifact/download/seedsinc/android_sdk/seeds-android-sdk-messaging-0.1.1.jar)
+[https://bintray.com/artifact/download/seedsinc/android_sdk/seeds-android-sdk-messaging-0.1.3.jar]([https://bintray.com/artifact/download/seedsinc/android_sdk/seeds-android-sdk-messaging-0.1.1.jar)
 
 
 
@@ -58,7 +58,6 @@ which requires adding the following methods to your main activity:
 ```java
 @Override
 public void inAppMessageClicked() {
-   Countly.sharedInstance().recordEvent("message clicked");
 }
 
 @Override
@@ -73,7 +72,6 @@ public void inAppMessageLoadSucceeded(InAppMessage inAppMessage) {
 
 @Override
 public void inAppMessageShown(InAppMessage inAppMessage, boolean b) {
-   Countly.sharedInstance().recordEvent("message shown");
 }
 
 @Override
@@ -82,12 +80,10 @@ public void noInAppMessageFound() {
 }
 ```
 
-Please include the additional event recording method calls as shown above for `inAppMessageClicked()` and `inAppMessageShown()`.
-
 2) Add the following to your main activity onCreate method. Please use your app_key as a String in place of YOUR_APP_KEY.
 
 ```java
-Countly.sharedInstance()
+Seeds.sharedInstance()
                .init(this, http://dash.playseeds.com/, “YOUR_APP_KEY”, null, “YOUR_DEVICE_ID”)
                .initInAppMessaging(this)
                .setLoggingEnabled(true);  //optional
@@ -95,14 +91,14 @@ Countly.sharedInstance()
 
 You can specify device ID by yourself if you have one (it has to be unique per device):
 
-`Countly.sharedInstance().init(this, "https://YOUR_SERVER", "YOUR_APP_KEY", "YOUR_DEVICE_ID")`
+`Seeds.sharedInstance().init(this, "https://YOUR_SERVER", "YOUR_APP_KEY", "YOUR_DEVICE_ID")`
 
 You can rely on Google Advertising ID for device ID generation (recommended) which also requires setting up [Google Play Services](https://developers.google.com/android/guides/setup).
 
-`Countly.sharedInstance().init(this, "https://YOUR_SERVER", "YOUR_APP_KEY", null, DeviceId.Type.ADVERTISING_ID)`
+`Seeds.sharedInstance().init(this, "https://YOUR_SERVER", "YOUR_APP_KEY", null, DeviceId.Type.ADVERTISING_ID)`
 
 Or you can use OpenUDID:
-`Countly.sharedInstance().init(this, "https://YOUR_SERVER", "YOUR_APP_KEY", null, DeviceId.Type.OPEN_UDID)`
+`Seeds.sharedInstance().init(this, "https://YOUR_SERVER", "YOUR_APP_KEY", null, DeviceId.Type.OPEN_UDID)`
 
 In the case of OpenUDID you'll need to include the following declaration in your AndroidManifest.xml:
 
@@ -129,8 +125,8 @@ manager.requestInAppMessage(); //  recommended to preload the promo
 ```
 
 4) Then add the following calls to all your activities:
-- Call `Countly.sharedInstance().onStart()` in onStart.
-- Call `Countly.sharedInstance().onStop()` in onStop.
+- Call `Seeds.sharedInstance().onStart()` in onStart.
+- Call `Seeds.sharedInstance().onStop()` in onStop.
 
 5) Finally, make sure that the INTERNET permission is set if it isn’t already in your manifest file and include the following in your AndroidManifest.xml:
 
@@ -184,10 +180,10 @@ public void showSeedsPromo() {
 In your item store code, please include the following tracking code after a purchase of the Seeds-promoted item:
 
 ```java
-Countly.sharedInstance().recordEvent("[item] purchased");
+Seeds.sharedInstance().recordIAPEvent(ITEM, price);
 ```
 
-where [item] is the name or SKU of the item.
+where ITEM is the name or SKU of the item and price is the price of the item.
 
 ## Support
 
