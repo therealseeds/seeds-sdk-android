@@ -34,5 +34,5 @@ dependencies {
     //    compile 'ly.count.android:sdk:15.06'
     //    compile 'ly.count.android:sdk-messaging:15.06'
     compile 'com.google.android.gms:play-services:7.3.0'
-    compile project(':sdk-inappmessaging')
+    compile project(':sdk')
 }

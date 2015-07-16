@@ -17,7 +17,7 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import java.util.List;
 
-import ly.count.android.sdk.Countly;
+import com.playseeds.android.sdk.Countly;
 
 /**
 * Created by artem on 14/10/14.

@@ -21,8 +21,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import ly.count.android.sdk.Countly;
-import ly.count.android.sdk.DeviceId;
+import com.playseeds.android.sdk.Countly;
+import com.playseeds.android.sdk.DeviceId;
 
 /**
  * Countly Messaging

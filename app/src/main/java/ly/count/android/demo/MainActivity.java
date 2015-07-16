@@ -9,9 +9,7 @@ import android.widget.Toast;
 
 import java.util.HashMap;
 
-import ly.count.android.sdk.Countly;
-
-import ly.count.android.demo.R;
+import com.playseeds.android.sdk.Countly;
 
 
 public class MainActivity extends Activity {

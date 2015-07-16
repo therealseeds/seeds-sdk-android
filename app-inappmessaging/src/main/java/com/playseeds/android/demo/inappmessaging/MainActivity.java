@@ -1,10 +1,6 @@
 package com.playseeds.android.demo.inappmessaging;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Handler;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,15 +8,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import ly.count.android.sdk.Countly;
-import ly.count.android.sdk.DeviceId;
+import com.playseeds.android.sdk.Countly;
+import com.playseeds.android.sdk.DeviceId;
 
 //import ly.count.android.sdk.messaging.CountlyMessaging;
 //import ly.count.android.sdk.messaging.Message;
 
-import com.playseeds.android.sdk.inappmessaging.inappmessaging.InAppMessage;
-import com.playseeds.android.sdk.inappmessaging.inappmessaging.InAppMessageListener;
-import com.playseeds.android.sdk.inappmessaging.inappmessaging.InAppMessageManager;
+import com.playseeds.android.sdk.inappmessaging.InAppMessage;
+import com.playseeds.android.sdk.inappmessaging.InAppMessageListener;
+import com.playseeds.android.sdk.inappmessaging.InAppMessageManager;
 import com.playseeds.demo.inappmessaging.R;
 
 
