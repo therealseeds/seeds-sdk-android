@@ -24,6 +24,7 @@ import com.playseeds.android.sdk.inappmessaging.inappmessaging.InAppMessageManag
 import com.playseeds.demo.inappmessaging.R;
 
 
+
 public class MainActivity extends Activity implements InAppMessageListener {
 
     private static String YOUR_SERVER = "http://devdashboard.playseeds.com"; // don't include trailing slash

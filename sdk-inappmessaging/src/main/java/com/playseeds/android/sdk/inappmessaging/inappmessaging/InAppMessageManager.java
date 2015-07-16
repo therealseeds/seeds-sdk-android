@@ -32,6 +32,7 @@ import android.location.Location;
 import android.os.Handler;
 
 import ly.count.android.sdk.DeviceId;
+import ly.count.android.sdk.Countly;
 
 public class InAppMessageManager {
 
