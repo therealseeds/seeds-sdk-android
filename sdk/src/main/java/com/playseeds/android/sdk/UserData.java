@@ -59,8 +59,8 @@ public class UserData {
         if(picturePath != null){
             File sourceFile = new File(picturePath);
             if (!sourceFile.isFile()) {
-                if (Countly.sharedInstance().isLoggingEnabled()) {
-                    Log.w(Countly.TAG, "Provided file " + picturePath + " can not be opened");
+                if (Seeds.sharedInstance().isLoggingEnabled()) {
+                    Log.w(Seeds.TAG, "Provided file " + picturePath + " can not be opened");
                 }
                 picturePath = null;
             }
@@ -74,8 +74,8 @@ public class UserData {
                 byear = Integer.parseInt(data.get(BYEAR_KEY));
             }
             catch(NumberFormatException e){
-                if (Countly.sharedInstance().isLoggingEnabled()) {
-                    Log.w(Countly.TAG, "Incorrect byear number format");
+                if (Seeds.sharedInstance().isLoggingEnabled()) {
+                    Log.w(Seeds.TAG, "Incorrect byear number format");
                 }
                 byear = 0;
             }
@@ -184,8 +184,8 @@ public class UserData {
             }
         }
         catch (JSONException e) {
-            if (Countly.sharedInstance().isLoggingEnabled()) {
-                Log.w(Countly.TAG, "Got exception converting an UserData to JSON", e);
+            if (Seeds.sharedInstance().isLoggingEnabled()) {
+                Log.w(Seeds.TAG, "Got exception converting an UserData to JSON", e);
             }
         }
 
@@ -219,8 +219,8 @@ public class UserData {
                         }
                     }
                 } catch (JSONException e) {
-                    if (Countly.sharedInstance().isLoggingEnabled()) {
-                        Log.w(Countly.TAG, "Got exception converting an Custom Json to Custom User data", e);
+                    if (Seeds.sharedInstance().isLoggingEnabled()) {
+                        Log.w(Seeds.TAG, "Got exception converting an Custom Json to Custom User data", e);
                     }
                 }
             }

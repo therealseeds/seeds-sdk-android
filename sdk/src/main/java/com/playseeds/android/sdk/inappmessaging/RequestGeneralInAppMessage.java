@@ -18,7 +18,7 @@
 
 package com.playseeds.android.sdk.inappmessaging;
 
-import com.playseeds.android.sdk.Countly;
+import com.playseeds.android.sdk.Seeds;
 
 import org.apache.http.Header;
 import org.w3c.dom.Document;
@@ -133,8 +133,8 @@ public class RequestGeneralInAppMessage extends RequestInAppMessage<InAppMessage
 			String messageVariant = jsonObject.getString("messageVariant");
 
 			if (messageVariant != null && !messageVariant.equals("false")) {
-				Countly.sharedInstance().setA_bTestingOn(true);
-				Countly.sharedInstance().setMessageVariantName(messageVariant);
+				Seeds.sharedInstance().setA_bTestingOn(true);
+				Seeds.sharedInstance().setMessageVariantName(messageVariant);
 			}
 
 

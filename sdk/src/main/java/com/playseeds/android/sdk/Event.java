@@ -71,8 +71,8 @@ class Event {
             json.put(SUM_KEY, sum);
         }
         catch (JSONException e) {
-            if (Countly.sharedInstance().isLoggingEnabled()) {
-                Log.w(Countly.TAG, "Got exception converting an Event to JSON", e);
+            if (Seeds.sharedInstance().isLoggingEnabled()) {
+                Log.w(Seeds.TAG, "Got exception converting an Event to JSON", e);
             }
         }
 
@@ -111,8 +111,8 @@ class Event {
             }
         }
         catch (JSONException e) {
-            if (Countly.sharedInstance().isLoggingEnabled()) {
-                Log.w(Countly.TAG, "Got exception converting JSON to an Event", e);
+            if (Seeds.sharedInstance().isLoggingEnabled()) {
+                Log.w(Seeds.TAG, "Got exception converting JSON to an Event", e);
             }
             event = null;
         }

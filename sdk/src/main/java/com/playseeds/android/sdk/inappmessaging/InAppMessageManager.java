@@ -32,7 +32,7 @@ import android.location.Location;
 import android.os.Handler;
 
 import com.playseeds.android.sdk.DeviceId;
-import com.playseeds.android.sdk.Countly;
+import com.playseeds.android.sdk.Seeds;
 
 public class InAppMessageManager {
 
@@ -378,12 +378,12 @@ public class InAppMessageManager {
 				}
 			});
 		}
-		if (Countly.sharedInstance().isA_bTestingOn()) {
+		if (Seeds.sharedInstance().isA_bTestingOn()) {
 			setSegmentation();
-			Countly.sharedInstance().recordEvent("message clicked", segmentation, 1);
+			Seeds.sharedInstance().recordEvent("message clicked", segmentation, 1);
 			android.util.Log.d("Main", "message shown: " + segmentation);
 		} else {
-			Countly.sharedInstance().recordEvent("message clicked");
+			Seeds.sharedInstance().recordEvent("message clicked");
 			android.util.Log.d("Main", "message shown: no segmentation");
 		}
 	}
@@ -399,12 +399,12 @@ public class InAppMessageManager {
 			});
 		}
 		this.mResponse = null;
-		if (Countly.sharedInstance().isA_bTestingOn()) {
+		if (Seeds.sharedInstance().isA_bTestingOn()) {
 			setSegmentation();
-			Countly.sharedInstance().recordEvent("message shown", segmentation, 1);
+			Seeds.sharedInstance().recordEvent("message shown", segmentation, 1);
 			android.util.Log.d("Main", "message shown: " + segmentation);
 		} else {
-			Countly.sharedInstance().recordEvent("message shown");
+			Seeds.sharedInstance().recordEvent("message shown");
 			android.util.Log.d("Main", "message shown: no segmentation");
 		}
 	}
@@ -502,7 +502,7 @@ public class InAppMessageManager {
 
 	public void setSegmentation() {
 		segmentation = new HashMap<String, String>();
-		segmentation.put("message", Countly.sharedInstance().getMessageVariantName());
+		segmentation.put("message", Seeds.sharedInstance().getMessageVariantName());
 	}
 
 }

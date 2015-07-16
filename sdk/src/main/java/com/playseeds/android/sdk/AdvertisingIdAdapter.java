@@ -29,14 +29,14 @@ public class AdvertisingIdAdapter {
                     deviceId.setId(DeviceId.Type.ADVERTISING_ID, getAdvertisingId(context));
                 } catch (Throwable t) {
                     if (t.getCause() != null && t.getCause().getClass().toString().contains("GooglePlayServicesAvailabilityException")) {
-                        // recoverable, let device ID be null, which will result in storing all requests to Countly server
+                        // recoverable, let device ID be null, which will result in storing all requests to Seeds server
                         // and rerunning them whenever Advertising ID becomes available
-                        if (Countly.sharedInstance().isLoggingEnabled()) {
+                        if (Seeds.sharedInstance().isLoggingEnabled()) {
                             Log.i(TAG, "Advertising ID cannot be determined yet");
                         }
                     } else if (t.getCause() != null && t.getCause().getClass().toString().contains("GooglePlayServicesNotAvailableException")) {
                         // non-recoverable, fallback to OpenUDID
-                        if (Countly.sharedInstance().isLoggingEnabled()) {
+                        if (Seeds.sharedInstance().isLoggingEnabled()) {
                             Log.w(TAG, "Advertising ID cannot be determined because Play Services are not available");
                         }
                         deviceId.switchToIdType(DeviceId.Type.OPEN_UDID, context, store);

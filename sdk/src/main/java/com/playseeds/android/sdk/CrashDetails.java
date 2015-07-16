@@ -56,7 +56,7 @@ import java.util.regex.Pattern;
  */
 class CrashDetails {
     private static ArrayList<String> logs = new ArrayList<String>();
-    private static int startTime = Countly.currentTimestamp();
+    private static int startTime = Seeds.currentTimestamp();
     private static Map<String,String> customSegments = null;
     private static boolean inBackground = true;
     private static long totalMemory = 0;
@@ -252,8 +252,8 @@ class CrashDetails {
             }
         }
         catch(Exception e){
-            if (Countly.sharedInstance().isLoggingEnabled()) {
-                Log.i(Countly.TAG, "Can't get batter level");
+            if (Seeds.sharedInstance().isLoggingEnabled()) {
+                Log.i(Seeds.TAG, "Can't get batter level");
             }
         }
 
@@ -264,7 +264,7 @@ class CrashDetails {
      * Get app's running time before crashing.
      */
     static String getRunningTime() {
-        return Integer.toString(Countly.currentTimestamp() - startTime);
+        return Integer.toString(Seeds.currentTimestamp() - startTime);
     }
 
     /**
@@ -314,8 +314,8 @@ class CrashDetails {
             return "false";
         }
         catch(Exception e){
-            if (Countly.sharedInstance().isLoggingEnabled()) {
-                Log.w(Countly.TAG, "Got exception determining connectivity", e);
+            if (Seeds.sharedInstance().isLoggingEnabled()) {
+                Log.w(Seeds.TAG, "Got exception determining connectivity", e);
             }
         }
         return null;

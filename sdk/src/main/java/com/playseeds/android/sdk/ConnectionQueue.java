@@ -37,7 +37,7 @@ import javax.net.ssl.TrustManager;
  * a Count.ly server on a background thread.
  *
  * None of the methods in this class are synchronized because access to this class is
- * controlled by the Countly singleton, which is synchronized.
+ * controlled by the Seeds singleton, which is synchronized.
  *
  * NOTE: This class is only public to facilitate unit testing, because
  *       of this bug in dexmaker: https://code.google.com/p/dexmaker/issues/detail?id=34
@@ -76,11 +76,11 @@ public class ConnectionQueue {
     void setServerURL(final String serverURL) {
         serverURL_ = serverURL;
 
-        if (Countly.publicKeyPinCertificates == null) {
+        if (Seeds.publicKeyPinCertificates == null) {
             sslContext_ = null;
         } else {
             try {
-                TrustManager tm[] = { new CertificateTrustManager(Countly.publicKeyPinCertificates) };
+                TrustManager tm[] = { new CertificateTrustManager(Seeds.publicKeyPinCertificates) };
                 sslContext_ = SSLContext.getInstance("TLS");
                 sslContext_.init(null, tm, null);
             } catch (Throwable e) {
@@ -117,10 +117,10 @@ public class ConnectionQueue {
         if (store_ == null) {
             throw new IllegalStateException("countly store has not been set");
         }
-        if (serverURL_ == null || !Countly.isValidURL(serverURL_)) {
+        if (serverURL_ == null || !Seeds.isValidURL(serverURL_)) {
             throw new IllegalStateException("server URL is not valid");
         }
-        if (Countly.publicKeyPinCertificates != null && !serverURL_.startsWith("https")) {
+        if (Seeds.publicKeyPinCertificates != null && !serverURL_.startsWith("https")) {
             throw new IllegalStateException("server must start with https once you specified public keys");
         }
     }
@@ -132,8 +132,8 @@ public class ConnectionQueue {
     void beginSession() {
         checkInternalState();
         final String data = "app_key=" + appKey_
-                          + "&timestamp=" + Countly.currentTimestamp()
-                          + "&sdk_version=" + Countly.COUNTLY_SDK_VERSION_STRING
+                          + "&timestamp=" + Seeds.currentTimestamp()
+                          + "&sdk_version=" + Seeds.COUNTLY_SDK_VERSION_STRING
                           + "&begin_session=1"
                           + "&metrics=" + DeviceInfo.getMetrics(context_);
 
@@ -152,7 +152,7 @@ public class ConnectionQueue {
         checkInternalState();
         if (duration > 0) {
             final String data = "app_key=" + appKey_
-                              + "&timestamp=" + Countly.currentTimestamp()
+                              + "&timestamp=" + Seeds.currentTimestamp()
                               + "&session_duration=" + duration
                               + "&location=" + getCountlyStore().getAndRemoveLocation();
 
@@ -162,14 +162,14 @@ public class ConnectionQueue {
         }
     }
 
-    public void tokenSession(String token, Countly.CountlyMessagingMode mode) {
+    public void tokenSession(String token, Seeds.CountlyMessagingMode mode) {
         checkInternalState();
 
         final String data = "app_key=" + appKey_
-                + "&" + "timestamp=" + Countly.currentTimestamp()
+                + "&" + "timestamp=" + Seeds.currentTimestamp()
                 + "&" + "token_session=1"
                 + "&" + "android_token=" + token
-                + "&" + "test_mode=" + (mode == Countly.CountlyMessagingMode.TEST ? 2 : 0)
+                + "&" + "test_mode=" + (mode == Seeds.CountlyMessagingMode.TEST ? 2 : 0)
                 + "&" + "locale=" + DeviceInfo.getLocale();
 
         // To ensure begin_session will be fully processed by the server before token_session
@@ -192,7 +192,7 @@ public class ConnectionQueue {
     void endSession(final int duration) {
         checkInternalState();
         String data = "app_key=" + appKey_
-                    + "&timestamp=" + Countly.currentTimestamp()
+                    + "&timestamp=" + Seeds.currentTimestamp()
                     + "&end_session=1";
         if (duration > 0) {
             data += "&session_duration=" + duration;
@@ -213,7 +213,7 @@ public class ConnectionQueue {
 
         if(!userdata.equals("")){
             String data = "app_key=" + appKey_
-                    + "&timestamp=" + Countly.currentTimestamp()
+                    + "&timestamp=" + Seeds.currentTimestamp()
                     + userdata;
             store_.addConnection(data);
 
@@ -222,7 +222,7 @@ public class ConnectionQueue {
     }
 
     /**
-     * Attribute installation to Countly server.
+     * Attribute installation to Seeds server.
      * @param referrer query parameters
      * @throws java.lang.IllegalStateException if context, app key, store, or server URL have not been set
      */
@@ -231,7 +231,7 @@ public class ConnectionQueue {
 
         if(referrer != null){
             String data = "app_key=" + appKey_
-                    + "&timestamp=" + Countly.currentTimestamp()
+                    + "&timestamp=" + Seeds.currentTimestamp()
                     + referrer;
             store_.addConnection(data);
 
@@ -246,8 +246,8 @@ public class ConnectionQueue {
     void sendCrashReport(String error, boolean nonfatal) {
         checkInternalState();
         final String data = "app_key=" + appKey_
-                + "&timestamp=" + Countly.currentTimestamp()
-                + "&sdk_version=" + Countly.COUNTLY_SDK_VERSION_STRING
+                + "&timestamp=" + Seeds.currentTimestamp()
+                + "&sdk_version=" + Seeds.COUNTLY_SDK_VERSION_STRING
                 + "&crash=" + CrashDetails.getCrashData(context_, error, nonfatal);
 
         store_.addConnection(data);
@@ -263,7 +263,7 @@ public class ConnectionQueue {
     void recordEvents(final String events) {
         checkInternalState();
         final String data = "app_key=" + appKey_
-                          + "&timestamp=" + Countly.currentTimestamp()
+                          + "&timestamp=" + Seeds.currentTimestamp()
                           + "&events=" + events;
 
         store_.addConnection(data);
@@ -279,7 +279,7 @@ public class ConnectionQueue {
     void recordLocation(final String events) {
         checkInternalState();
         final String data = "app_key=" + appKey_
-                          + "&timestamp=" + Countly.currentTimestamp()
+                          + "&timestamp=" + Seeds.currentTimestamp()
                           + "&events=" + events;
 
         store_.addConnection(data);

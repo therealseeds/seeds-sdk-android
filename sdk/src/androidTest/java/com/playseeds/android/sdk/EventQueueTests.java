@@ -32,11 +32,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.playseeds.android.sdk.Countly;
-import com.playseeds.android.sdk.CountlyStore;
-import com.playseeds.android.sdk.Event;
-import com.playseeds.android.sdk.EventQueue;
-
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -63,7 +58,7 @@ public class EventQueueTests extends AndroidTestCase {
         final int count = 42;
         final double sum = 3.0d;
         final Map<String, String> segmentation = new HashMap<String, String>(1);
-        final int timestamp = Countly.currentTimestamp();
+        final int timestamp = Seeds.currentTimestamp();
         final ArgumentCaptor<Integer> arg = ArgumentCaptor.forClass(Integer.class);
 
         mEventQueue.recordEvent(eventKey, segmentation, count, sum);

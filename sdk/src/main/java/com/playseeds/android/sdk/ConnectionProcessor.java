@@ -76,7 +76,7 @@ public class ConnectionProcessor implements Runnable {
             urlStr += eventData;
         final URL url = new URL(urlStr);
         final HttpURLConnection conn;
-        if (Countly.publicKeyPinCertificates == null) {
+        if (Seeds.publicKeyPinCertificates == null) {
             conn = (HttpURLConnection)url.openConnection();
         } else {
             HttpsURLConnection c = (HttpsURLConnection)url.openConnection();
@@ -88,8 +88,8 @@ public class ConnectionProcessor implements Runnable {
         conn.setUseCaches(false);
         conn.setDoInput(true);
         String picturePath = UserData.getPicturePathFromQuery(url);
-        if (Countly.sharedInstance().isLoggingEnabled()) {
-            Log.d(Countly.TAG, "Got picturePath: " + picturePath);
+        if (Seeds.sharedInstance().isLoggingEnabled()) {
+            Log.d(Seeds.TAG, "Got picturePath: " + picturePath);
         }
         if(!picturePath.equals("")){
         	//Uploading files:
@@ -125,8 +125,8 @@ public class ConnectionProcessor implements Runnable {
             writer.append("--" + boundary + "--").append(CRLF).flush();
         }
         else if(eventData.contains("&crash=")){
-            if (Countly.sharedInstance().isLoggingEnabled()) {
-                Log.d(Countly.TAG, "Using post because of crash");
+            if (Seeds.sharedInstance().isLoggingEnabled()) {
+                Log.d(Seeds.TAG, "Using post because of crash");
             }
             conn.setDoOutput(true);
             conn.setRequestMethod("POST");
@@ -156,8 +156,8 @@ public class ConnectionProcessor implements Runnable {
             if (deviceId_.getId() == null) {
                 // When device ID is supplied by OpenUDID or by Google Advertising ID.
                 // In some cases it might take time for them to initialize. So, just wait for it.
-                if (Countly.sharedInstance().isLoggingEnabled()) {
-                    Log.i(Countly.TAG, "No Device ID available yet, skipping request " + storedEvents[0]);
+                if (Seeds.sharedInstance().isLoggingEnabled()) {
+                    Log.i(Seeds.TAG, "No Device ID available yet, skipping request " + storedEvents[0]);
                 }
                 break;
             }
@@ -184,8 +184,8 @@ public class ConnectionProcessor implements Runnable {
                     final HttpURLConnection httpConn = (HttpURLConnection) conn;
                     final int responseCode = httpConn.getResponseCode();
                     success = responseCode >= 200 && responseCode < 300;
-                    if (!success && Countly.sharedInstance().isLoggingEnabled()) {
-                        Log.w(Countly.TAG, "HTTP error response code was " + responseCode + " from submitting event data: " + eventData);
+                    if (!success && Seeds.sharedInstance().isLoggingEnabled()) {
+                        Log.w(Seeds.TAG, "HTTP error response code was " + responseCode + " from submitting event data: " + eventData);
                     }
                 }
 
@@ -193,14 +193,14 @@ public class ConnectionProcessor implements Runnable {
                 if (success) {
                     final JSONObject responseDict = new JSONObject(responseData.toString("UTF-8"));
                     success = responseDict.optString("result").equalsIgnoreCase("success");
-                    if (!success && Countly.sharedInstance().isLoggingEnabled()) {
-                        Log.w(Countly.TAG, "Response from Countly server did not report success, it was: " + responseData.toString("UTF-8"));
+                    if (!success && Seeds.sharedInstance().isLoggingEnabled()) {
+                        Log.w(Seeds.TAG, "Response from Seeds server did not report success, it was: " + responseData.toString("UTF-8"));
                     }
                 }
 
                 if (success) {
-                    if (Countly.sharedInstance().isLoggingEnabled()) {
-                        Log.d(Countly.TAG, "ok ->" + eventData);
+                    if (Seeds.sharedInstance().isLoggingEnabled()) {
+                        Log.d(Seeds.TAG, "ok ->" + eventData);
                     }
 
                     // successfully submitted event data to Count.ly server, so remove
@@ -213,8 +213,8 @@ public class ConnectionProcessor implements Runnable {
                 }
             }
             catch (Exception e) {
-                if (Countly.sharedInstance().isLoggingEnabled()) {
-                    Log.w(Countly.TAG, "Got exception while trying to submit event data: " + eventData, e);
+                if (Seeds.sharedInstance().isLoggingEnabled()) {
+                    Log.w(Seeds.TAG, "Got exception while trying to submit event data: " + eventData, e);
                 }
                 // if exception occurred, stop processing, let next tick take care of retrying
                 break;

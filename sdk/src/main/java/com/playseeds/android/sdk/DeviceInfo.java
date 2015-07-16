@@ -83,8 +83,8 @@ class DeviceInfo {
             resolution = metrics.widthPixels + "x" + metrics.heightPixels;
         }
         catch (Throwable t) {
-            if (Countly.sharedInstance().isLoggingEnabled()) {
-                Log.i(Countly.TAG, "Device resolution cannot be determined");
+            if (Seeds.sharedInstance().isLoggingEnabled()) {
+                Log.i(Seeds.TAG, "Device resolution cannot be determined");
             }
         }
         return resolution;
@@ -143,8 +143,8 @@ class DeviceInfo {
         }
         if (carrier == null || carrier.length() == 0) {
             carrier = "";
-            if (Countly.sharedInstance().isLoggingEnabled()) {
-                Log.i(Countly.TAG, "No carrier found");
+            if (Seeds.sharedInstance().isLoggingEnabled()) {
+                Log.i(Seeds.TAG, "No carrier found");
             }
         }
         return carrier;
@@ -164,13 +164,13 @@ class DeviceInfo {
      * is not present.
      */
     static String getAppVersion(final Context context) {
-        String result = Countly.DEFAULT_APP_VERSION;
+        String result = Seeds.DEFAULT_APP_VERSION;
         try {
             result = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
         }
         catch (PackageManager.NameNotFoundException e) {
-            if (Countly.sharedInstance().isLoggingEnabled()) {
-                Log.i(Countly.TAG, "No app version found");
+            if (Seeds.sharedInstance().isLoggingEnabled()) {
+                Log.i(Seeds.TAG, "No app version found");
             }
         }
         return result;
@@ -185,14 +185,14 @@ class DeviceInfo {
             try {
                 result = context.getPackageManager().getInstallerPackageName(context.getPackageName());
             } catch (Exception e) {
-                if (Countly.sharedInstance().isLoggingEnabled()) {
-                    Log.i(Countly.TAG, "Can't get Installer package");
+                if (Seeds.sharedInstance().isLoggingEnabled()) {
+                    Log.i(Seeds.TAG, "Can't get Installer package");
                 }
             }
             if (result == null || result.length() == 0) {
                 result = "";
-                if (Countly.sharedInstance().isLoggingEnabled()) {
-                    Log.i(Countly.TAG, "No store found");
+                if (Seeds.sharedInstance().isLoggingEnabled()) {
+                    Log.i(Seeds.TAG, "No store found");
                 }
             }
         }

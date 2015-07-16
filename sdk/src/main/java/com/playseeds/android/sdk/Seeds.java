@@ -25,6 +25,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 
+import com.playseeds.android.sdk.inappmessaging.InAppMessageListener;
 import com.playseeds.android.sdk.inappmessaging.InAppMessageManager;
 
 import java.io.PrintWriter;
@@ -41,10 +42,10 @@ import java.util.concurrent.TimeUnit;
 
 
 /**
- * This class is the public API for the Countly Android SDK.
+ * This class is the public API for the Seeds Android SDK.
  * Get more details <a href="https://github.com/the-real-sseds/seeds-sdk-android">here</a>.
  */
-public class Countly {
+public class Seeds {
 
     /**
      * Current version of the Count.ly Android SDK as a displayable string.
@@ -58,7 +59,7 @@ public class Countly {
     /**
      * Tag used in all logging in the Count.ly SDK.
      */
-    public static final String TAG = "Countly";
+    public static final String TAG = "Seeds";
 
     /**
      * Determines how many custom events can be queued locally before
@@ -73,8 +74,8 @@ public class Countly {
     protected static List<String> publicKeyPinCertificates;
 
     /**
-     * Enum used in Countly.initMessaging() method which controls what kind of
-     * app installation it is. Later (in Countly Dashboard or when calling Countly API method),
+     * Enum used in Seeds.initMessaging() method which controls what kind of
+     * app installation it is. Later (in Seeds Dashboard or when calling Seeds API method),
      * you'll be able to choose whether you want to send a message to ly.count.android.sdk.test devices,
      * or to production ones.
      */
@@ -85,7 +86,7 @@ public class Countly {
 
     // see http://stackoverflow.com/questions/7048198/thread-safe-singletons-in-java
     private static class SingletonHolder {
-        static final Countly instance = new Countly();
+        static final Seeds instance = new Seeds();
     }
 
     private ConnectionQueue connectionQueue_;
@@ -97,21 +98,21 @@ public class Countly {
     private int activityCount_;
     private boolean disableUpdateSessionRequests_;
     private boolean enableLogging_;
-    private Countly.CountlyMessagingMode messagingMode_;
+    private Seeds.CountlyMessagingMode messagingMode_;
     private Context context_;
 
     /**
-     * Returns the Countly singleton.
+     * Returns the Seeds singleton.
      */
-    public static Countly sharedInstance() {
+    public static Seeds sharedInstance() {
         return SingletonHolder.instance;
     }
 
     /**
-     * Constructs a Countly object.
+     * Constructs a Seeds object.
      * Creates a new ConnectionQueue and initializes the session timer.
      */
-    Countly() {
+    Seeds() {
         connectionQueue_ = new ConnectionQueue();
         timerService_ = Executors.newSingleThreadScheduledExecutor();
         timerService_.scheduleWithFixedDelay(new Runnable() {
@@ -124,49 +125,49 @@ public class Countly {
 
 
     /**
-     * Initializes the Countly SDK. Call from your main Activity's onCreate() method.
+     * Initializes the Seeds SDK. Call from your main Activity's onCreate() method.
      * Must be called before other SDK methods can be used.
      * Device ID is supplied by OpenUDID service if available, otherwise Advertising ID is used.
-     * BE CAUTIOUS!!!! If neither OpenUDID, nor Advertising ID is available, Countly will ignore this user.
+     * BE CAUTIOUS!!!! If neither OpenUDID, nor Advertising ID is available, Seeds will ignore this user.
      * @param context application context
-     * @param serverURL URL of the Countly server to submit data to; use "https://cloud.count.ly" for Countly Cloud
-     * @param appKey app key for the application being tracked; find in the Countly Dashboard under Management &gt; Applications
-     * @return Countly instance for easy method chaining
+     * @param serverURL URL of the Seeds server to submit data to; use "https://cloud.count.ly" for Seeds Cloud
+     * @param appKey app key for the application being tracked; find in the Seeds Dashboard under Management &gt; Applications
+     * @return Seeds instance for easy method chaining
      * @throws java.lang.IllegalArgumentException if context, serverURL, appKey, or deviceID are invalid
-     * @throws java.lang.IllegalStateException if the Countly SDK has already been initialized
+     * @throws java.lang.IllegalStateException if the Seeds SDK has already been initialized
      */
-    public Countly init(final Context context, final String serverURL, final String appKey) {
+    public Seeds init(final Context context, final String serverURL, final String appKey) {
         return init(context, serverURL, appKey, null, OpenUDIDAdapter.isOpenUDIDAvailable() ? DeviceId.Type.OPEN_UDID : DeviceId.Type.ADVERTISING_ID);
     }
 
     /**
-     * Initializes the Countly SDK. Call from your main Activity's onCreate() method.
+     * Initializes the Seeds SDK. Call from your main Activity's onCreate() method.
      * Must be called before other SDK methods can be used.
      * @param context application context
-     * @param serverURL URL of the Countly server to submit data to; use "https://cloud.count.ly" for Countly Cloud
-     * @param appKey app key for the application being tracked; find in the Countly Dashboard under Management &gt; Applications
-     * @param deviceID unique ID for the device the app is running on; note that null in deviceID means that Countly will fall back to OpenUDID, then, if it's not available, to Google Advertising ID
-     * @return Countly instance for easy method chaining
+     * @param serverURL URL of the Seeds server to submit data to; use "https://cloud.count.ly" for Seeds Cloud
+     * @param appKey app key for the application being tracked; find in the Seeds Dashboard under Management &gt; Applications
+     * @param deviceID unique ID for the device the app is running on; note that null in deviceID means that Seeds will fall back to OpenUDID, then, if it's not available, to Google Advertising ID
+     * @return Seeds instance for easy method chaining
      * @throws IllegalArgumentException if context, serverURL, appKey, or deviceID are invalid
      * @throws IllegalStateException if init has previously been called with different values during the same application instance
      */
-    public Countly init(final Context context, final String serverURL, final String appKey, final String deviceID) {
+    public Seeds init(final Context context, final String serverURL, final String appKey, final String deviceID) {
         return init(context, serverURL, appKey, deviceID, null);
     }
 
     /**
-     * Initializes the Countly SDK. Call from your main Activity's onCreate() method.
+     * Initializes the Seeds SDK. Call from your main Activity's onCreate() method.
      * Must be called before other SDK methods can be used.
      * @param context application context
-     * @param serverURL URL of the Countly server to submit data to; use "https://cloud.count.ly" for Countly Cloud
-     * @param appKey app key for the application being tracked; find in the Countly Dashboard under Management &gt; Applications
-     * @param deviceID unique ID for the device the app is running on; note that null in deviceID means that Countly will fall back to OpenUDID, then, if it's not available, to Google Advertising ID
-     * @param idMode enum value specifying which device ID generation strategy Countly should use: OpenUDID or Google Advertising ID
-     * @return Countly instance for easy method chaining
+     * @param serverURL URL of the Seeds server to submit data to; use "https://cloud.count.ly" for Seeds Cloud
+     * @param appKey app key for the application being tracked; find in the Seeds Dashboard under Management &gt; Applications
+     * @param deviceID unique ID for the device the app is running on; note that null in deviceID means that Seeds will fall back to OpenUDID, then, if it's not available, to Google Advertising ID
+     * @param idMode enum value specifying which device ID generation strategy Seeds should use: OpenUDID or Google Advertising ID
+     * @return Seeds instance for easy method chaining
      * @throws IllegalArgumentException if context, serverURL, appKey, or deviceID are invalid
      * @throws IllegalStateException if init has previously been called with different values during the same application instance
      */
-    public synchronized Countly init(final Context context, final String serverURL, final String appKey, final String deviceID, DeviceId.Type idMode) {
+    public synchronized Seeds init(final Context context, final String serverURL, final String appKey, final String deviceID, DeviceId.Type idMode) {
         if (context == null) {
             throw new IllegalArgumentException("valid context is required");
         }
@@ -192,11 +193,11 @@ public class Countly {
         if (eventQueue_ != null && (!connectionQueue_.getServerURL().equals(serverURL) ||
                                     !connectionQueue_.getAppKey().equals(appKey) ||
                                     !DeviceId.deviceIDEqualsNullSafe(deviceID, idMode, connectionQueue_.getDeviceId()) )) {
-            throw new IllegalStateException("Countly cannot be reinitialized with different values");
+            throw new IllegalStateException("Seeds cannot be reinitialized with different values");
         }
 
         // In some cases CountlyMessaging does some background processing, so it needs a way
-        // to start Countly on itself
+        // to start Seeds on itself
         if (MessagingAdapter.isMessagingAvailable()) {
             MessagingAdapter.storeConfiguration(context, serverURL, appKey, deviceID, idMode);
         }
@@ -228,51 +229,55 @@ public class Countly {
         // context is allowed to be changed on the second init call
         connectionQueue_.setContext(context);
 
+        initInAppMessaging((Activity) context);
+        InAppMessageManager.sharedInstance().setListener((InAppMessageListener) context);
+
+
         return this;
     }
 
     /**
-     * Checks whether Countly.init has been already called.
-     * @return true if Countly is ready to use
+     * Checks whether Seeds.init has been already called.
+     * @return true if Seeds is ready to use
      */
     public synchronized boolean isInitialized() {
         return eventQueue_ != null;
     }
 
     /**
-     * Initializes the Countly MessagingSDK. Call from your main Activity's onCreate() method.
+     * Initializes the Seeds MessagingSDK. Call from your main Activity's onCreate() method.
      * @param activity application activity which acts as a final destination for notifications
      * @param activityClass application activity class which acts as a final destination for notifications
      * @param projectID ProjectID for this app from Google API Console
      * @param mode whether this app installation is a ly.count.android.sdk.test release or production
-     * @return Countly instance for easy method chaining
+     * @return Seeds instance for easy method chaining
      * @throws IllegalStateException if no CountlyMessaging class is found (you need to use countly-messaging-sdk-android library instead of countly-sdk-android)
      */
-    public Countly initMessaging(Activity activity, Class<? extends Activity> activityClass, String projectID, Countly.CountlyMessagingMode mode) {
+    public Seeds initMessaging(Activity activity, Class<? extends Activity> activityClass, String projectID, Seeds.CountlyMessagingMode mode) {
         return initMessaging(activity, activityClass, projectID, null, mode);
     }
     /**
-     * Initializes the Countly MessagingSDK. Call from your main Activity's onCreate() method.
+     * Initializes the Seeds MessagingSDK. Call from your main Activity's onCreate() method.
      * @param activity application activity which acts as a final destination for notifications
      * @param activityClass application activity class which acts as a final destination for notifications
      * @param projectID ProjectID for this app from Google API Console
      * @param buttonNames Strings to use when displaying Dialogs (uses new String[]{"Open", "Review"} by default)
      * @param mode whether this app installation is a ly.count.android.sdk.test release or production
-     * @return Countly instance for easy method chaining
+     * @return Seeds instance for easy method chaining
      * @throws IllegalStateException if no CountlyMessaging class is found (you need to use countly-messaging-sdk-android library instead of countly-sdk-android)
      */
-    public synchronized Countly initMessaging(Activity activity, Class<? extends Activity> activityClass, String projectID, String[] buttonNames, Countly.CountlyMessagingMode mode) {
+    public synchronized Seeds initMessaging(Activity activity, Class<? extends Activity> activityClass, String projectID, String[] buttonNames, Seeds.CountlyMessagingMode mode) {
         if (mode != null && !MessagingAdapter.isMessagingAvailable()) {
-            throw new IllegalStateException("you need to include countly-messaging-sdk-android library instead of countly-sdk-android if you want to use Countly Messaging");
+            throw new IllegalStateException("you need to include countly-messaging-sdk-android library instead of countly-sdk-android if you want to use Seeds Messaging");
         } else {
             if (!MessagingAdapter.init(activity, activityClass, projectID, buttonNames)) {
-                throw new IllegalStateException("couldn't initialize Countly Messaging");
+                throw new IllegalStateException("couldn't initialize Seeds Messaging");
             }
         }
         messagingMode_ = mode;
 
         if (MessagingAdapter.isMessagingAvailable()) {
-            Log.d(Countly.TAG, "deviceId in initMessaging: " + connectionQueue_.getDeviceId() +  connectionQueue_.getDeviceId().getId() + connectionQueue_.getDeviceId().getType());
+            Log.d(Seeds.TAG, "deviceId in initMessaging: " + connectionQueue_.getDeviceId() +  connectionQueue_.getDeviceId().getId() + connectionQueue_.getDeviceId().getType());
             MessagingAdapter.storeConfiguration(connectionQueue_.getContext(), connectionQueue_.getServerURL(), connectionQueue_.getAppKey(), connectionQueue_.getDeviceId().getId(), connectionQueue_.getDeviceId().getType());
         }
 
@@ -280,15 +285,15 @@ public class Countly {
     }
 
     /**
-     * Initializes the Countly InAppMessaging part of the MessagingSDK. Call from your main Activity's onCreate() method.
+     * Initializes the Seeds InAppMessaging part of the MessagingSDK. Call from your main Activity's onCreate() method.
      * @param activity application activity which acts as a final destination for notifications
-     * @return Countly instance for easy method chaining
+     * @return Seeds instance for easy method chaining
      */
 
-    public synchronized Countly initInAppMessaging(Activity activity) {
+    public synchronized Seeds initInAppMessaging(Activity activity) {
 
 
-        Log.d(Countly.TAG, "deviceId: " + connectionQueue_.getDeviceId() +  connectionQueue_.getDeviceId().getId() + connectionQueue_.getDeviceId().getType());
+        Log.d(Seeds.TAG, "deviceId: " + connectionQueue_.getDeviceId() + connectionQueue_.getDeviceId().getId() + connectionQueue_.getDeviceId().getType());
 
         InAppMessageManager.sharedInstance().init(connectionQueue_.getContext(), connectionQueue_.getServerURL(), connectionQueue_.getAppKey(), connectionQueue_.getDeviceId().getId(), connectionQueue_.getDeviceId().getType());
 
@@ -300,7 +305,7 @@ public class Countly {
      * Immediately disables session &amp; event tracking and clears any stored session &amp; event data.
      * This API is useful if your app has a tracking opt-out switch, and you want to immediately
      * disable tracking when a user opts out. The onStart/onStop/recordEvent methods will throw
-     * IllegalStateException after calling this until Countly is reinitialized by calling init
+     * IllegalStateException after calling this until Seeds is reinitialized by calling init
      * again.
      */
     public synchronized void halt() {
@@ -318,11 +323,11 @@ public class Countly {
     }
 
     /**
-     * Tells the Countly SDK that an Activity has started. Since Android does not have an
+     * Tells the Seeds SDK that an Activity has started. Since Android does not have an
      * easy way to determine when an application instance starts and stops, you must call this
      * method from every one of your Activity's onStart methods for accurate application
      * session tracking.
-     * @throws IllegalStateException if Countly SDK has not been initialized
+     * @throws IllegalStateException if Seeds SDK has not been initialized
      */
     public synchronized void onStart() {
         if (eventQueue_ == null) {
@@ -336,8 +341,8 @@ public class Countly {
 
         //check if there is an install referrer data
         String referrer = ReferrerReceiver.getReferrer(context_);
-        if (Countly.sharedInstance().isLoggingEnabled()) {
-            Log.d(Countly.TAG, "Checking referrer: " + referrer);
+        if (Seeds.sharedInstance().isLoggingEnabled()) {
+            Log.d(Seeds.TAG, "Checking referrer: " + referrer);
         }
         if(referrer != null){
             connectionQueue_.sendReferrerData(referrer);
@@ -357,11 +362,11 @@ public class Countly {
     }
 
     /**
-     * Tells the Countly SDK that an Activity has stopped. Since Android does not have an
+     * Tells the Seeds SDK that an Activity has stopped. Since Android does not have an
      * easy way to determine when an application instance starts and stops, you must call this
      * method from every one of your Activity's onStop methods for accurate application
      * session tracking.
-     * @throws IllegalStateException if Countly SDK has not been initialized, or if
+     * @throws IllegalStateException if Seeds SDK has not been initialized, or if
      *                               unbalanced calls to onStart/onStop are detected
      */
     public synchronized void onStop() {
@@ -403,7 +408,7 @@ public class Countly {
     /**
      * Records a custom event with no segmentation values, a count of one and a sum of zero.
      * @param key name of the custom event, required, must not be the empty string
-     * @throws IllegalStateException if Countly SDK has not been initialized
+     * @throws IllegalStateException if Seeds SDK has not been initialized
      * @throws IllegalArgumentException if key is null or empty
      */
     public void recordEvent(final String key) {
@@ -414,7 +419,7 @@ public class Countly {
      * Records a custom event with no segmentation values, the specified count, and a sum of zero.
      * @param key name of the custom event, required, must not be the empty string
      * @param count count to associate with the event, should be more than zero
-     * @throws IllegalStateException if Countly SDK has not been initialized
+     * @throws IllegalStateException if Seeds SDK has not been initialized
      * @throws IllegalArgumentException if key is null or empty
      */
     public void recordEvent(final String key, final int count) {
@@ -426,7 +431,7 @@ public class Countly {
      * @param key name of the custom event, required, must not be the empty string
      * @param count count to associate with the event, should be more than zero
      * @param sum sum to associate with the event
-     * @throws IllegalStateException if Countly SDK has not been initialized
+     * @throws IllegalStateException if Seeds SDK has not been initialized
      * @throws IllegalArgumentException if key is null or empty
      */
     public void recordEvent(final String key, final int count, final double sum) {
@@ -437,7 +442,7 @@ public class Countly {
      * Records an IAP event
      * @param key name of the custom event, required, must not be the empty string
      * @param price sum to associate with the event
-     * @throws IllegalStateException if Countly SDK has not been initialized
+     * @throws IllegalStateException if Seeds SDK has not been initialized
      * @throws IllegalArgumentException if key is null or empty
      */
     public void recordIAPEvent(String key, final double price) {
@@ -459,7 +464,7 @@ public class Countly {
      * @param key name of the custom event, required, must not be the empty string
      * @param segmentation segmentation dictionary to associate with the event, can be null
      * @param count count to associate with the event, should be more than zero
-     * @throws IllegalStateException if Countly SDK has not been initialized
+     * @throws IllegalStateException if Seeds SDK has not been initialized
      * @throws IllegalArgumentException if key is null or empty
      */
     public void recordEvent(final String key, final Map<String, String> segmentation, final int count) {
@@ -472,27 +477,27 @@ public class Countly {
      * @param segmentation segmentation dictionary to associate with the event, can be null
      * @param count count to associate with the event, should be more than zero
      * @param sum sum to associate with the event
-     * @throws IllegalStateException if Countly SDK has not been initialized
+     * @throws IllegalStateException if Seeds SDK has not been initialized
      * @throws IllegalArgumentException if key is null or empty, count is less than 1, or if
      *                                  segmentation contains null or empty keys or values
      */
     public synchronized void recordEvent(final String key, final Map<String, String> segmentation, final int count, final double sum) {
         if (!isInitialized()) {
-            throw new IllegalStateException("Countly.sharedInstance().init must be called before recordEvent");
+            throw new IllegalStateException("Seeds.sharedInstance().init must be called before recordEvent");
         }
         if (key == null || key.length() == 0) {
-            throw new IllegalArgumentException("Valid Countly event key is required");
+            throw new IllegalArgumentException("Valid Seeds event key is required");
         }
         if (count < 1) {
-            throw new IllegalArgumentException("Countly event count should be greater than zero");
+            throw new IllegalArgumentException("Seeds event count should be greater than zero");
         }
         if (segmentation != null) {
             for (String k : segmentation.keySet()) {
                 if (k == null || k.length() == 0) {
-                    throw new IllegalArgumentException("Countly event segmentation key cannot be null or empty");
+                    throw new IllegalArgumentException("Seeds event segmentation key cannot be null or empty");
                 }
                 if (segmentation.get(k) == null || segmentation.get(k).length() == 0) {
-                    throw new IllegalArgumentException("Countly event segmentation value cannot be null or empty");
+                    throw new IllegalArgumentException("Seeds event segmentation value cannot be null or empty");
                 }
             }
         }
@@ -534,7 +539,7 @@ public class Countly {
      * </ul>
      * @param data Map&lt;String, String&gt; with user data
      */
-    public synchronized Countly setUserData(Map<String, String> data) {
+    public synchronized Seeds setUserData(Map<String, String> data) {
         return setUserData(data, null);
     }
 
@@ -574,7 +579,7 @@ public class Countly {
      * @param data Map&lt;String, String&gt; with user data
      * @param customdata Map&lt;String, String&gt; with custom key values for this user
      */
-    public synchronized Countly setUserData(Map<String, String> data, Map<String, String> customdata) {
+    public synchronized Seeds setUserData(Map<String, String> data, Map<String, String> customdata) {
         UserData.setData(data);
         if(customdata != null)
             UserData.setCustomData(customdata);
@@ -587,7 +592,7 @@ public class Countly {
      * In custom properties you can provide any string key values to be stored with user
      * @param customdata Map&lt;String, String&gt; with custom key values for this user
      */
-    public synchronized Countly setCustomUserData(Map<String, String> customdata) {
+    public synchronized Seeds setCustomUserData(Map<String, String> customdata) {
         if(customdata != null)
             UserData.setCustomData(customdata);
         connectionQueue_.sendUserData();
@@ -597,14 +602,14 @@ public class Countly {
     /**
      * Set user location.
      *
-     * Countly detects user location based on IP address. But for geolocation-enabled apps,
+     * Seeds detects user location based on IP address. But for geolocation-enabled apps,
      * it's better to supply exact location of user.
      * Allows sending messages to a custom segment of users located in a particular area.
      *
      * @param lat Latitude
      * @param lon Longitude
      */
-    public synchronized Countly setLocation(double lat, double lon) {
+    public synchronized Seeds setLocation(double lat, double lon) {
         connectionQueue_.getCountlyStore().setLocation(lat, lon);
 
         if (disableUpdateSessionRequests_) {
@@ -619,7 +624,7 @@ public class Countly {
      * In custom segments you can provide any string key values to segments crashes by
      * @param segments Map&lt;String, String&gt; key segments and their values
      */
-    public synchronized Countly setCustomCrashSegments(Map<String, String> segments) {
+    public synchronized Seeds setCustomCrashSegments(Map<String, String> segments) {
         if(segments != null)
             CrashDetails.setCustomSegments(segments);
         return this;
@@ -629,7 +634,7 @@ public class Countly {
      * Add crash breadcrumb like log record to the log that will be send together with crash report
      * @param record String a bread crumb for the crash report
      */
-    public synchronized Countly addCrashLog(String record) {
+    public synchronized Seeds addCrashLog(String record) {
         CrashDetails.addLog(record);
         return this;
     }
@@ -638,7 +643,7 @@ public class Countly {
      * Log handled exception to report it to server as non fatal crash
      * @param exception Exception to log
      */
-    public synchronized Countly logException(Exception exception) {
+    public synchronized Seeds logException(Exception exception) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         exception.printStackTrace(pw);
@@ -649,7 +654,7 @@ public class Countly {
     /**
      * Enable crash reporting to send unhandled crash reports to server
      */
-    public synchronized Countly enableCrashReporting() {
+    public synchronized Seeds enableCrashReporting() {
         //get default handler
         final Thread.UncaughtExceptionHandler oldHandler = Thread.getDefaultUncaughtExceptionHandler();
 
@@ -676,13 +681,13 @@ public class Countly {
 
     /**
      * Disable periodic session time updates.
-     * By default, Countly will send a request to the server each 30 seconds with a small update
+     * By default, Seeds will send a request to the server each 30 seconds with a small update
      * containing session duration time. This method allows you to disable such behavior.
      * Note that event updates will still be sent every 10 events or 30 seconds after event recording.
      * @param disable whether or not to disable session time updates
-     * @return Countly instance for easy method chaining
+     * @return Seeds instance for easy method chaining
      */
-    public synchronized Countly setDisableUpdateSessionRequests(final boolean disable) {
+    public synchronized Seeds setDisableUpdateSessionRequests(final boolean disable) {
         disableUpdateSessionRequests_ = disable;
         return this;
     }
@@ -690,9 +695,9 @@ public class Countly {
     /**
      * Sets whether debug logging is turned on or off. Logging is disabled by default.
      * @param enableLogging true to enable logging, false to disable logging
-     * @return Countly instance for easy method chaining
+     * @return Seeds instance for easy method chaining
      */
-    public synchronized Countly setLoggingEnabled(final boolean enableLogging) {
+    public synchronized Seeds setLoggingEnabled(final boolean enableLogging) {
         enableLogging_ = enableLogging;
         return this;
     }
@@ -763,14 +768,14 @@ public class Countly {
     /**
      * Allows public key pinning.
      * Supply list of SSL certificates (base64-encoded strings between "-----BEGIN CERTIFICATE-----" and "-----END CERTIFICATE-----" without end-of-line)
-     * along with server URL starting with "https://". Countly will only accept connections to the server
+     * along with server URL starting with "https://". Seeds will only accept connections to the server
      * if public key of SSL certificate provided by the server matches one provided to this method.
      * @param certificates List of SSL certificates
-     * @return Countly instance
+     * @return Seeds instance
      */
-    public static Countly enablePublicKeyPinning(List<String> certificates) {
+    public static Seeds enablePublicKeyPinning(List<String> certificates) {
         publicKeyPinCertificates = certificates;
-        return Countly.sharedInstance();
+        return Seeds.sharedInstance();
     }
 
     // for unit testing
@@ -785,7 +790,7 @@ public class Countly {
     boolean getDisableUpdateSessionRequests() { return disableUpdateSessionRequests_; }
 
 
-    //// Countly A/B testing stuff
+    //// Seeds A/B testing stuff
 
     private boolean a_bTestingOn = false;
     private String messageVariantName;
@@ -807,6 +812,17 @@ public class Countly {
         return messageVariantName;
     }
 
+    public void requestInAppMessage() {
+        InAppMessageManager.sharedInstance().requestInAppMessage();
+    }
+
+    public boolean isInAppMessageLoaded() {
+        return InAppMessageManager.sharedInstance().isInAppMessageLoaded();
+    }
+
+    public void showInAppMessage() {
+        InAppMessageManager.sharedInstance().showInAppMessage();
+    }
 
 
 }

@@ -41,9 +41,9 @@ import java.util.Map;
  * The "read" methods in this class are not synchronized, because the underlying data store
  * provides thread-safe reads.  The "write" methods in this class are synchronized, because
  * 1) they often read a list of items, modify the list, and then commit it back to the underlying
- * data store, and 2) while the Countly singleton is synchronized to ensure only a single writer
+ * data store, and 2) while the Seeds singleton is synchronized to ensure only a single writer
  * at a time from the public API side, the internal implementation has a background thread that
- * submits data to a Countly server, and it writes to this store as well.
+ * submits data to a Seeds server, and it writes to this store as well.
  *
  * NOTE: This class is only public to facilitate unit testing, because
  *       of this bug in dexmaker: https://code.google.com/p/dexmaker/issues/detail?id=34

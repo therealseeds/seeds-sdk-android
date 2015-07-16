@@ -8,11 +8,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.playseeds.android.sdk.Countly;
+import com.playseeds.android.sdk.Seeds;
 import com.playseeds.android.sdk.DeviceId;
-
-//import ly.count.android.sdk.messaging.CountlyMessaging;
-//import ly.count.android.sdk.messaging.Message;
 
 import com.playseeds.android.sdk.inappmessaging.InAppMessage;
 import com.playseeds.android.sdk.inappmessaging.InAppMessageListener;
@@ -43,28 +40,24 @@ public class MainActivity extends Activity implements InAppMessageListener {
         iamButton = (Button) findViewById(R.id.iamButton);
         purchaseEventButton = (Button) findViewById(R.id.purchaseEventButton);
 
-        Countly.sharedInstance()
+        Seeds.sharedInstance()
                 .init(this, YOUR_SERVER, YOUR_APP_KEY, null, DeviceId.Type.ADVERTISING_ID)
-                .initInAppMessaging(this)
-                .setLoggingEnabled(true);
+                .setLoggingEnabled(true)
+                .requestInAppMessage(); // preload Ad
 
-        manager = InAppMessageManager.sharedInstance();
-        manager.setListener(this);
-        manager.requestInAppMessage(); // preload Ad
-
-        Countly.sharedInstance().recordEvent("test", 1);
+        Seeds.sharedInstance().recordEvent("test", 1);
 
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Countly.sharedInstance().recordEvent("test2", 1, 2);
+                Seeds.sharedInstance().recordEvent("test2", 1, 2);
             }
         }, 5000);
 
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Countly.sharedInstance().recordEvent("test3");
+                Seeds.sharedInstance().recordEvent("test3");
             }
         }, 10000);
 
@@ -74,37 +67,24 @@ public class MainActivity extends Activity implements InAppMessageListener {
     public void onStart()
     {
         super.onStart();
-        Countly.sharedInstance().onStart();
+        Seeds.sharedInstance().onStart();
     }
 
     @Override
     public void onStop()
     {
-        Countly.sharedInstance().onStop();
+        Seeds.sharedInstance().onStop();
         super.onStop();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
-//        /** Register for broadcast action if you need to be notified when Countly message received */
-//        messageReceiver = new BroadcastReceiver() {
-//            @Override
-//            public void onReceive(Context context, Intent intent) {
-//                Message message = intent.getParcelableExtra(CountlyMessaging.BROADCAST_RECEIVER_ACTION_MESSAGE);
-//                Log.i("CountlyActivity", "Got a message with data: " + message.getData());
-//            }
-//        };
-//        IntentFilter filter = new IntentFilter();
-//        filter.addAction(CountlyMessaging.getBroadcastAction(getApplicationContext()));
-//        registerReceiver(messageReceiver, filter);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-//        unregisterReceiver(messageReceiver);
     }
 
     public void iamButtonClicked(View view) {
@@ -113,19 +93,19 @@ public class MainActivity extends Activity implements InAppMessageListener {
 
     public void purchaseEventButtonClicked(View view) {
         Log.d("Main", "purchase button clicked");
-        Countly.sharedInstance().recordIAPEvent("item1", 0.99);
+        Seeds.sharedInstance().recordIAPEvent("item1", 0.99);
     }
 
     public void showInAppMessage() {
         try {
             runOnUiThread(new Runnable() {
                 public void run() {
-                    if (manager.isInAppMessageLoaded()) {
-                        manager.showInAppMessage();
+                    if (Seeds.sharedInstance().isInAppMessageLoaded()) {
+                        Seeds.sharedInstance().showInAppMessage();
 
 
                     } else {
-                        manager.requestInAppMessage();
+                        Seeds.sharedInstance().requestInAppMessage();
 //                        Toast.makeText(AndroidLauncher.this, "InAppMessage loading...", Toast.LENGTH_LONG)
 //                                .show();
                     }

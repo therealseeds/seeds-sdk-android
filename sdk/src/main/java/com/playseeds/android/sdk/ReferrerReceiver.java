@@ -49,7 +49,7 @@ public class ReferrerReceiver extends BroadcastReceiver
                     String referrer = URLDecoder.decode(rawReferrer, "UTF-8");
 
                     // Log the referrer string.
-                    Log.d(Countly.TAG, "Referrer: " + referrer);
+                    Log.d(Seeds.TAG, "Referrer: " + referrer);
 
                     String parts[] = referrer.split("&");
                     String cid = null;
@@ -66,7 +66,7 @@ public class ReferrerReceiver extends BroadcastReceiver
                     if(uid != null)
                         res += "&campaign_user="+uid;
 
-                    Log.d(Countly.TAG, "Processed: " + res);
+                    Log.d(Seeds.TAG, "Processed: " + res);
                     // Persist the referrer string.
                     if(!res.equals(""))
                         context.getSharedPreferences(key, Context.MODE_PRIVATE).edit().putString(key, res).commit();
@@ -75,7 +75,7 @@ public class ReferrerReceiver extends BroadcastReceiver
         }
         catch (Exception e)
         {
-            Log.d(Countly.TAG, e.toString());
+            Log.d(Seeds.TAG, e.toString());
         }
     }
 }

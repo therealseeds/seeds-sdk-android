@@ -28,7 +28,7 @@ public class MessagingAdapter {
             return true;
         }
         catch (Throwable logged) {
-            Log.e(TAG, "Couldn't init Countly Messaging", logged);
+            Log.e(TAG, "Couldn't init Seeds Messaging", logged);
             return false;
         }
     }
@@ -41,7 +41,7 @@ public class MessagingAdapter {
             return true;
         }
         catch (Throwable logged) {
-            Log.e(TAG, "Couldn't store configuration in Countly Messaging", logged);
+            Log.e(TAG, "Couldn't store configuration in Seeds Messaging", logged);
             return false;
         }
     }

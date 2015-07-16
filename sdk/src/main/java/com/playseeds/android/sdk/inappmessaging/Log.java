@@ -24,7 +24,7 @@ public final class Log {
 	 * adb shell setprop log.tag.ADSDK DEBUG
 	 */
 
-	public static final String TAG = "Countly IAM";
+	public static final String TAG = "Seeds IAM";
 	public static final boolean LOG_AD_RESPONSES = false;
 
 	public static boolean isLoggable(int logLevel) {

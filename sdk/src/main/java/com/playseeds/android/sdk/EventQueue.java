@@ -32,7 +32,7 @@ import java.util.Map;
  * for submission to a Count.ly server.
  *
  * None of the methods in this class are synchronized because access to this class is
- * controlled by the Countly singleton, which is synchronized.
+ * controlled by the Seeds singleton, which is synchronized.
  *
  * NOTE: This class is only public to facilitate unit testing, because
  *       of this bug in dexmaker: https://code.google.com/p/dexmaker/issues/detail?id=34
@@ -94,7 +94,7 @@ public class EventQueue {
      * @throws IllegalArgumentException if key is null or empty
      */
     void recordEvent(final String key, final Map<String, String> segmentation, final int count, final double sum) {
-        final int timestamp = Countly.currentTimestamp();
+        final int timestamp = Seeds.currentTimestamp();
         countlyStore_.addEvent(key, segmentation, timestamp, count, sum);
     }
 
