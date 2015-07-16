@@ -8,7 +8,7 @@ import java.lang.reflect.Method;
 
 public class InAppMessagingAdapter {
     private static final String TAG = "InAppMessagingAdapter";
-    private final static String MESSAGING_CLASS_NAME = "ly.count.android.sdk.inappmessaging.InAppMessageManager";
+    private final static String MESSAGING_CLASS_NAME = "com.playseeds.android.sdk.inappmessaging.inappmessaging.InAppMessageManager";
 
     public static boolean isInAppMessagingAvailable() {
         boolean messagingAvailable = false;
