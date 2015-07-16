@@ -11,5 +11,5 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
    limitations under the License.
 
-Code in the ly.count.android.sdk.inappmessaging package modified from
+Code in the com.playseeds.android.sdk.inappmessaging.inappmessaging package modified from
 MobFox Android SDK available at https://github.com/mobfox/MobFox-Android-SDK
