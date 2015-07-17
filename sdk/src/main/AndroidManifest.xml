@@ -1,10 +1,10 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="ly.count.android.sdk">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.playseeds.android.sdk">
 
     <uses-permission android:name="android.permission.INTERNET"/>
 
-    <application android:allowBackup="true" android:label="Seeds Android SDK">
-        <uses-library android:name="android.test.runner"/>
-    </application>
+    <!--<application android:allowBackup="true" android:label="Seeds Android SDK">-->
+        <!--<uses-library android:name="android.test.runner"/>-->
+    <!--</application>-->
 
     <!--<instrumentation android:name="com.playseeds.android.sdk.test.InstrumentationTestRunner"-->
         <!--android:targetPackage="ly.count.android.sdk"/>-->

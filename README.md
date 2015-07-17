@@ -6,13 +6,13 @@
 Note the Seeds Android SDK is built with production-tested open source components, including [Countly Android SDK](https://github.com/Countly/seeds-sdk-android) for analytics and in-app messaging functionality from the [MobFox Android SDK](https://github.com/mobfox/MobFox-Android-SDK).
 
 ##Preparation
-If you would like to just test the in-app message functionality to display a test image promo, you may use the special app_key “test”
+If you would like to just test the in-app message functionality to display a test image promo, you may use the special app_key “test”.
 
 After testing, please make a deep link (see [how to make a deep link](https://developer.android.com/training/app-indexing/deep-linking.html)) to the in-app purchase item you’d like to promote and let us know what that deep link is.
 
 If you haven't already, please also let us know your name,  email address and game name so we can get you set up. Please send this info to [sungwon@playseeds.com](sungwon@playseeds.com)
 
-We will then set you up with an app_key so you can get started. 
+We will then set you up with an app_key so you can get started.
 
 
 ##Installation
@@ -31,18 +31,16 @@ repositories {
 }
 
 dependencies {
-   compile('com.playseeds:android-sdk-messaging:0.1.4')
+   compile('com.playseeds:android-sdk:0.1.4')
 }
 ```
 
 ####Eclipse
 
-Download the following jars and add them to to your libs directory:
+Download the following jar and add them to to your libs directory:
 
 
 [https://bintray.com/artifact/download/seedsinc/android_sdk/seeds-android-sdk-0.1.4.jar](https://bintray.com/artifact/download/seedsinc/android_sdk/seeds-android-sdk-0.1.4.jar)
-
-[https://bintray.com/artifact/download/seedsinc/android_sdk/seeds-android-sdk-messaging-0.1.4.jar]([https://bintray.com/artifact/download/seedsinc/android_sdk/seeds-android-sdk-messaging-0.1.4.jar)
 
 
 
@@ -124,10 +122,10 @@ Seeds.sharedInstance().requestInAppMessage(); //  recommended to preload the pro
 
 ```xml
 <!-- for Seeds promo -->
-<activity android:name="ly.count.android.sdk.inappmessaging.RichMediaActivity"
+<activity android:name="com.playseeds.android.sdk.inappmessaging.RichMediaActivity"
    android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
    android:hardwareAccelerated="false" />
-<activity android:name="ly.count.android.sdk.inappmessaging.InAppWebView"
+<activity android:name="com.playseeds.android.sdk.inappmessaging.InAppWebView"
    android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
 ```
 
