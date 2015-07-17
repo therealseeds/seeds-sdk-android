@@ -6,13 +6,14 @@
 Note the Seeds Android SDK is built with production-tested open source components, including [Countly Android SDK](https://github.com/Countly/seeds-sdk-android) for analytics and in-app messaging functionality from the [MobFox Android SDK](https://github.com/mobfox/MobFox-Android-SDK).
 
 ##Preparation
-Please make a deep link to the in-app purchase item you’d like to promote and let us know what that deep link is.
+If you would like to just test the in-app message functionality to display a test image promo, you may use the special app_key “test”
+
+After testing, please make a deep link (see [how to make a deep link](https://developer.android.com/training/app-indexing/deep-linking.html)) to the in-app purchase item you’d like to promote and let us know what that deep link is.
 
 If you haven't already, please also let us know your name,  email address and game name so we can get you set up. Please send this info to [sungwon@playseeds.com](sungwon@playseeds.com)
 
 We will then set you up with an app_key so you can get started. 
 
-(Note, if you would like to ly.count.android.sdk.test just the in-app message functionality to display a ly.count.android.sdk.test image promo, you may use the special app_key “ly.count.android.sdk.test”)
 
 ##Installation
 
@@ -30,7 +31,7 @@ repositories {
 }
 
 dependencies {
-   compile('com.playseeds:android-sdk-messaging:0.1.3')
+   compile('com.playseeds:android-sdk-messaging:0.1.4')
 }
 ```
 
@@ -39,9 +40,9 @@ dependencies {
 Download the following jars and add them to to your libs directory:
 
 
-[https://bintray.com/artifact/download/seedsinc/android_sdk/seeds-android-sdk-0.1.3.jar](https://bintray.com/artifact/download/seedsinc/android_sdk/seeds-android-sdk-0.1.1.jar)
+[https://bintray.com/artifact/download/seedsinc/android_sdk/seeds-android-sdk-0.1.4.jar](https://bintray.com/artifact/download/seedsinc/android_sdk/seeds-android-sdk-0.1.4.jar)
 
-[https://bintray.com/artifact/download/seedsinc/android_sdk/seeds-android-sdk-messaging-0.1.3.jar]([https://bintray.com/artifact/download/seedsinc/android_sdk/seeds-android-sdk-messaging-0.1.1.jar)
+[https://bintray.com/artifact/download/seedsinc/android_sdk/seeds-android-sdk-messaging-0.1.4.jar]([https://bintray.com/artifact/download/seedsinc/android_sdk/seeds-android-sdk-messaging-0.1.4.jar)
 
 
 
@@ -85,7 +86,6 @@ public void noInAppMessageFound() {
 ```java
 Seeds.sharedInstance()
                .init(this, http://dash.playseeds.com/, “YOUR_APP_KEY”, null, “YOUR_DEVICE_ID”)
-               .initInAppMessaging(this)
                .setLoggingEnabled(true);  //optional
 ```
 
@@ -110,18 +110,10 @@ In the case of OpenUDID you'll need to include the following declaration in your
 </service>
 ```
 
-3) Next, add a member InAppMessageManager  variable in your main activity, e.g. :
+3) Next, you can optionally preload the Seeds promo :
 
 ```java
-private InAppMessageManager manager;
-```
-
-And then initialize it in your onCreate method e.g.:
-
-```java
-manager = InAppMessageManager.sharedInstance();
-manager.setListener(this);
-manager.requestInAppMessage(); //  recommended to preload the promo
+Seeds.sharedInstance().requestInAppMessage(); //  recommended to preload the promo
 ```
 
 4) Then add the following calls to all your activities:
@@ -144,13 +136,13 @@ manager.requestInAppMessage(); //  recommended to preload the promo
 Use the InAppMessageManager instance to load:
 
 ```java
-manager.requestInAppMessage();
+Seeds.sharedInstance().requestInAppMessage();
 ```
 
 and show:
 
 ```java
-manager.showInAppMessage();
+Seeds.sharedInstance().showInAppMessage();
 ```
 
 the interstitial promo.
@@ -162,10 +154,10 @@ public void showSeedsPromo() {
        try {
            runOnUiThread(new Runnable() {
                public void run() {
-                   if (manager.isInAppMessageLoaded()) {
-                       manager.showInAppMessage();
+                   if (Seeds.sharedInstance().isInAppMessageLoaded()) {
+                       Seeds.sharedInstance().showInAppMessage();
                    } else {
-                       manager.requestInAppMessage();
+                       Seeds.sharedInstance().requestInAppMessage();
                    }
                }
            });
