@@ -1,13 +1,13 @@
 apply plugin: 'com.android.library'
-apply plugin: 'bintray-release'
+//apply plugin: 'com.novoda.bintray-release'
 
 buildscript {
     repositories {
         jcenter()
     }
-    dependencies {
-        classpath 'com.novoda:bintray-release:0.2.7'
-    }
+//    dependencies {
+//        classpath 'com.novoda:bintray-release:0.3.0'
+//    }
 }
 
 android {
@@ -18,7 +18,7 @@ android {
         minSdkVersion 12
         targetSdkVersion 22
         versionCode 1
-        versionName "0.1.8"
+        versionName "1.0"
 
         testInstrumentationRunner 'com.playseeds.android.sdk.test.InstrumentationTestRunner'
         testHandleProfiling true
@@ -41,16 +41,17 @@ dependencies {
     androidTestCompile 'org.mockito:mockito-core:1.9.5'
     androidTestCompile 'com.google.dexmaker:dexmaker:1.0'
     androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.0'
+    //compile 'com.android.support:appcompat-v7:22.2.0'
     compile 'org.glassfish:javax.json:1.0.4'
     compile 'com.google.android.gms:play-services:7.5.0'
 }
 
-publish {
-    userOrg = 'seedsinc'
-    groupId = 'com.playseeds'
-    artifactId = 'android-sdk'
-    version = '0.1.8'
-    description = 'Android SDK for Seeds mobile analytics forked to add In-App Messaging'
-    website = 'https://github.com/therealseeds/seeds-sdk-android'
-}
+//publish {
+//    userOrg = 'seedsinc'
+//    groupId = 'com.playseeds'
+//    artifactId = 'android-sdk'
+//    version = '0.1.9'
+//    description = 'Android SDK for Seeds mobile analytics forked to add In-App Messaging'
+//    website = 'https://github.com/therealseeds/seeds-sdk-android'
+//}
 

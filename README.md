@@ -31,7 +31,7 @@ repositories {
 }
 
 dependencies {
-   compile('com.playseeds:android-sdk:0.1.4')
+   compile('com.playseeds:android-sdk:0.1.9')
 }
 ```
 
@@ -83,20 +83,20 @@ public void noInAppMessageFound() {
 
 ```java
 Seeds.sharedInstance()
-               .init(this, http://dash.playseeds.com/, “YOUR_APP_KEY”, null, “YOUR_DEVICE_ID”)
+               .init(this, "http://dash.playseeds.com", “YOUR_APP_KEY”, null, “YOUR_DEVICE_ID”) // note: make sure there is no trailing slash in the url
                .setLoggingEnabled(true);  //optional
 ```
 
 You can specify device ID by yourself if you have one (it has to be unique per device):
 
-`Seeds.sharedInstance().init(this, "https://YOUR_SERVER", "YOUR_APP_KEY", "YOUR_DEVICE_ID")`
+`Seeds.sharedInstance().init(this, "http://dash.playseeds.com", "YOUR_APP_KEY", "YOUR_DEVICE_ID")`
 
 You can rely on Google Advertising ID for device ID generation (recommended) which also requires setting up [Google Play Services](https://developers.google.com/android/guides/setup).
 
-`Seeds.sharedInstance().init(this, "https://YOUR_SERVER", "YOUR_APP_KEY", null, DeviceId.Type.ADVERTISING_ID)`
+`Seeds.sharedInstance().init(this, "http://dash.playseeds.com", "YOUR_APP_KEY", null, DeviceId.Type.ADVERTISING_ID)`
 
 Or you can use OpenUDID:
-`Seeds.sharedInstance().init(this, "https://YOUR_SERVER", "YOUR_APP_KEY", null, DeviceId.Type.OPEN_UDID)`
+`Seeds.sharedInstance().init(this, "http://dash.playseeds.com", "YOUR_APP_KEY", null, DeviceId.Type.OPEN_UDID)`
 
 In the case of OpenUDID you'll need to include the following declaration in your AndroidManifest.xml:
 
