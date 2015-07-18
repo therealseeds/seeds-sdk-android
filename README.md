@@ -118,7 +118,13 @@ Seeds.sharedInstance().requestInAppMessage(); //  recommended to preload the pro
 - Call `Seeds.sharedInstance().onStart()` in onStart.
 - Call `Seeds.sharedInstance().onStop()` in onStop.
 
-5) Finally, make sure that the INTERNET permission is set if it isn’t already in your manifest file and include the following in your AndroidManifest.xml:
+5) Finally, make sure that the INTERNET permission is set if it isn’t already in your manifest file
+
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+```
+
+and include the following in your AndroidManifest.xml:
 
 ```xml
 <!-- for Seeds promo -->
