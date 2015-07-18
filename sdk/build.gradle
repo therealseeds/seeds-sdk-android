@@ -18,7 +18,7 @@ android {
         minSdkVersion 12
         targetSdkVersion 22
         versionCode 1
-        versionName "0.1.6"
+        versionName "0.1.8"
 
         testInstrumentationRunner 'com.playseeds.android.sdk.test.InstrumentationTestRunner'
         testHandleProfiling true
@@ -49,7 +49,7 @@ publish {
     userOrg = 'seedsinc'
     groupId = 'com.playseeds'
     artifactId = 'android-sdk'
-    version = '0.1.6'
+    version = '0.1.8'
     description = 'Android SDK for Seeds mobile analytics forked to add In-App Messaging'
     website = 'https://github.com/therealseeds/seeds-sdk-android'
 }

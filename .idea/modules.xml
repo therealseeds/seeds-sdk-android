@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app-inappmessaging/app-inappmessaging.iml" filepath="$PROJECT_DIR$/app-inappmessaging/app-inappmessaging.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app-messaging/app-messaging.iml" filepath="$PROJECT_DIR$/app-messaging/app-messaging.iml" />
       <module fileurl="file://$PROJECT_DIR$/sdk/sdk.iml" filepath="$PROJECT_DIR$/sdk/sdk.iml" />
       <module fileurl="file://$PROJECT_DIR$/seeds-sdk-android.iml" filepath="$PROJECT_DIR$/seeds-sdk-android.iml" />
     </modules>
