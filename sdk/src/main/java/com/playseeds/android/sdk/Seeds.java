@@ -446,7 +446,7 @@ public class Seeds {
      * @throws IllegalArgumentException if key is null or empty
      */
     public void recordIAPEvent(String key, final double price) {
-        Log.d(TAG, "what's going on here");
+
         if (isA_bTestingOn()) {
             HashMap<String, String> segmentation = new HashMap<String, String>();
             segmentation.put("message", getMessageVariantName());
