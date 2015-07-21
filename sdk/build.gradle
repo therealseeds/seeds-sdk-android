@@ -1,13 +1,13 @@
 apply plugin: 'com.android.library'
-//apply plugin: 'com.novoda.bintray-release'
+apply plugin: 'com.novoda.bintray-release'
 
 buildscript {
     repositories {
         jcenter()
     }
-//    dependencies {
-//        classpath 'com.novoda:bintray-release:0.3.0'
-//    }
+    dependencies {
+        classpath 'com.novoda:bintray-release:0.3.0'
+    }
 }
 
 android {
@@ -46,12 +46,12 @@ dependencies {
     compile 'com.google.android.gms:play-services:7.5.0'
 }
 
-//publish {
-//    userOrg = 'seedsinc'
-//    groupId = 'com.playseeds'
-//    artifactId = 'android-sdk'
-//    version = '0.2.0'
-//    description = 'Android SDK for Seeds mobile analytics forked to add In-App Messaging'
-//    website = 'https://github.com/therealseeds/seeds-sdk-android'
-//}
+publish {
+    userOrg = 'seedsinc'
+    groupId = 'com.playseeds'
+    artifactId = 'android-sdk'
+    version = '0.2.0'
+    description = 'Android SDK for Seeds mobile analytics forked to add In-App Messaging'
+    website = 'https://github.com/therealseeds/seeds-sdk-android'
+}
 
