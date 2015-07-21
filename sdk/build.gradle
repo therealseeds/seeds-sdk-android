@@ -50,7 +50,7 @@ dependencies {
 //    userOrg = 'seedsinc'
 //    groupId = 'com.playseeds'
 //    artifactId = 'android-sdk'
-//    version = '0.1.9'
+//    version = '0.2.0'
 //    description = 'Android SDK for Seeds mobile analytics forked to add In-App Messaging'
 //    website = 'https://github.com/therealseeds/seeds-sdk-android'
 //}

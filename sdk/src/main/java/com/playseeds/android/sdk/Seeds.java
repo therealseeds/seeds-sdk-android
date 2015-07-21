@@ -446,18 +446,41 @@ public class Seeds {
      * @throws IllegalArgumentException if key is null or empty
      */
     public void recordIAPEvent(String key, final double price) {
+        recordGenericIAPEvent(key, price, false);
+    }
+
+    private void recordGenericIAPEvent(String key, final double price, boolean seedsEvent) {
+
+        HashMap<String, String> segmentation = new HashMap<String, String>();
+
+        if (seedsEvent) {
+            segmentation.put("IAP type", "Seeds");
+        } else {
+            segmentation.put("IAP type", "Non-Seeds");
+        }
 
         if (isA_bTestingOn()) {
-            HashMap<String, String> segmentation = new HashMap<String, String>();
             segmentation.put("message", getMessageVariantName());
             recordEvent("IAP: " + key, segmentation, 1, price);
             Log.d(TAG, "IAP: " + key + " segment: " + segmentation);
         } else {
-            recordEvent("IAP: key", null, 1, price);
+            recordEvent("IAP: " + key, null, 1, price);
             Log.d(TAG, "IAP: " + key + " no segmentation");
         }
     }
 
+
+
+    /**
+     * Records an IAP event
+     * @param key name of the custom event, required, must not be the empty string
+     * @param price sum to associate with the event
+     * @throws IllegalStateException if Seeds SDK has not been initialized
+     * @throws IllegalArgumentException if key is null or empty
+     */
+    public void recordSeedsIAPEvent(String key, final double price) {
+        recordGenericIAPEvent(key, price, true);
+    }
 
     /**
      * Records a custom event with the specified segmentation values and count, and a sum of zero.

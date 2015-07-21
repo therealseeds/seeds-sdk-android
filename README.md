@@ -176,10 +176,16 @@ public void showSeedsPromo() {
 In your item store code, please include the following tracking code after a purchase of the Seeds-promoted item:
 
 ```java
-Seeds.sharedInstance().recordIAPEvent(ITEM, price);
+Seeds.sharedInstance().recordSeedsIAPEvent(ITEM, PRICE);
 ```
 
-where ITEM is the name or SKU of the item and price is the price of the item.
+and for regular non-Seeds-promoted items:
+
+```java
+Seeds.sharedInstance().recordIAPEvent(ITEM, PRICE);
+```
+
+where ITEM is the name or SKU of the item and PRICE is the price of the item.
 
 ## Support
 

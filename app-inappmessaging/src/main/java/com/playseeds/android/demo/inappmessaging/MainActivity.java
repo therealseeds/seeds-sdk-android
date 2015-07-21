@@ -98,7 +98,7 @@ public class MainActivity extends Activity implements InAppMessageListener {
 
     public void seedsPurchaseEventButtonClicked(View view) {
         Log.d("Main", "purchase button clicked");
-        Seeds.sharedInstance().recordIAPEvent("item1", 0.99);
+        Seeds.sharedInstance().recordSeedsIAPEvent("item1", 0.99);
     }
 
 
