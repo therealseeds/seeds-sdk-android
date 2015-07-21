@@ -173,8 +173,6 @@ public void showSeedsPromo() {
 
 4. Track the item purchase 
 
-(Note: if you're doing the UN hackathon you don't have to implement this) :)
-
 In your item store code, please include the following tracking code after a purchase of the Seeds-promoted item:
 
 ```java
