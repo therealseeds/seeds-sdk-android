@@ -171,7 +171,7 @@ public void showSeedsPromo() {
 }
 ```
 
-4. Track the item purchase 
+4. Track the item purchase
 
 In your item store code, please include the following tracking code after a purchase of the Seeds-promoted item:
 
