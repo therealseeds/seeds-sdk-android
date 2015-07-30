@@ -1,19 +1,20 @@
 #Seeds
 [Seeds](http://www.playseeds.com) increases paying user conversion for freemium mobile games motivating users to make their first purchase by letting them know that their purchase will help finance microloans in the developing world. The SDK implements this with an interstitial ad and event tracking analytics.
 
+We also have an [API](https://github.com/therealseeds/seeds-public-api) available!
+
 ##Integrating the Seeds SDK
 
 Note the Seeds Android SDK is built with production-tested open source components, including [Countly Android SDK](https://github.com/Countly/seeds-sdk-android) for analytics and in-app messaging functionality from the [MobFox Android SDK](https://github.com/mobfox/MobFox-Android-SDK).
 
-##Preparation
-If you would like to just test the in-app message functionality to display a test image promo, you may use the special app_key “test”.
+##Overview
+All you need to get started with integration is the special app_key “test”. This will show a test interstitial ad.
 
-After testing, please make a deep link (see [how to make a deep link](https://developer.android.com/training/app-indexing/deep-linking.html)) to the in-app purchase item you’d like to promote and let us know what that deep link is.
+After testing, please make a deep link (see [how to make a deep link](https://developer.android.com/training/app-indexing/deep-linking.html)) to the in-app purchase item you’d like to promote (in-game virtual currency is a great choice).
 
-If you haven't already, please also let us know your name,  email address and game name so we can get you set up. Please send this info to [sungwon@playseeds.com](sungwon@playseeds.com)
+If you haven't already, please also let us know your game name, in-app item and the deep-link URL to [sungwon@playseeds.com](sungwon@playseeds.com).
 
-We will then set you up with an app_key so you can get started.
-
+We will then set you up with an app_key specific to your game and make a custom ad for your game item.
 
 ##Installation
 
