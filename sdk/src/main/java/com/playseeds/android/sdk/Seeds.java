@@ -130,20 +130,22 @@ public class Seeds {
      * Device ID is supplied by OpenUDID service if available, otherwise Advertising ID is used.
      * BE CAUTIOUS!!!! If neither OpenUDID, nor Advertising ID is available, Seeds will ignore this user.
      * @param context application context
+     * @param listener callbacks listener
      * @param serverURL URL of the Seeds server to submit data to; use "https://cloud.count.ly" for Seeds Cloud
      * @param appKey app key for the application being tracked; find in the Seeds Dashboard under Management &gt; Applications
      * @return Seeds instance for easy method chaining
      * @throws java.lang.IllegalArgumentException if context, serverURL, appKey, or deviceID are invalid
      * @throws java.lang.IllegalStateException if the Seeds SDK has already been initialized
      */
-    public Seeds init(final Context context, final String serverURL, final String appKey) {
-        return init(context, serverURL, appKey, null, OpenUDIDAdapter.isOpenUDIDAvailable() ? DeviceId.Type.OPEN_UDID : DeviceId.Type.ADVERTISING_ID);
+    public Seeds init(final Context context, final InAppMessageListener listener, final String serverURL, final String appKey) {
+        return init(context, listener, serverURL, appKey, null, OpenUDIDAdapter.isOpenUDIDAvailable() ? DeviceId.Type.OPEN_UDID : DeviceId.Type.ADVERTISING_ID);
     }
 
     /**
      * Initializes the Seeds SDK. Call from your main Activity's onCreate() method.
      * Must be called before other SDK methods can be used.
      * @param context application context
+     * @param listener callbacks listener
      * @param serverURL URL of the Seeds server to submit data to; use "https://cloud.count.ly" for Seeds Cloud
      * @param appKey app key for the application being tracked; find in the Seeds Dashboard under Management &gt; Applications
      * @param deviceID unique ID for the device the app is running on; note that null in deviceID means that Seeds will fall back to OpenUDID, then, if it's not available, to Google Advertising ID
@@ -151,14 +153,15 @@ public class Seeds {
      * @throws IllegalArgumentException if context, serverURL, appKey, or deviceID are invalid
      * @throws IllegalStateException if init has previously been called with different values during the same application instance
      */
-    public Seeds init(final Context context, final String serverURL, final String appKey, final String deviceID) {
-        return init(context, serverURL, appKey, deviceID, null);
+    public Seeds init(final Context context, final InAppMessageListener listener, final String serverURL, final String appKey, final String deviceID) {
+        return init(context, listener, serverURL, appKey, deviceID, null);
     }
 
     /**
      * Initializes the Seeds SDK. Call from your main Activity's onCreate() method.
      * Must be called before other SDK methods can be used.
      * @param context application context
+     * @param listener callbacks listener
      * @param serverURL URL of the Seeds server to submit data to; use "https://cloud.count.ly" for Seeds Cloud
      * @param appKey app key for the application being tracked; find in the Seeds Dashboard under Management &gt; Applications
      * @param deviceID unique ID for the device the app is running on; note that null in deviceID means that Seeds will fall back to OpenUDID, then, if it's not available, to Google Advertising ID
@@ -167,7 +170,7 @@ public class Seeds {
      * @throws IllegalArgumentException if context, serverURL, appKey, or deviceID are invalid
      * @throws IllegalStateException if init has previously been called with different values during the same application instance
      */
-    public synchronized Seeds init(final Context context, final String serverURL, final String appKey, final String deviceID, DeviceId.Type idMode) {
+    public synchronized Seeds init(final Context context, final InAppMessageListener listener, final String serverURL, final String appKey, final String deviceID, DeviceId.Type idMode) {
         if (context == null) {
             throw new IllegalArgumentException("valid context is required");
         }
@@ -229,8 +232,8 @@ public class Seeds {
         // context is allowed to be changed on the second init call
         connectionQueue_.setContext(context);
 
-        initInAppMessaging((Activity) context);
-        InAppMessageManager.sharedInstance().setListener((InAppMessageListener) context);
+        initInAppMessaging();
+        InAppMessageManager.sharedInstance().setListener(listener);
 
 
         return this;
@@ -286,11 +289,10 @@ public class Seeds {
 
     /**
      * Initializes the Seeds InAppMessaging part of the MessagingSDK. Call from your main Activity's onCreate() method.
-     * @param activity application activity which acts as a final destination for notifications
      * @return Seeds instance for easy method chaining
      */
 
-    public synchronized Seeds initInAppMessaging(Activity activity) {
+    public synchronized Seeds initInAppMessaging() {
 
 
         Log.d(Seeds.TAG, "deviceId: " + connectionQueue_.getDeviceId() + connectionQueue_.getDeviceId().getId() + connectionQueue_.getDeviceId().getType());

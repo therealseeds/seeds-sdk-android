@@ -41,7 +41,7 @@ public class MainActivity extends Activity implements InAppMessageListener {
         purchaseEventButton = (Button) findViewById(R.id.purchaseEventButton);
 
         Seeds.sharedInstance()
-                .init(this, YOUR_SERVER, YOUR_APP_KEY, null, DeviceId.Type.ADVERTISING_ID)
+                .init(this, this, YOUR_SERVER, YOUR_APP_KEY, null, DeviceId.Type.ADVERTISING_ID)
                 .setLoggingEnabled(true)
                 .requestInAppMessage(); // preload Ad
 
