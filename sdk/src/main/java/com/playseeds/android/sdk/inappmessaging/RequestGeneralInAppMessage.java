@@ -139,13 +139,13 @@ public class RequestGeneralInAppMessage extends RequestInAppMessage<InAppMessage
 
 
 			// result of policies such as do not show to paying users
-			boolean showAd = jsonObject.getBoolean("showAd");
+			boolean doNotShow = jsonObject.getBoolean("doNotShow");
 
-			if (showAd == false) {
+			if (doNotShow) {
 				InAppMessageManager.sharedInstance().doNotShow();
 			}
 
-
+			Log.d("after showAd");
 			jsonReader.close();
 
 		} catch (final Throwable t) {
