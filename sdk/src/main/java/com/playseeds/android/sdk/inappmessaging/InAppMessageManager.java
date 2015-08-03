@@ -58,6 +58,8 @@ public class InAppMessageManager {
 	private int userAge;
 	private List<String> keywords;
 
+	private boolean doNotShow = false;
+
 	private HashMap<String, String> segmentation;
 
 	// see http://stackoverflow.com/questions/7048198/thread-safe-singletons-in-java
@@ -299,7 +301,7 @@ public class InAppMessageManager {
 
 	public void showInAppMessage() {
 
-		if (((mResponse == null) || (mResponse.getType() == Const.NO_AD) || (mResponse.getType() == Const.AD_FAILED))) {
+		if (((mResponse == null) || (mResponse.getType() == Const.NO_AD) || (mResponse.getType() == Const.AD_FAILED)) || doNotShow) {
 			notifyAdShown(mResponse, false);
 			return;
 		}
@@ -503,6 +505,10 @@ public class InAppMessageManager {
 	public void setSegmentation() {
 		segmentation = new HashMap<String, String>();
 		segmentation.put("message", Seeds.sharedInstance().getMessageVariantName());
+	}
+
+	public void doNotShow() {
+		doNotShow = true;
 	}
 
 }
