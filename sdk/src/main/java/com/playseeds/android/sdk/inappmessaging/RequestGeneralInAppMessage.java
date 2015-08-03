@@ -137,6 +137,7 @@ public class RequestGeneralInAppMessage extends RequestInAppMessage<InAppMessage
 				Seeds.sharedInstance().setMessageVariantName(messageVariant);
 			}
 
+			String payingUser = jsonObject.getString()
 
 			jsonReader.close();
 

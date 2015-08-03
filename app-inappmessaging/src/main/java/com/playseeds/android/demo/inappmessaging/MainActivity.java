@@ -22,7 +22,7 @@ public class MainActivity extends Activity implements InAppMessageListener {
 
     private static String YOUR_SERVER = "http://devdashboard.playseeds.com"; // don't include trailing slash
 
-    private static String YOUR_APP_KEY = "aa1fd1f255b25fb89b413f216f11e8719188129d"; //"test";
+    private static String YOUR_APP_KEY = "test";
 
     private Button iamButton;
     private Button purchaseEventButton;
