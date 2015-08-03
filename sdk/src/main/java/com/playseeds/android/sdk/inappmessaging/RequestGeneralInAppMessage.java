@@ -137,12 +137,14 @@ public class RequestGeneralInAppMessage extends RequestInAppMessage<InAppMessage
 				Seeds.sharedInstance().setMessageVariantName(messageVariant);
 			}
 
+
 			// result of policies such as do not show to paying users
 			boolean showAd = jsonObject.getBoolean("showAd");
 
 			if (showAd == false) {
 				InAppMessageManager.sharedInstance().doNotShow();
 			}
+
 
 			jsonReader.close();
 
