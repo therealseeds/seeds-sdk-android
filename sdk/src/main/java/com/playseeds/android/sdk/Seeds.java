@@ -677,6 +677,15 @@ public class Seeds {
     }
 
     /**
+     * Log handled exception to report it to server as non fatal crash
+     * @param exception Exception to log
+     */
+    public synchronized Seeds logException(String exception) {
+        connectionQueue_.sendCrashReport(exception, true);
+        return this;
+    }
+
+    /**
      * Enable crash reporting to send unhandled crash reports to server
      */
     public synchronized Seeds enableCrashReporting() {
