@@ -32,7 +32,7 @@ repositories {
 }
 
 dependencies {
-   compile('com.playseeds:android-sdk:0.1.9')
+   compile('com.playseeds:android-sdk:0.2.0')
 }
 ```
 
@@ -41,7 +41,7 @@ dependencies {
 Download the following jar and add them to to your libs directory:
 
 
-[https://bintray.com/artifact/download/seedsinc/android_sdk/seeds-android-sdk-0.1.4.jar](https://bintray.com/artifact/download/seedsinc/android_sdk/seeds-android-sdk-0.1.4.jar)
+[https://bintray.com/artifact/download/seedsinc/maven/com/playseeds/android-sdk/0.2.0/android-sdk-0.2.0.jar](https://bintray.com/artifact/download/seedsinc/maven/com/playseeds/android-sdk/0.2.0/android-sdk-0.2.0.jar)
 
 
 
