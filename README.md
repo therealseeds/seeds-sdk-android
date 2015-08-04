@@ -138,7 +138,7 @@ and include the following in your AndroidManifest.xml:
 
 ###3. Display the Seeds promo interstitial
 
-Use the InAppMessageManager instance to load:
+Use the Seeds instance to load:
 
 ```java
 Seeds.sharedInstance().requestInAppMessage();
