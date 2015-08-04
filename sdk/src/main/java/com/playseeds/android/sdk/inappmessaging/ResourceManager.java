@@ -42,6 +42,8 @@ import android.os.Message;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 
+import com.playseeds.android.sdk.R;
+
 public class ResourceManager {
 
 	public static final int RESOURCE_LOADED_MSG = 100;
@@ -53,19 +55,6 @@ public class ResourceManager {
 	public static HttpGet sDownloadGet;
 
 	public static final String VERSION = "version.txt";
-	public static final String TOPBAR_BG = "bar.png";
-	public static final String BOTTOMBAR_BG = "bar.png";
-
-	public static final String PLAY_ICON = "video_play.png";
-	public static final String PAUSE_ICON = "video_pause.png";
-	public static final String REPLAY_ICON = "video_replay.png";
-	public static final String BACK_ICON = "browser_back.png";
-	public static final String FORWARD_ICON = "browser_forward.png";
-	public static final String RELOAD_ICON = "video_replay.png";
-	public static final String EXTERNAL_ICON = "browser_external.png";
-	public static final String SKIP_ICON = "skip.png";
-	public static final String CLOSE_BUTTON_NORMAL = "close_button_normal.png";
-	public static final String CLOSE_BUTTON_PRESSED = "close_button_pressed.png";
 
 	public static final int DEFAULT_TOPBAR_BG_RESOURCE_ID = -1;
 	public static final int DEFAULT_BOTTOMBAR_BG_RESOURCE_ID = -2;
@@ -92,7 +81,7 @@ public class ResourceManager {
 	}
 
 	public static Drawable getDefaultSkipButton(Context ctx){
-		return buildDrawable(ctx, SKIP_ICON);
+		return buildDrawable(ctx, R.drawable.skip);
 	}
 	
 	public static boolean resourcesInstalled(Context ctx) {
@@ -167,73 +156,68 @@ public class ResourceManager {
 		switch (resource) {
 		case DEFAULT_PLAY_IMAGE_RESOURCE_ID:
 			registerImageResource(ctx, DEFAULT_PLAY_IMAGE_RESOURCE_ID,
-					PLAY_ICON);
+					R.drawable.video_play);
 			break;
 		case DEFAULT_PAUSE_IMAGE_RESOURCE_ID:
 			registerImageResource(ctx, DEFAULT_PAUSE_IMAGE_RESOURCE_ID,
-					PAUSE_ICON);
+					R.drawable.video_pause);
 			break;
 		case DEFAULT_REPLAY_IMAGE_RESOURCE_ID:
 			registerImageResource(ctx, DEFAULT_REPLAY_IMAGE_RESOURCE_ID,
-					REPLAY_ICON);
+					R.drawable.video_replay);
 			break;
 		case DEFAULT_BACK_IMAGE_RESOURCE_ID:
 			registerImageResource(ctx, DEFAULT_BACK_IMAGE_RESOURCE_ID,
-					BACK_ICON);
+					R.drawable.browser_back);
 			break;
 		case DEFAULT_FORWARD_IMAGE_RESOURCE_ID:
 			registerImageResource(ctx, DEFAULT_FORWARD_IMAGE_RESOURCE_ID,
-					FORWARD_ICON);
+					R.drawable.browser_forward);
 			break;
 		case DEFAULT_RELOAD_IMAGE_RESOURCE_ID:
 			registerImageResource(ctx, DEFAULT_RELOAD_IMAGE_RESOURCE_ID,
-					RELOAD_ICON);
+					R.drawable.browser_reload);
 			break;
 		case DEFAULT_EXTERNAL_IMAGE_RESOURCE_ID:
 			registerImageResource(ctx, DEFAULT_EXTERNAL_IMAGE_RESOURCE_ID,
-					EXTERNAL_ICON);
+					R.drawable.browser_external);
 			break;
 		case DEFAULT_SKIP_IMAGE_RESOURCE_ID:
 			registerImageResource(ctx, DEFAULT_SKIP_IMAGE_RESOURCE_ID,
-					SKIP_ICON);
+					R.drawable.skip);
 			break;
 		case DEFAULT_TOPBAR_BG_RESOURCE_ID:
-			registerImageResource(ctx, DEFAULT_TOPBAR_BG_RESOURCE_ID, TOPBAR_BG);
+			registerImageResource(ctx, DEFAULT_TOPBAR_BG_RESOURCE_ID, R.drawable.bar);
 			break;
 		case DEFAULT_BOTTOMBAR_BG_RESOURCE_ID:
 			registerImageResource(ctx, DEFAULT_BOTTOMBAR_BG_RESOURCE_ID,
-					BOTTOMBAR_BG);
+					R.drawable.bar);
 			break;
 		case DEFAULT_CLOSE_BUTTON_NORMAL_RESOURCE_ID:
 			registerImageResource(ctx, DEFAULT_CLOSE_BUTTON_NORMAL_RESOURCE_ID,
-					CLOSE_BUTTON_NORMAL);
+					R.drawable.close_button_normal);
 			break;
 		case DEFAULT_CLOSE_BUTTON_PRESSED_RESOURCE_ID:
 			registerImageResource(ctx, DEFAULT_CLOSE_BUTTON_PRESSED_RESOURCE_ID,
-					CLOSE_BUTTON_PRESSED);
+					R.drawable.close_button_pressed);
 			break;
 		}
 	}
 
 	private static void registerImageResource(Context ctx, int resId,
-			String name) {
-		Drawable d = buildDrawable(ctx, name);
+											  int resourceId) {
+		Drawable d = buildDrawable(ctx, resourceId);
 		if (d != null) {
 			sResources.put(resId, d);
 		} else {
-			Log.i("registerImageResource: drawable was null " + name);
+			Log.i("registerImageResource: drawable was null " + resourceId);
 			Log.i("Context was " + ctx);
 		}
 	}
 
-	private static Drawable buildDrawable(Context ctx, String name) {
-
-		InputStream in = null;
+	private static Drawable buildDrawable(Context ctx, int resourceId) {
 		try {
-			in = ctx.getClass().getClassLoader()
-					.getResourceAsStream(name);
-
-			Bitmap b = BitmapFactory.decodeStream(in);
+			Bitmap b = BitmapFactory.decodeResource(ctx.getResources(), resourceId);
 			if (b != null) {
 
 				DisplayMetrics m = ctx.getResources().getDisplayMetrics();
@@ -252,15 +236,7 @@ public class ResourceManager {
 				throw new FileNotFoundException();
 			}
 		} catch (Exception e) {
-			Log.i("ResourceManager cannot find resource " + name);
-		} finally {
-			if (in != null) {
-				try {
-					in.close();
-					in = null;
-				} catch (Exception e) {
-				}
-			}
+			Log.i("ResourceManager cannot find resource " + resourceId);
 		}
 		return null;
 	}
