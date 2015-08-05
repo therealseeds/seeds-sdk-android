@@ -463,12 +463,10 @@ public class Seeds {
 
         if (isA_bTestingOn()) {
             segmentation.put("message", getMessageVariantName());
-            recordEvent("IAP: " + key, segmentation, 1, price);
-            Log.d(TAG, "IAP: " + key + " segment: " + segmentation);
-        } else {
-            recordEvent("IAP: " + key, null, 1, price);
-            Log.d(TAG, "IAP: " + key + " no segmentation");
+
         }
+        recordEvent("IAP: " + key, segmentation, 1, price);
+        Log.d(TAG, "IAP: " + key + " segment: " + segmentation);
     }
 
 
