@@ -42,6 +42,8 @@ import android.os.Message;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 
+import com.playseeds.android.sdk.BuildConfig;
+
 public class ResourceManager {
 
 	public static final int RESOURCE_LOADED_MSG = 100;
@@ -53,19 +55,6 @@ public class ResourceManager {
 	public static HttpGet sDownloadGet;
 
 	public static final String VERSION = "version.txt";
-	public static final String TOPBAR_BG = "bar.png";
-	public static final String BOTTOMBAR_BG = "bar.png";
-
-	public static final String PLAY_ICON = "video_play.png";
-	public static final String PAUSE_ICON = "video_pause.png";
-	public static final String REPLAY_ICON = "video_replay.png";
-	public static final String BACK_ICON = "browser_back.png";
-	public static final String FORWARD_ICON = "browser_forward.png";
-	public static final String RELOAD_ICON = "video_replay.png";
-	public static final String EXTERNAL_ICON = "browser_external.png";
-	public static final String SKIP_ICON = "skip.png";
-	public static final String CLOSE_BUTTON_NORMAL = "close_button_normal.png";
-	public static final String CLOSE_BUTTON_PRESSED = "close_button_pressed.png";
 
 	public static final int DEFAULT_TOPBAR_BG_RESOURCE_ID = -1;
 	public static final int DEFAULT_BOTTOMBAR_BG_RESOURCE_ID = -2;
@@ -82,6 +71,18 @@ public class ResourceManager {
 	public static final int DEFAULT_CLOSE_BUTTON_NORMAL_RESOURCE_ID = -29;
 	public static final int DEFAULT_CLOSE_BUTTON_PRESSED_RESOURCE_ID = -30;
 
+	public static final String PLAY_IMAGE_DRAWABLE = "video_play";
+	public static final String PAUSE_IMAGE_DRAWABLE = "video_pause";
+	public static final String REPLAY_IMAGE_DRAWABLE = "video_replay";
+	public static final String BACK_IMAGE_DRAWABLE = "browser_back";
+	public static final String FORWARD_IMAGE_DRAWABLE = "browser_forward";
+	public static final String RELOAD_IMAGE_DRAWABLE = "browser_reload";
+	public static final String EXTERNAL_IMAGE_DRAWABLE = "browser_external";
+	public static final String SKIP_IMAGE_DRAWABLE = "skip";
+	public static final String BAR_IMAGE_DRAWABLE = "bar";
+	public static final String CLOSE_BUTTON_NORMAL_IMAGE_DRAWABLE = "close_button_normal";
+	public static final String CLOSE_BUTTON_PRESSED_IMAGE_DRAWABLE = "close_button_pressed";
+
 	private static HashMap<Integer, Drawable> sResources = new HashMap<Integer,Drawable>();
 
 	private Handler mHandler;
@@ -92,7 +93,7 @@ public class ResourceManager {
 	}
 
 	public static Drawable getDefaultSkipButton(Context ctx){
-		return buildDrawable(ctx, SKIP_ICON);
+		return buildDrawable(ctx, SKIP_IMAGE_DRAWABLE);
 	}
 	
 	public static boolean resourcesInstalled(Context ctx) {
@@ -166,74 +167,67 @@ public class ResourceManager {
 	private static void initDefaultResource(Context ctx, int resource) {
 		switch (resource) {
 		case DEFAULT_PLAY_IMAGE_RESOURCE_ID:
-			registerImageResource(ctx, DEFAULT_PLAY_IMAGE_RESOURCE_ID,
-					PLAY_ICON);
+			registerImageResource(ctx, DEFAULT_PLAY_IMAGE_RESOURCE_ID, PLAY_IMAGE_DRAWABLE);
 			break;
 		case DEFAULT_PAUSE_IMAGE_RESOURCE_ID:
-			registerImageResource(ctx, DEFAULT_PAUSE_IMAGE_RESOURCE_ID,
-					PAUSE_ICON);
+			registerImageResource(ctx, DEFAULT_PAUSE_IMAGE_RESOURCE_ID, PAUSE_IMAGE_DRAWABLE);
 			break;
 		case DEFAULT_REPLAY_IMAGE_RESOURCE_ID:
-			registerImageResource(ctx, DEFAULT_REPLAY_IMAGE_RESOURCE_ID,
-					REPLAY_ICON);
+			registerImageResource(ctx, DEFAULT_REPLAY_IMAGE_RESOURCE_ID, REPLAY_IMAGE_DRAWABLE);
 			break;
 		case DEFAULT_BACK_IMAGE_RESOURCE_ID:
-			registerImageResource(ctx, DEFAULT_BACK_IMAGE_RESOURCE_ID,
-					BACK_ICON);
+			registerImageResource(ctx, DEFAULT_BACK_IMAGE_RESOURCE_ID, BACK_IMAGE_DRAWABLE);
 			break;
 		case DEFAULT_FORWARD_IMAGE_RESOURCE_ID:
-			registerImageResource(ctx, DEFAULT_FORWARD_IMAGE_RESOURCE_ID,
-					FORWARD_ICON);
+			registerImageResource(ctx, DEFAULT_FORWARD_IMAGE_RESOURCE_ID, FORWARD_IMAGE_DRAWABLE);
 			break;
 		case DEFAULT_RELOAD_IMAGE_RESOURCE_ID:
-			registerImageResource(ctx, DEFAULT_RELOAD_IMAGE_RESOURCE_ID,
-					RELOAD_ICON);
+			registerImageResource(ctx, DEFAULT_RELOAD_IMAGE_RESOURCE_ID, RELOAD_IMAGE_DRAWABLE);
 			break;
 		case DEFAULT_EXTERNAL_IMAGE_RESOURCE_ID:
-			registerImageResource(ctx, DEFAULT_EXTERNAL_IMAGE_RESOURCE_ID,
-					EXTERNAL_ICON);
+			registerImageResource(ctx, DEFAULT_EXTERNAL_IMAGE_RESOURCE_ID, EXTERNAL_IMAGE_DRAWABLE);
 			break;
 		case DEFAULT_SKIP_IMAGE_RESOURCE_ID:
-			registerImageResource(ctx, DEFAULT_SKIP_IMAGE_RESOURCE_ID,
-					SKIP_ICON);
+			registerImageResource(ctx, DEFAULT_SKIP_IMAGE_RESOURCE_ID, SKIP_IMAGE_DRAWABLE);
 			break;
 		case DEFAULT_TOPBAR_BG_RESOURCE_ID:
-			registerImageResource(ctx, DEFAULT_TOPBAR_BG_RESOURCE_ID, TOPBAR_BG);
+			registerImageResource(ctx, DEFAULT_TOPBAR_BG_RESOURCE_ID, BAR_IMAGE_DRAWABLE);
 			break;
 		case DEFAULT_BOTTOMBAR_BG_RESOURCE_ID:
-			registerImageResource(ctx, DEFAULT_BOTTOMBAR_BG_RESOURCE_ID,
-					BOTTOMBAR_BG);
+			registerImageResource(ctx, DEFAULT_BOTTOMBAR_BG_RESOURCE_ID, BAR_IMAGE_DRAWABLE);
 			break;
 		case DEFAULT_CLOSE_BUTTON_NORMAL_RESOURCE_ID:
 			registerImageResource(ctx, DEFAULT_CLOSE_BUTTON_NORMAL_RESOURCE_ID,
-					CLOSE_BUTTON_NORMAL);
+					CLOSE_BUTTON_NORMAL_IMAGE_DRAWABLE);
 			break;
 		case DEFAULT_CLOSE_BUTTON_PRESSED_RESOURCE_ID:
 			registerImageResource(ctx, DEFAULT_CLOSE_BUTTON_PRESSED_RESOURCE_ID,
-					CLOSE_BUTTON_PRESSED);
+					CLOSE_BUTTON_PRESSED_IMAGE_DRAWABLE);
 			break;
 		}
 	}
 
 	private static void registerImageResource(Context ctx, int resId,
-			String name) {
-		Drawable d = buildDrawable(ctx, name);
+											  String drawableName) {
+		Drawable d = buildDrawable(ctx, drawableName);
 		if (d != null) {
 			sResources.put(resId, d);
 		} else {
-			Log.i("registerImageResource: drawable was null " + name);
+			Log.i("registerImageResource: drawable was null " + drawableName);
 			Log.i("Context was " + ctx);
 		}
 	}
 
-	private static Drawable buildDrawable(Context ctx, String name) {
-
-		InputStream in = null;
+	private static Drawable buildDrawable(Context ctx, String drawableName) {
 		try {
-			in = ctx.getClass().getClassLoader()
-					.getResourceAsStream(name);
+			int resourceId = ctx.getResources().getIdentifier(drawableName, "drawable",
+					BuildConfig.APPLICATION_ID);
+			if (resourceId == 0) {
+				resourceId = ctx.getResources().getIdentifier(drawableName, "drawable",
+						ctx.getApplicationContext().getPackageName());
+			}
 
-			Bitmap b = BitmapFactory.decodeStream(in);
+			Bitmap b = BitmapFactory.decodeResource(ctx.getResources(), resourceId);
 			if (b != null) {
 
 				DisplayMetrics m = ctx.getResources().getDisplayMetrics();
@@ -252,15 +246,7 @@ public class ResourceManager {
 				throw new FileNotFoundException();
 			}
 		} catch (Exception e) {
-			Log.i("ResourceManager cannot find resource " + name);
-		} finally {
-			if (in != null) {
-				try {
-					in.close();
-					in = null;
-				} catch (Exception e) {
-				}
-			}
+			Log.i("ResourceManager cannot find resource " + drawableName);
 		}
 		return null;
 	}

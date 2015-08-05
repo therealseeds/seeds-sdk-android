@@ -20,7 +20,7 @@ import com.playseeds.demo.inappmessaging.R;
 
 public class MainActivity extends Activity implements InAppMessageListener {
 
-    private static String YOUR_SERVER = "http://devdashboard.playseeds.com"; // don't include trailing slash
+    private static String YOUR_SERVER = "http://dash.playseeds.com"; // don't include trailing slash
 
     private static String YOUR_APP_KEY = "test";
 
@@ -41,7 +41,7 @@ public class MainActivity extends Activity implements InAppMessageListener {
         purchaseEventButton = (Button) findViewById(R.id.purchaseEventButton);
 
         Seeds.sharedInstance()
-                .init(this, YOUR_SERVER, YOUR_APP_KEY, null, DeviceId.Type.ADVERTISING_ID)
+                .init(this, this, YOUR_SERVER, YOUR_APP_KEY)
                 .setLoggingEnabled(true)
                 .requestInAppMessage(); // preload Ad
 
