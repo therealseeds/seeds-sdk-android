@@ -42,7 +42,7 @@ import android.os.Message;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 
-import com.playseeds.android.sdk.R;
+import com.playseeds.android.sdk.BuildConfig;
 
 public class ResourceManager {
 
@@ -71,6 +71,18 @@ public class ResourceManager {
 	public static final int DEFAULT_CLOSE_BUTTON_NORMAL_RESOURCE_ID = -29;
 	public static final int DEFAULT_CLOSE_BUTTON_PRESSED_RESOURCE_ID = -30;
 
+	public static final String PLAY_IMAGE_DRAWABLE = "video_play";
+	public static final String PAUSE_IMAGE_DRAWABLE = "video_pause";
+	public static final String REPLAY_IMAGE_DRAWABLE = "video_replay";
+	public static final String BACK_IMAGE_DRAWABLE = "browser_back";
+	public static final String FORWARD_IMAGE_DRAWABLE = "browser_forward";
+	public static final String RELOAD_IMAGE_DRAWABLE = "browser_reload";
+	public static final String EXTERNAL_IMAGE_DRAWABLE = "browser_external";
+	public static final String SKIP_IMAGE_DRAWABLE = "skip";
+	public static final String BAR_IMAGE_DRAWABLE = "bar";
+	public static final String CLOSE_BUTTON_NORMAL_IMAGE_DRAWABLE = "close_button_normal";
+	public static final String CLOSE_BUTTON_PRESSED_IMAGE_DRAWABLE = "close_button_pressed";
+
 	private static HashMap<Integer, Drawable> sResources = new HashMap<Integer,Drawable>();
 
 	private Handler mHandler;
@@ -81,7 +93,7 @@ public class ResourceManager {
 	}
 
 	public static Drawable getDefaultSkipButton(Context ctx){
-		return buildDrawable(ctx, R.drawable.skip);
+		return buildDrawable(ctx, SKIP_IMAGE_DRAWABLE);
 	}
 	
 	public static boolean resourcesInstalled(Context ctx) {
@@ -155,68 +167,66 @@ public class ResourceManager {
 	private static void initDefaultResource(Context ctx, int resource) {
 		switch (resource) {
 		case DEFAULT_PLAY_IMAGE_RESOURCE_ID:
-			registerImageResource(ctx, DEFAULT_PLAY_IMAGE_RESOURCE_ID,
-					R.drawable.video_play);
+			registerImageResource(ctx, DEFAULT_PLAY_IMAGE_RESOURCE_ID, PLAY_IMAGE_DRAWABLE);
 			break;
 		case DEFAULT_PAUSE_IMAGE_RESOURCE_ID:
-			registerImageResource(ctx, DEFAULT_PAUSE_IMAGE_RESOURCE_ID,
-					R.drawable.video_pause);
+			registerImageResource(ctx, DEFAULT_PAUSE_IMAGE_RESOURCE_ID, PAUSE_IMAGE_DRAWABLE);
 			break;
 		case DEFAULT_REPLAY_IMAGE_RESOURCE_ID:
-			registerImageResource(ctx, DEFAULT_REPLAY_IMAGE_RESOURCE_ID,
-					R.drawable.video_replay);
+			registerImageResource(ctx, DEFAULT_REPLAY_IMAGE_RESOURCE_ID, REPLAY_IMAGE_DRAWABLE);
 			break;
 		case DEFAULT_BACK_IMAGE_RESOURCE_ID:
-			registerImageResource(ctx, DEFAULT_BACK_IMAGE_RESOURCE_ID,
-					R.drawable.browser_back);
+			registerImageResource(ctx, DEFAULT_BACK_IMAGE_RESOURCE_ID, BACK_IMAGE_DRAWABLE);
 			break;
 		case DEFAULT_FORWARD_IMAGE_RESOURCE_ID:
-			registerImageResource(ctx, DEFAULT_FORWARD_IMAGE_RESOURCE_ID,
-					R.drawable.browser_forward);
+			registerImageResource(ctx, DEFAULT_FORWARD_IMAGE_RESOURCE_ID, FORWARD_IMAGE_DRAWABLE);
 			break;
 		case DEFAULT_RELOAD_IMAGE_RESOURCE_ID:
-			registerImageResource(ctx, DEFAULT_RELOAD_IMAGE_RESOURCE_ID,
-					R.drawable.browser_reload);
+			registerImageResource(ctx, DEFAULT_RELOAD_IMAGE_RESOURCE_ID, RELOAD_IMAGE_DRAWABLE);
 			break;
 		case DEFAULT_EXTERNAL_IMAGE_RESOURCE_ID:
-			registerImageResource(ctx, DEFAULT_EXTERNAL_IMAGE_RESOURCE_ID,
-					R.drawable.browser_external);
+			registerImageResource(ctx, DEFAULT_EXTERNAL_IMAGE_RESOURCE_ID, EXTERNAL_IMAGE_DRAWABLE);
 			break;
 		case DEFAULT_SKIP_IMAGE_RESOURCE_ID:
-			registerImageResource(ctx, DEFAULT_SKIP_IMAGE_RESOURCE_ID,
-					R.drawable.skip);
+			registerImageResource(ctx, DEFAULT_SKIP_IMAGE_RESOURCE_ID, SKIP_IMAGE_DRAWABLE);
 			break;
 		case DEFAULT_TOPBAR_BG_RESOURCE_ID:
-			registerImageResource(ctx, DEFAULT_TOPBAR_BG_RESOURCE_ID, R.drawable.bar);
+			registerImageResource(ctx, DEFAULT_TOPBAR_BG_RESOURCE_ID, BAR_IMAGE_DRAWABLE);
 			break;
 		case DEFAULT_BOTTOMBAR_BG_RESOURCE_ID:
-			registerImageResource(ctx, DEFAULT_BOTTOMBAR_BG_RESOURCE_ID,
-					R.drawable.bar);
+			registerImageResource(ctx, DEFAULT_BOTTOMBAR_BG_RESOURCE_ID, BAR_IMAGE_DRAWABLE);
 			break;
 		case DEFAULT_CLOSE_BUTTON_NORMAL_RESOURCE_ID:
 			registerImageResource(ctx, DEFAULT_CLOSE_BUTTON_NORMAL_RESOURCE_ID,
-					R.drawable.close_button_normal);
+					CLOSE_BUTTON_NORMAL_IMAGE_DRAWABLE);
 			break;
 		case DEFAULT_CLOSE_BUTTON_PRESSED_RESOURCE_ID:
 			registerImageResource(ctx, DEFAULT_CLOSE_BUTTON_PRESSED_RESOURCE_ID,
-					R.drawable.close_button_pressed);
+					CLOSE_BUTTON_PRESSED_IMAGE_DRAWABLE);
 			break;
 		}
 	}
 
 	private static void registerImageResource(Context ctx, int resId,
-											  int resourceId) {
-		Drawable d = buildDrawable(ctx, resourceId);
+											  String drawableName) {
+		Drawable d = buildDrawable(ctx, drawableName);
 		if (d != null) {
 			sResources.put(resId, d);
 		} else {
-			Log.i("registerImageResource: drawable was null " + resourceId);
+			Log.i("registerImageResource: drawable was null " + drawableName);
 			Log.i("Context was " + ctx);
 		}
 	}
 
-	private static Drawable buildDrawable(Context ctx, int resourceId) {
+	private static Drawable buildDrawable(Context ctx, String drawableName) {
 		try {
+			int resourceId = ctx.getResources().getIdentifier(drawableName, "drawable",
+					BuildConfig.APPLICATION_ID);
+			if (resourceId == 0) {
+				resourceId = ctx.getResources().getIdentifier(drawableName, "drawable",
+						ctx.getApplicationContext().getPackageName());
+			}
+
 			Bitmap b = BitmapFactory.decodeResource(ctx.getResources(), resourceId);
 			if (b != null) {
 
@@ -236,7 +246,7 @@ public class ResourceManager {
 				throw new FileNotFoundException();
 			}
 		} catch (Exception e) {
-			Log.i("ResourceManager cannot find resource " + resourceId);
+			Log.i("ResourceManager cannot find resource " + drawableName);
 		}
 		return null;
 	}
