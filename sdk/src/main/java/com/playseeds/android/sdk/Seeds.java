@@ -832,8 +832,7 @@ public class Seeds {
         return a_bTestingOn;
     }
 
-    public void setA_bTestingOn(boolean a_bTestingOn) {
-        this.a_bTestingOn = a_bTestingOn;
+    public void setA_bTestingOn(boolean a_bTestingOn) { this.a_bTestingOn = a_bTestingOn;
     }
 
     public void setMessageVariantName(String messageVariantName) {
