@@ -507,8 +507,8 @@ public class InAppMessageManager {
 		segmentation.put("message", Seeds.sharedInstance().getMessageVariantName());
 	}
 
-	public void doNotShow() {
-		doNotShow = true;
+	public void doNotShow(boolean doNotShow) {
+		this.doNotShow = doNotShow;
 	}
 
 }

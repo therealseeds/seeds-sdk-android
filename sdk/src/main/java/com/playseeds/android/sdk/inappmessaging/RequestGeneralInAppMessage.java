@@ -143,10 +143,11 @@ public class RequestGeneralInAppMessage extends RequestInAppMessage<InAppMessage
 			if (jsonObject.containsKey("doNotShow")) {
 
 				boolean doNotShow = jsonObject.getBoolean("doNotShow");
+				InAppMessageManager.sharedInstance().doNotShow(doNotShow);
 
-				if (doNotShow) {
-					InAppMessageManager.sharedInstance().doNotShow();
-				}
+			} else {
+				// show it!
+				InAppMessageManager.sharedInstance().doNotShow(false);
 			}
 
 			Log.d("after showAd");
