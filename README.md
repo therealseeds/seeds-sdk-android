@@ -3,6 +3,8 @@
 
 We also have available: 
 [API](https://github.com/therealseeds/seeds-public-api) 
+[Unity SDK (Android)](https://github.com/therealseeds/seeds-sdk-unity) 
+
 
 ##The Seeds Android SDK
 
