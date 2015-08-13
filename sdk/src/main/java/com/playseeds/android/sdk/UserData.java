@@ -137,37 +137,37 @@ public class UserData {
 
         try {
             if (name != null)
-                if(name == "")
+                if(name.isEmpty())
                     json.put(NAME_KEY, JSONObject.NULL);
                 else
                     json.put(NAME_KEY, name);
             if (username != null)
-                if(username == "")
+                if(username.isEmpty())
                     json.put(USERNAME_KEY, JSONObject.NULL);
                 else
                     json.put(USERNAME_KEY, username);
             if (email != null)
-                if(email == "")
+                if(email.isEmpty())
                     json.put(EMAIL_KEY, JSONObject.NULL);
                 else
                     json.put(EMAIL_KEY, email);
             if (org != null)
-                if(org == "")
+                if(org.isEmpty())
                     json.put(ORG_KEY, JSONObject.NULL);
                 else
                     json.put(ORG_KEY, org);
             if (phone != null)
-                if(phone == "")
+                if(phone.isEmpty())
                     json.put(PHONE_KEY, JSONObject.NULL);
                 else
                     json.put(PHONE_KEY, phone);
             if (picture != null)
-                if(picture == "")
+                if(picture.isEmpty())
                     json.put(PICTURE_KEY, JSONObject.NULL);
                 else
                     json.put(PICTURE_KEY, picture);
             if (gender != null)
-                if(gender == "")
+                if(gender.isEmpty())
                     json.put(GENDER_KEY, JSONObject.NULL);
                 else
                     json.put(GENDER_KEY, gender);
