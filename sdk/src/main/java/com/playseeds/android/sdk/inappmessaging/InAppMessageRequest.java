@@ -22,6 +22,7 @@ import java.util.List;
 
 import android.net.Uri;
 import android.os.Build;
+import android.text.TextUtils;
 
 import com.playseeds.android.sdk.DeviceId;
 
@@ -209,9 +210,9 @@ public class InAppMessageRequest {
 		b.appendQueryParameter("app_key", appKey);
 		b.appendQueryParameter("orientation", orientation);
 
-		if (deviceId == null || deviceId == "") {
+		if (deviceId == null || deviceId.isEmpty()) {
 			deviceId = Util.getAndroidAdId();
-			if (deviceId == null || deviceId == "") {
+			if (deviceId == null || deviceId.isEmpty()) {
 				try {
 					Thread.sleep(DEVICE_ID_MS_DELAY);
 				} catch (InterruptedException e) {
@@ -221,7 +222,7 @@ public class InAppMessageRequest {
 			}
 		}
 
-		if (deviceId == null || deviceId == "") {
+		if (deviceId == null || deviceId.isEmpty()) {
 			Log.e("Device Id could not be set");
 		}
 		b.appendQueryParameter("device_id", deviceId);
