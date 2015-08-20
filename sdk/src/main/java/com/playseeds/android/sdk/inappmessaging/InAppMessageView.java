@@ -49,7 +49,6 @@ import android.widget.RelativeLayout;
 
 @SuppressLint({ "ViewConstructor", "SetJavaScriptEnabled" })
 public class InAppMessageView extends RelativeLayout {
-
 	public static final int LIVE = 0;
 	public static final int TEST = 1;
 
@@ -162,7 +161,13 @@ public class InAppMessageView extends RelativeLayout {
 		if (!(getContext() instanceof Activity)) {
 			i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		}
-		getContext().startActivity(i);
+
+		try {
+			getContext().startActivity(i);
+		} catch (Exception e) {
+			Log.e("Failed to start activity using " + i.toString(), e);
+			adListener.onError();
+		}
 	}
 
 	private void makeTrackingRequest(final String clickUrl) {
@@ -324,6 +329,8 @@ public class InAppMessageView extends RelativeLayout {
 		public void onLoad();
 
 		public void onClick();
+
+		public void onError();
 	}
 
 }

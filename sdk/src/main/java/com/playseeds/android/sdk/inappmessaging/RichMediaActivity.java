@@ -273,6 +273,11 @@ public class RichMediaActivity extends Activity {
 			public void onClick() {
 				notifyAdClicked();
 			}
+
+			@Override
+			public void onError() {
+				finish();
+			}
 		};
 	}
 
