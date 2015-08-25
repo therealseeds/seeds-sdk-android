@@ -461,10 +461,10 @@ public class Seeds {
             segmentation.put("IAP type", "Non-Seeds");
         }
 
-        if (isA_bTestingOn()) {
+        //if (isA_bTestingOn()) {
             segmentation.put("message", getMessageVariantName());
 
-        }
+        //}
         recordEvent("IAP: " + key, segmentation, 1, price);
         Log.d(TAG, "IAP: " + key + " segment: " + segmentation);
     }
@@ -822,18 +822,10 @@ public class Seeds {
     boolean getDisableUpdateSessionRequests() { return disableUpdateSessionRequests_; }
 
 
-    //// Seeds A/B testing stuff
+    // Seeds message identification stuff
 
-    private boolean a_bTestingOn = false;
     private String messageVariantName;
 
-
-    public boolean isA_bTestingOn() {
-        return a_bTestingOn;
-    }
-
-    public void setA_bTestingOn(boolean a_bTestingOn) { this.a_bTestingOn = a_bTestingOn;
-    }
 
     public void setMessageVariantName(String messageVariantName) {
         this.messageVariantName = messageVariantName;

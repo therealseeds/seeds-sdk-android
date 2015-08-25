@@ -132,10 +132,11 @@ public class RequestGeneralInAppMessage extends RequestInAppMessage<InAppMessage
 
 			String messageVariant = jsonObject.getString("messageVariant");
 
-			if (messageVariant != null && !messageVariant.equals("false")) {
-				Log.d("setting a b testing on");
-				Seeds.sharedInstance().setA_bTestingOn(true);
+			if (messageVariant != null) {
 				Seeds.sharedInstance().setMessageVariantName(messageVariant);
+			} else {
+				Log.e("messageVariant null or missing");
+				Seeds.sharedInstance().setMessageVariantName("none");
 			}
 
 

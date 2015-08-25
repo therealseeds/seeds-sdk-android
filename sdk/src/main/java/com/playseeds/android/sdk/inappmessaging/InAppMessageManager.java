@@ -380,14 +380,11 @@ public class InAppMessageManager {
 				}
 			});
 		}
-		if (Seeds.sharedInstance().isA_bTestingOn()) {
-			setSegmentation();
-			Seeds.sharedInstance().recordEvent("message clicked", segmentation, 1);
-			android.util.Log.d("Main", "message shown: " + segmentation);
-		} else {
-			Seeds.sharedInstance().recordEvent("message clicked");
-			android.util.Log.d("Main", "message shown: no segmentation");
-		}
+
+		setSegmentation();
+		Seeds.sharedInstance().recordEvent("message clicked", segmentation, 1);
+		android.util.Log.d("Main", "message shown: " + segmentation);
+
 	}
 
 	private void notifyAdShown(final InAppMessageResponse ad, final boolean ok) {
@@ -401,14 +398,10 @@ public class InAppMessageManager {
 			});
 		}
 		this.mResponse = null;
-		if (Seeds.sharedInstance().isA_bTestingOn()) {
-			setSegmentation();
-			Seeds.sharedInstance().recordEvent("message shown", segmentation, 1);
-			android.util.Log.d("Main", "message shown: " + segmentation);
-		} else {
-			Seeds.sharedInstance().recordEvent("message shown");
-			android.util.Log.d("Main", "message shown: no segmentation");
-		}
+
+		setSegmentation();
+		Seeds.sharedInstance().recordEvent("message shown", segmentation, 1);
+		android.util.Log.d("Main", "message shown: " + segmentation);
 	}
 
 	private void notifyAdClose(final InAppMessageResponse ad, final boolean ok) {
