@@ -1,11 +1,14 @@
 package com.playseeds.android.demo.inappmessaging;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.playseeds.android.sdk.Seeds;
@@ -45,21 +48,22 @@ public class MainActivity extends Activity implements InAppMessageListener {
                 .setLoggingEnabled(true)
                 .requestInAppMessage(); // preload Ad
 
-        Seeds.sharedInstance().recordEvent("test", 1);
+//        Seeds.sharedInstance().recordEvent("test", 1);
+//
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                Seeds.sharedInstance().recordEvent("test2", 1, 2);
+//            }
+//        }, 5000);
+//
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                Seeds.sharedInstance().recordEvent("test3");
+//            }
+//        }, 10000);
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Seeds.sharedInstance().recordEvent("test2", 1, 2);
-            }
-        }, 5000);
-
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Seeds.sharedInstance().recordEvent("test3");
-            }
-        }, 10000);
 
     }
 

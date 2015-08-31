@@ -101,6 +101,16 @@ public class Seeds {
     private Seeds.CountlyMessagingMode messagingMode_;
     private Context context_;
 
+//    public boolean isFromDeepLink() {
+//        return fromDeepLink;
+//    }
+//
+//    public void setFromDeepLink(boolean fromDeepLink) {
+//        this.fromDeepLink = fromDeepLink;
+//    }
+//
+//    private boolean fromDeepLink;
+
     /**
      * Returns the Seeds singleton.
      */
@@ -461,9 +471,8 @@ public class Seeds {
             segmentation.put("IAP type", "Non-Seeds");
         }
 
-        //if (isA_bTestingOn()) {
+        //if (isFromDeepLink()) {
             segmentation.put("message", getMessageVariantName());
-
         //}
         recordEvent("IAP: " + key, segmentation, 1, price);
         Log.d(TAG, "IAP: " + key + " segment: " + segmentation);
