@@ -101,15 +101,15 @@ public class Seeds {
     private Seeds.CountlyMessagingMode messagingMode_;
     private Context context_;
 
-//    public boolean isFromDeepLink() {
-//        return fromDeepLink;
-//    }
-//
-//    public void setFromDeepLink(boolean fromDeepLink) {
-//        this.fromDeepLink = fromDeepLink;
-//    }
-//
-//    private boolean fromDeepLink;
+    public boolean isAdClicked() {
+        return adClicked;
+    }
+
+    public void setAdClicked(boolean adClicked) {
+        this.adClicked = adClicked;
+    }
+
+    private boolean adClicked = false;
 
     /**
      * Returns the Seeds singleton.
@@ -467,13 +467,18 @@ public class Seeds {
 
         if (seedsEvent) {
             segmentation.put("IAP type", "Seeds");
+        }
+//        else {
+//            segmentation.put("IAP type", "Non-Seeds");
+//        }
+
+        if (isAdClicked()) {
+            segmentation.put("message", getMessageVariantName());
+            setAdClicked(false);
+            segmentation.put("IAP type", "Seeds");
         } else {
             segmentation.put("IAP type", "Non-Seeds");
         }
-
-        //if (isFromDeepLink()) {
-            segmentation.put("message", getMessageVariantName());
-        //}
         recordEvent("IAP: " + key, segmentation, 1, price);
         Log.d(TAG, "IAP: " + key + " segment: " + segmentation);
     }

@@ -23,9 +23,9 @@ import com.playseeds.demo.inappmessaging.R;
 
 public class MainActivity extends Activity implements InAppMessageListener {
 
-    private static String YOUR_SERVER = "http://dash.playseeds.com"; // don't include trailing slash
+    private static String YOUR_SERVER = "http://devdash.playseeds.com"; // don't include trailing slash
 
-    private static String YOUR_APP_KEY = "test";
+    private static String YOUR_APP_KEY = "aa1fd1f255b25fb89b413f216f11e8719188129d"; //"test";
 
     private Button iamButton;
     private Button purchaseEventButton;

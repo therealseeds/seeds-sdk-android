@@ -368,6 +368,8 @@ public class InAppMessageManager {
 				}
 			});
 		}
+		// sanity check
+		Seeds.sharedInstance().setAdClicked(false);
 	}
 
 	private void notifyAdClicked() {
@@ -383,6 +385,8 @@ public class InAppMessageManager {
 
 		setSegmentation();
 		Seeds.sharedInstance().recordEvent("message clicked", segmentation, 1);
+
+		Seeds.sharedInstance().setAdClicked(true);
 		android.util.Log.d("Main", "message shown: " + segmentation);
 
 	}
@@ -399,9 +403,11 @@ public class InAppMessageManager {
 		}
 		this.mResponse = null;
 
-		setSegmentation();
-		Seeds.sharedInstance().recordEvent("message shown", segmentation, 1);
-		android.util.Log.d("Main", "message shown: " + segmentation);
+		if (ok) {
+			setSegmentation();
+			Seeds.sharedInstance().recordEvent("message shown", segmentation, 1);
+			android.util.Log.d("Main", "message shown: " + segmentation);
+		}
 	}
 
 	private void notifyAdClose(final InAppMessageResponse ad, final boolean ok) {
