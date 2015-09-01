@@ -368,8 +368,6 @@ public class InAppMessageManager {
 				}
 			});
 		}
-		// sanity check
-		Seeds.sharedInstance().setAdClicked(false);
 	}
 
 	private void notifyAdClicked() {
@@ -408,6 +406,8 @@ public class InAppMessageManager {
 			Seeds.sharedInstance().recordEvent("message shown", segmentation, 1);
 			android.util.Log.d("Main", "message shown: " + segmentation);
 		}
+		// sanity check
+		Seeds.sharedInstance().setAdClicked(false);
 	}
 
 	private void notifyAdClose(final InAppMessageResponse ad, final boolean ok) {

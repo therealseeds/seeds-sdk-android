@@ -107,6 +107,7 @@ public class Seeds {
 
     public void setAdClicked(boolean adClicked) {
         this.adClicked = adClicked;
+        Log.d("setAdClicked", "adClicked: " + Seeds.sharedInstance().isAdClicked());
     }
 
     private boolean adClicked = false;
@@ -461,30 +462,6 @@ public class Seeds {
         recordGenericIAPEvent(key, price, false);
     }
 
-    private void recordGenericIAPEvent(String key, final double price, boolean seedsEvent) {
-
-        HashMap<String, String> segmentation = new HashMap<String, String>();
-
-        if (seedsEvent) {
-            segmentation.put("IAP type", "Seeds");
-        }
-//        else {
-//            segmentation.put("IAP type", "Non-Seeds");
-//        }
-
-        if (isAdClicked()) {
-            segmentation.put("message", getMessageVariantName());
-            setAdClicked(false);
-            segmentation.put("IAP type", "Seeds");
-        } else {
-            segmentation.put("IAP type", "Non-Seeds");
-        }
-        recordEvent("IAP: " + key, segmentation, 1, price);
-        Log.d(TAG, "IAP: " + key + " segment: " + segmentation);
-    }
-
-
-
     /**
      * Records an IAP event
      * @param key name of the custom event, required, must not be the empty string
@@ -495,6 +472,34 @@ public class Seeds {
     public void recordSeedsIAPEvent(String key, final double price) {
         recordGenericIAPEvent(key, price, true);
     }
+
+
+    public void trackPurchase(String key, final double price) {
+
+
+        if (isAdClicked()) {
+            recordSeedsIAPEvent(key, price);
+            setAdClicked(false);
+        } else {
+            recordIAPEvent(key, price);
+        }
+    }
+
+    private void recordGenericIAPEvent(String key, final double price, boolean seedsEvent) {
+
+        HashMap<String, String> segmentation = new HashMap<String, String>();
+
+        if (seedsEvent) {
+            segmentation.put("IAP type", "Seeds");
+            segmentation.put("message", getMessageVariantName());
+        } else {
+            segmentation.put("IAP type", "Non-Seeds");
+        }
+
+        recordEvent("IAP: " + key, segmentation, 1, price);
+        Log.d(TAG, "IAP: " + key + " segment: " + segmentation);
+    }
+
 
     /**
      * Records a custom event with the specified segmentation values and count, and a sum of zero.
