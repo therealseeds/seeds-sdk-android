@@ -48,7 +48,6 @@ public class MainActivity extends Activity implements InAppMessageListener {
                 .setLoggingEnabled(true)
                 .requestInAppMessage(); // preload Ad
 
-        Log.d("onCreate", "adClicked: " + Seeds.sharedInstance().isAdClicked());
 
 //        Seeds.sharedInstance().recordEvent("test", 1);
 //

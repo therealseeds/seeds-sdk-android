@@ -151,7 +151,6 @@ public class RequestGeneralInAppMessage extends RequestInAppMessage<InAppMessage
 				InAppMessageManager.sharedInstance().doNotShow(false);
 			}
 
-			Log.d("after showAd");
 			jsonReader.close();
 
 		} catch (final Throwable t) {

@@ -107,7 +107,6 @@ public class Seeds {
 
     public void setAdClicked(boolean adClicked) {
         this.adClicked = adClicked;
-        Log.d("setAdClicked", "adClicked: " + Seeds.sharedInstance().isAdClicked());
     }
 
     private boolean adClicked = false;
@@ -495,6 +494,8 @@ public class Seeds {
         } else {
             segmentation.put("IAP type", "Non-Seeds");
         }
+
+        segmentation.put("item", key);
 
         recordEvent("IAP: " + key, segmentation, 1, price);
         Log.d(TAG, "IAP: " + key + " segment: " + segmentation);
