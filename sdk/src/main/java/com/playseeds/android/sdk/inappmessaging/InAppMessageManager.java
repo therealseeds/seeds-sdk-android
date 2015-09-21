@@ -301,7 +301,14 @@ public class InAppMessageManager {
 
 	public void showInAppMessage() {
 
-		if (((mResponse == null) || (mResponse.getType() == Const.NO_AD) || (mResponse.getType() == Const.AD_FAILED)) || doNotShow) {
+		int expectedOrientation = requestedHorizontalAd
+				? Configuration.ORIENTATION_LANDSCAPE
+				: Configuration.ORIENTATION_PORTRAIT;
+		if (((mResponse == null)
+				|| (mResponse.getType() == Const.NO_AD)
+				|| (mResponse.getType() == Const.AD_FAILED))
+				|| doNotShow
+				|| (mContext.getResources().getConfiguration().orientation != expectedOrientation)) {
 			notifyAdShown(mResponse, false);
 			return;
 		}

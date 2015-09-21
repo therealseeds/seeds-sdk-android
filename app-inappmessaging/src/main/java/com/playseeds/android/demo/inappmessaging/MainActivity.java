@@ -24,14 +24,11 @@ import com.playseeds.demo.inappmessaging.R;
 public class MainActivity extends Activity implements InAppMessageListener {
 
     private static String YOUR_SERVER = "http://dash.playseeds.com"; // don't include trailing slash
-
     private static String YOUR_APP_KEY = "test";
 
     private Button iamButton;
     private Button purchaseEventButton;
     private Button seedsPurchaseEventButton;
-    private InAppMessageManager manager;
-
 
     /** Called when the activity is first created. */
     @Override
@@ -46,26 +43,7 @@ public class MainActivity extends Activity implements InAppMessageListener {
         Seeds.sharedInstance()
                 .init(this, this, YOUR_SERVER, YOUR_APP_KEY)
                 .setLoggingEnabled(true)
-                .requestInAppMessage(); // preload Ad
-
-
-//        Seeds.sharedInstance().recordEvent("test", 1);
-//
-//        new Handler().postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                Seeds.sharedInstance().recordEvent("test2", 1, 2);
-//            }
-//        }, 5000);
-//
-//        new Handler().postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                Seeds.sharedInstance().recordEvent("test3");
-//            }
-//        }, 10000);
-
-
+                .requestInAppMessage();
     }
 
     @Override
@@ -129,26 +107,27 @@ public class MainActivity extends Activity implements InAppMessageListener {
 
     @Override
     public void inAppMessageClicked() {
+        Toast.makeText(this, "inAppMessageClicked", Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void inAppMessageClosed(InAppMessage inAppMessage, boolean completed) {
-
+        Toast.makeText(this, "inAppMessageClosed(completed = " + completed + ")", Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void inAppMessageLoadSucceeded(InAppMessage inAppMessage) {
-        Toast.makeText(this, "InAppMessage loaded", Toast.LENGTH_LONG)
-                                .show();
+        Toast.makeText(this, "inAppMessageLoadSucceeded", Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void inAppMessageShown(InAppMessage inAppMessage, boolean succeeded) {
+        Toast.makeText(this, "inAppMessageShown(succeeded = " + succeeded + ")", Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void noInAppMessageFound() {
-
+        Toast.makeText(this, "noInAppMessageFound", Toast.LENGTH_LONG).show();
     }
 
 
