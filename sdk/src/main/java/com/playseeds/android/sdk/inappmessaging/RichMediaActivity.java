@@ -221,12 +221,9 @@ public class RichMediaActivity extends Activity {
 			int height = (int)(displayMetrics.heightPixels / displayMetrics.density);
 
 			//NOTE: A very odd scaling
-			float adScale = Math.min(displayMetrics.widthPixels / (float)adWidth,
-					displayMetrics.heightPixels / (float)adHeight);
+			float adScale = Math.min(width / (float)adWidth, height / (float)adHeight);
 			if (adScale < 1.0f)
 				adScale = 1.0f;
-			else
-				adScale /= scale;
 			width = (int)(width * adScale);
 			height = (int)(height * adScale);
 
