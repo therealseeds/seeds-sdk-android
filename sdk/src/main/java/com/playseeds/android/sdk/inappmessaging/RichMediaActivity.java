@@ -220,12 +220,11 @@ public class RichMediaActivity extends Activity {
 			int width = (int)(displayMetrics.widthPixels / displayMetrics.density);
 			int height = (int)(displayMetrics.heightPixels / displayMetrics.density);
 
-			//NOTE: A very odd scaling
-			float adScale = Math.min(width / (float)adWidth, height / (float)adHeight);
-			if (adScale < 1.0f)
-				adScale = 1.0f;
-			width = (int)(width * adScale);
-			height = (int)(height * adScale);
+			final float adAspectRatio = adWidth / (float) adHeight;
+			if (adAspectRatio >= 1.0f)
+				width = (int)(height * adAspectRatio + 0.5f);
+			else
+				height = (int)(width / adAspectRatio + 0.5f);
 
 			InAppMessageView banner = new InAppMessageView(this, mAd, width, height, false, createLocalAdListener());
 
