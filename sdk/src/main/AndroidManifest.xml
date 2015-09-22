@@ -11,6 +11,7 @@
     <application>
         <!-- MobFox activities declaration -->
         <activity android:name="com.playseeds.android.sdk.inappmessaging.RichMediaActivity"
+            android:theme="@android:style/Theme.Translucent"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
             android:hardwareAccelerated="false" />
         <activity android:name="com.playseeds.android.sdk.inappmessaging.InAppWebView"

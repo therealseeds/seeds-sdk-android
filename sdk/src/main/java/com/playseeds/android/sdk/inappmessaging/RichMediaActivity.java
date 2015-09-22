@@ -205,31 +205,37 @@ public class RichMediaActivity extends Activity {
 	private void initInterstitialFromBannerView() {
 		final FrameLayout layout = new FrameLayout(this);
 		if (mAd.getType() == Const.TEXT || mAd.getType() == Const.IMAGE) {
-			final float scale = this.getResources().getDisplayMetrics().density;
+			final DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
+			final float scale = displayMetrics.density;
 
-			int deviceWidth = this.getResources().getDisplayMetrics().widthPixels;
-			int deviceHeight = this.getResources().getDisplayMetrics().heightPixels;
-
-			int width, height;
+			int adWidth, adHeight;
 			if (mAd.isHorizontalOrientationRequested()) {
-				width = 480;
-				height = 320;
+				adWidth = 1080;
+				adHeight = 720;
 			} else {
-				width = 320;
-				height = 480;
+				adWidth = 720;
+				adHeight = 1080;
 			}
 
-			Log.d("scale " + scale);
+			int width = (int)(displayMetrics.widthPixels / displayMetrics.density);
+			int height = (int)(displayMetrics.heightPixels / displayMetrics.density);
 
-			Log.d("device width, height " + deviceWidth + ", " + deviceHeight);
-
-			// Sungwon's scaling code
-			width = width * (int) (deviceWidth / width / scale);
-			height = height * (int) (deviceHeight / height / scale);
+			//NOTE: A very odd scaling
+			float adScale = Math.min(displayMetrics.widthPixels / (float)adWidth,
+					displayMetrics.heightPixels / (float)adHeight);
+			if (adScale < 1.0f)
+				adScale = 1.0f;
+			else
+				adScale /= scale;
+			width = (int)(width * adScale);
+			height = (int)(height * adScale);
 
 			InAppMessageView banner = new InAppMessageView(this, mAd, width, height, false, createLocalAdListener());
 
-			banner.setLayoutParams(new FrameLayout.LayoutParams((int) (width * scale + 0.5f ), (int) (height * scale + 0.5f ), Gravity.CENTER));
+			banner.setLayoutParams(new FrameLayout.LayoutParams(
+					(int) (width * scale + 0.5f),
+					(int) (height * scale + 0.5f),
+					Gravity.CENTER));
 			banner.showContent();
 			layout.addView(banner);
 		}
@@ -289,7 +295,7 @@ public class RichMediaActivity extends Activity {
 
 	private void initRootLayout() {
 		this.mRootLayout = new FrameLayout(this);
-		this.mRootLayout.setBackgroundColor(Color.BLACK);
+		this.mRootLayout.setBackgroundColor(Color.argb(128, 0, 0, 0));
 	}
 
 

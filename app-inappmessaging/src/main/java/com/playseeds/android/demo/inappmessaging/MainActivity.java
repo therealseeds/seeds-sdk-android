@@ -26,19 +26,11 @@ public class MainActivity extends Activity implements InAppMessageListener {
     private static String YOUR_SERVER = "http://dash.playseeds.com"; // don't include trailing slash
     private static String YOUR_APP_KEY = "test";
 
-    private Button iamButton;
-    private Button purchaseEventButton;
-    private Button seedsPurchaseEventButton;
-
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
-        iamButton = (Button) findViewById(R.id.iamButton);
-        purchaseEventButton = (Button) findViewById(R.id.purchaseEventButton);
 
         Seeds.sharedInstance()
                 .init(this, this, YOUR_SERVER, YOUR_APP_KEY)
