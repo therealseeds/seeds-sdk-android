@@ -18,8 +18,32 @@ public class SeedsTests {
     public static final String NO_ADS_APP_KEY = "ef2444ec9f590d24db5054fad8385991138a394b";
     public static final String UNLIMITED_ADS_APP_KEY = "c30f02a55541cbe362449d29d83d777c125c8dd6";
 
-    @Before
-    public void setup() {
+    @Test
+    public void testSeedsCustomId() {
+        Seeds.sharedInstance()
+                .init(ShadowApplication.getInstance().getApplicationContext( ), null,
+                        SERVER, UNLIMITED_ADS_APP_KEY, "some fake");
+    }
+
+    @Test
+    public void testSeedsCustomIdExplicit() {
+        Seeds.sharedInstance()
+                .init(ShadowApplication.getInstance().getApplicationContext( ), null,
+                        SERVER, UNLIMITED_ADS_APP_KEY, "some fake", DeviceId.Type.DEVELOPER_SUPPLIED);
+    }
+
+    @Test
+    public void testSeedsUDIDUsage() {
+        Seeds.sharedInstance()
+                .init(ShadowApplication.getInstance().getApplicationContext( ), null,
+                        SERVER, UNLIMITED_ADS_APP_KEY, null, DeviceId.Type.OPEN_UDID);
+    }
+
+    @Test
+    public void testSeedsAdIdUsage() {
+        Seeds.sharedInstance()
+                .init(ShadowApplication.getInstance().getApplicationContext(), null,
+                        SERVER, UNLIMITED_ADS_APP_KEY, null, DeviceId.Type.ADVERTISING_ID);
     }
 
     @Test
@@ -53,8 +77,8 @@ public class SeedsTests {
 
         Seeds.sharedInstance()
                 .init(ShadowApplication.getInstance().getApplicationContext(), listener,
-                        SERVER, UNLIMITED_ADS_APP_KEY, null, DeviceId.Type.OPEN_UDID);
-
+                        SERVER, UNLIMITED_ADS_APP_KEY);
+        Seeds.sharedInstance().requestInAppMessage();
 
 //        WelcomeActivity activity = Robolectric.setupActivity(WelcomeActivity.class);
 //        activity.findViewById(R.id.login).performClick();
@@ -63,22 +87,6 @@ public class SeedsTests {
 //        assertThat(shadowOf(activity).getNextStartedActivity()).isEqualTo(expectedIntent);
     }
 
-//
-//    - (void)setUp {
-//
-//        [super setUp];
-//
-//        [Seeds sharedInstance].inAppMessageDelegate = self;
-//
-//        _testVC = [[TestViewController alloc] init];
-//
-//    }
-//
-//    - (void)tearDown {
-//
-//        [super tearDown];
-//
-//    }
 //
 //    - (void)testSeedInAppMessageShown {
 //
