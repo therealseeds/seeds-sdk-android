@@ -20,8 +20,14 @@ package com.playseeds.android.sdk.inappmessaging;
 
 import static com.playseeds.android.sdk.inappmessaging.Const.AD_EXTRA;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.InputStream;
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 
@@ -31,6 +37,7 @@ import android.content.res.Configuration;
 import android.location.Location;
 import android.os.Handler;
 
+import com.google.gson.Gson;
 import com.playseeds.android.sdk.DeviceId;
 import com.playseeds.android.sdk.Seeds;
 
@@ -148,7 +155,7 @@ public class InAppMessageManager {
 					}
 					Log.d("starting request thread");
 					try {
-						RequestGeneralInAppMessage requestAd = new RequestGeneralInAppMessage();
+						GeneralInAppMessageProvider requestAd = new GeneralInAppMessageProvider();
 						if (!alreadyRequestedInterstitial) {
 							request = getInterstitialRequest();
 							alreadyRequestedInterstitial = true;
@@ -159,20 +166,46 @@ public class InAppMessageManager {
 							return;
 						}
 
-						mResponse = requestAd.sendRequest(request);
+						try {
+							mResponse = requestAd.obtainInAppMessage(request);
+						} catch (Exception e) {
+							File cachedInAppMessageFile = new File(mContext.getCacheDir(),
+									URLEncoder.encode(request.countlyUriToString(), "UTF-8"));
+							if (cachedInAppMessageFile.exists()) {
+								BufferedReader cacheReader = new BufferedReader(new FileReader(cachedInAppMessageFile));
+								mResponse = new Gson().fromJson(cacheReader, InAppMessageResponse.class);
+								cacheReader.close();
+							}
+						}
 						if (mResponse.getType() == Const.NO_AD) {
 							 if (!alreadyRequestedInterstitial) {
 								request = getInterstitialRequest();
 								alreadyRequestedInterstitial = true;
-								mResponse = requestAd.sendRequest(request);
+								mResponse = requestAd.obtainInAppMessage(request);
 							}
 						}
 
 						//TODO: remove debug code
 						Log.i("mResponse is: " + mResponse);
 
-						if (mResponse.getType() == Const.TEXT ||  mResponse.getType() == Const.IMAGE) {
+						if (mResponse.getType() == Const.TEXT || mResponse.getType() == Const.IMAGE) {
 							notifyAdLoaded(mResponse);
+
+							BufferedWriter cacheWriter = null;
+							try {
+								File cachedInAppMessageFile = new File(mContext.getCacheDir(),
+										URLEncoder.encode(request.countlyUriToString(), "UTF-8"));
+								cacheWriter = new BufferedWriter(new FileWriter(cachedInAppMessageFile));
+								cacheWriter.write(new Gson().toJson(mResponse));
+							} catch (Exception e) {
+								Log.e("Cache", e);
+							} finally {
+								try {
+									// Close the writer regardless of what happens...
+									cacheWriter.close();
+								} catch (Exception e) {
+								}
+							}
 						} else if (mResponse.getType() == Const.NO_AD) {
 							Log.d("response NO AD received");
 							notifyNoAdFound();
@@ -184,7 +217,6 @@ public class InAppMessageManager {
 							mRequestThread = null;
 							requestInAppMessageInternal(true);
 						} else {
-
 							mResponse = new InAppMessageResponse();
 							mResponse.setType(Const.AD_FAILED);
 							notifyNoAdFound();
@@ -236,23 +268,27 @@ public class InAppMessageManager {
 					}
 					Log.d("starting request thread");
 					try {
-						RequestGeneralInAppMessage requestAd = new RequestGeneralInAppMessage(xml);
+						GeneralInAppMessageProvider requestAd = new GeneralInAppMessageProvider(xml);
 						request = getInterstitialRequest();
-						mResponse = requestAd.sendRequest(request);
+						mResponse = requestAd.obtainInAppMessage(request);
 
 						if (mResponse.getType() == Const.NO_AD) {
 							if (!alreadyRequestedInterstitial) {
 								request = getInterstitialRequest();
 								alreadyRequestedInterstitial = true;
-								mResponse = requestAd.sendRequest(request);
+								mResponse = requestAd.obtainInAppMessage(request);
 							}
 						}
 
 						if (mResponse.getType() != Const.NO_AD) {
 							Log.d("response OK received");
 							notifyAdLoaded(mResponse);
+
+
 						} 
 					} catch (Throwable t) {
+
+
 						mResponse = new InAppMessageResponse();
 						mResponse.setType(Const.AD_FAILED);
 						notifyNoAdFound();

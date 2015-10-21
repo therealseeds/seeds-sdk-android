@@ -32,14 +32,14 @@ import javax.json.JsonObject;
 import javax.json.JsonReader;
 
 
-public class RequestGeneralInAppMessage extends RequestInAppMessage<InAppMessageResponse> {
+public class GeneralInAppMessageProvider extends InAppMessageProvider<InAppMessageResponse> {
 
 	private final static int RELOAD_AFTER_NO_AD = 20;
 
-	public RequestGeneralInAppMessage() {
+	public GeneralInAppMessageProvider() {
 	}
 
-	public RequestGeneralInAppMessage(InputStream xmlArg) {
+	public GeneralInAppMessageProvider(InputStream xmlArg) {
 		is = xmlArg;
 		Log.d("Parse is null" + (is == null));
 	}

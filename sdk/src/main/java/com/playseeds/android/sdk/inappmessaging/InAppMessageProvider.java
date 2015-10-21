@@ -30,12 +30,11 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpProtocolParams;
 
-public abstract class RequestInAppMessage<T> {
+public abstract class InAppMessageProvider<T> {
 
 	InputStream is;
 
-	public T sendRequest(InAppMessageRequest request)
-			throws RequestException {
+	public T obtainInAppMessage(InAppMessageRequest request) throws RequestException {
 
 		Log.i("sendCountlyRequest");
 
@@ -74,6 +73,5 @@ public abstract class RequestInAppMessage<T> {
 
 	}
 
-	abstract T parseCountlyJSON(InputStream inputStream, Header[] headers) throws RequestException;
-
+	protected abstract T parseCountlyJSON(InputStream inputStream, Header[] headers) throws RequestException;
 }
