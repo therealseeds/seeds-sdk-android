@@ -28,7 +28,7 @@ wget -qO- "http://central.maven.org/maven2/com/google/code/gson/gson/$GSON_VERSI
 mkdir -p build/Unity3D/tmp
 mkdir -p build/Unity3D/tmp/classes
 (cd build/Unity3D/tmp/classes && jar cf ../classes.jar .)
-(cd build/Unity3D/tmp && zip ../../../build/Unity3D/Assets/Plugins/Android/play-services-$PLAY_SERVICES_VERSION.aar build/Unity3D/tmp/classes.jar)
+(cd build/Unity3D/tmp && zip ../../../build/Unity3D/Assets/Plugins/Android/play-services-$PLAY_SERVICES_VERSION.aar classes.jar)
 rm -rf build/Unity3D/tmp
 
 open build/Unity3D
