@@ -20,12 +20,13 @@ package com.playseeds.android.sdk.inappmessaging;
 
 import com.playseeds.android.sdk.Seeds;
 
-import org.apache.http.Header;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -103,7 +104,7 @@ public class GeneralInAppMessageProvider extends InAppMessageProvider<InAppMessa
 
 
 
-	public InAppMessageResponse parseCountlyJSON(final InputStream inputStream, Header[] headers) throws RequestException {
+	public InAppMessageResponse parseCountlyJSON(final InputStream inputStream,  Map<String, List<String>> headers) throws RequestException {
 
 		Log.i("Starting parseCountlyJSON");
 

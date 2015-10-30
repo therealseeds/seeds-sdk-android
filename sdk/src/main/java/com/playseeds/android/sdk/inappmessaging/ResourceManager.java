@@ -12,7 +12,7 @@
  *		See the License for the specific language governing permissions and
  *		limitations under the License.
  *
- *		Changes: moved from video sub-package
+ *		Changes: moved from video sub-package; removed HttpClient
  */
 
 package com.playseeds.android.sdk.inappmessaging;
@@ -28,8 +28,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
-
-import org.apache.http.client.methods.HttpGet;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -52,7 +50,6 @@ public class ResourceManager {
 	public static final int TYPE_ZIP = 1;
 	public static boolean sDownloading = false;
 	public static boolean sCancel = false;
-	public static HttpGet sDownloadGet;
 
 	public static final String VERSION = "version.txt";
 
@@ -257,11 +254,6 @@ public class ResourceManager {
 
 	public static void cancel() {
 		sCancel = true;
-		if (sDownloadGet != null) {
-			sDownloadGet.abort();
-			sDownloadGet = null;
-		}
-
 		sResources.clear();
 	}
 

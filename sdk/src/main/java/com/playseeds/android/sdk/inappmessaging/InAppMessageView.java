@@ -14,22 +14,22 @@
  *
  *		Changes: 	moved from banner sub-package
  *					renamed from BannerAdView
+ *					removed HttpClient
  */
 
 package com.playseeds.android.sdk.inappmessaging;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.text.MessageFormat;
-
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -178,18 +178,18 @@ public class InAppMessageView extends RelativeLayout {
 				if (clickUrl.startsWith("market")) { // just to stay safe
 					return null;
 				}
+				HttpURLConnection urlConnection = null;
 				try {
-					HttpClient client = new DefaultHttpClient();
-					HttpGet request = new HttpGet();
-					request.setHeader("User-Agent", System.getProperty("http.agent"));
-					request.setURI(new URI(clickUrl));
-					client.execute(request);
-				} catch (URISyntaxException e) {
-					e.printStackTrace();
-				} catch (ClientProtocolException e) {
-					e.printStackTrace();
+					urlConnection = (HttpURLConnection) new URL(clickUrl).openConnection();
+					urlConnection.setRequestProperty("User-Agent", System.getProperty("http.agent"));
+					InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
+					byte[] data = new byte[16384];
+					while (inputStream.read(data, 0, data.length) != -1);
 				} catch (IOException e) {
 					e.printStackTrace();
+				} finally {
+					if (urlConnection != null)
+						urlConnection.disconnect();
 				}
 				return null;
 			}

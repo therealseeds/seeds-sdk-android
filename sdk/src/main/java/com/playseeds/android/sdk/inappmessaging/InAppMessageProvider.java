@@ -18,17 +18,13 @@
 
 package com.playseeds.android.sdk.inappmessaging;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-
-import org.apache.http.Header;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpProtocolParams;
+import java.net.URL;
+import java.util.List;
+import java.util.Map;
 
 public abstract class InAppMessageProvider<T> {
 
@@ -42,36 +38,26 @@ public abstract class InAppMessageProvider<T> {
 		String url = request.countlyUriToString();
 
 		Log.i("InAppMessage RequestPerform HTTP Get Url: " + url);
-		DefaultHttpClient client = new DefaultHttpClient();
-		HttpConnectionParams.setSoTimeout(client.getParams(),
-				Const.SOCKET_TIMEOUT);
-		HttpConnectionParams.setConnectionTimeout(client.getParams(),
-				Const.CONNECTION_TIMEOUT);
-		HttpProtocolParams.setUserAgent(client.getParams(),
-				request.getUserAgent());
-		HttpGet get = new HttpGet(url);
-		get.setHeader("User-Agent", System.getProperty("http.agent"));
-		HttpResponse response;
+
+		HttpURLConnection urlConnection = null;
 		try {
-			response = client.execute(get);
-			int responseCode = response.getStatusLine().getStatusCode();
+			urlConnection = (HttpURLConnection) new URL(url).openConnection();
+			urlConnection.setRequestProperty("User-Agent", System.getProperty("http.agent"));
+			InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
+			int responseCode = urlConnection.getResponseCode();
 			if (responseCode == HttpURLConnection.HTTP_OK) {
-				return parseCountlyJSON(response.getEntity().getContent(), response.getAllHeaders());
+				return parseCountlyJSON(inputStream, urlConnection.getHeaderFields());
 			} else {
 				throw new RequestException("Server Error. Response code:"
 						+ responseCode);
 			}
-		} catch (RequestException e) {
-			throw e;
-		} catch (ClientProtocolException e) {
-			throw new RequestException("Error in HTTP request", e);
-		} catch (IOException e) {
-			throw new RequestException("Error in HTTP request", e);
 		} catch (Throwable t) {
 			throw new RequestException("Error in HTTP request", t);
+		} finally {
+			if (urlConnection != null)
+				urlConnection.disconnect();
 		}
-
 	}
 
-	protected abstract T parseCountlyJSON(InputStream inputStream, Header[] headers) throws RequestException;
+	protected abstract T parseCountlyJSON(InputStream inputStream,  Map<String, List<String>> headers) throws RequestException;
 }

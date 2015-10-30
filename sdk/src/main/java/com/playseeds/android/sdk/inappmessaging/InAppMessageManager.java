@@ -213,6 +213,8 @@ public class InAppMessageManager {
 							notifyNoAdFound();
 						}
 					} catch (Throwable t) {
+						Log.e("ad request failed", t);
+
 						if (!alreadyRequestedInterstitial) {
 							mRequestThread = null;
 							requestInAppMessageInternal(true);

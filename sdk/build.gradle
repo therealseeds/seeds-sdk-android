@@ -14,9 +14,6 @@ android {
     compileSdkVersion 23
     buildToolsVersion "23.0.1"
 
-    //TODO: This should be removed
-    useLibrary 'org.apache.http.legacy'
-
     defaultConfig {
         minSdkVersion 12
         versionCode 1
