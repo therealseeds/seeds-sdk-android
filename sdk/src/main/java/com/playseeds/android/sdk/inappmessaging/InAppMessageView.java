@@ -147,6 +147,11 @@ public class InAppMessageView extends RelativeLayout {
 				startActivity(intent);
 				// this.getContext().startActivity(intent);
 			}
+		} else if (url.equals("about:close")) {
+			if (getContext() instanceof RichMediaActivity) {
+				RichMediaActivity activity = (RichMediaActivity)getContext();
+				activity.close();
+			}
 		} else {
 			final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
 			startActivity(intent);
@@ -302,17 +307,16 @@ public class InAppMessageView extends RelativeLayout {
 
 				String text = MessageFormat.format(Const.IMAGE_BODY, this.response.getImageUrl(), this.response.getBannerWidth(), this.response.getBannerHeight());
 				Log.d("set image: " + text);
-				text = Uri.encode(Const.HIDE_BORDER + text);
 				if (!text.contains("<html>")) {
-					text = "<html><head></head><body style='margin:0;padding:0;'>" + text + "</body></html>";
+					text = "<html><head></head><body style='margin:0;padding:0;'>" + Const.HIDE_BORDER + text + "</body></html>";
 				}
 				webView.loadData(text, "text/html", Const.ENCODING);
 				adListener.onLoad();
 			} else if (this.response.getType() == Const.TEXT) {
-				String text = Uri.encode(Const.HIDE_BORDER + this.response.getText());
+				String text = this.response.getText();
 				Log.d("set text: " + text);
 				if (!text.contains("<html>")) {
-					text = "<html><head></head><body style='margin:0;padding:0;'>" + text + "</body></html>";
+					text = "<html><head></head><body style='margin:0;padding:0;'>" + Const.HIDE_BORDER + text + "</body></html>";
 				}
 				webView.loadData(text, "text/html", Const.ENCODING);
 				adListener.onLoad();

@@ -129,7 +129,11 @@ public class GeneralInAppMessageProvider extends InAppMessageProvider<InAppMessa
 			JsonObject jsonObject = jsonReader.readObject();
 
 			response.setText(jsonObject.getString("htmlString"));
-			response.setClickUrl(jsonObject.getString("clickurl"));
+			JsonObject jsonClickUrl = jsonObject.getJsonObject("clickurl");
+			if (jsonClickUrl != null)
+				response.setClickUrl(jsonClickUrl.toString());
+			else
+				response.setSkipOverlay(1);
 
 			String messageVariant = jsonObject.getString("messageVariant");
 

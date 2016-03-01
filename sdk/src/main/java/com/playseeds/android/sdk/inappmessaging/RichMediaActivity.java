@@ -158,9 +158,7 @@ public class RichMediaActivity extends Activity {
 
 			Log.v("###########TRACKING SKIP INTERSTITIAL");
 
-			RichMediaActivity.this.mResult = true;
-			RichMediaActivity.this.setResult(Activity.RESULT_OK);
-			RichMediaActivity.this.finish();
+			RichMediaActivity.this.close();
 		}
 	};
 
@@ -236,30 +234,32 @@ public class RichMediaActivity extends Activity {
 			layout.addView(banner);
 		}
 
-		this.mSkipButton = new ImageView(this);
-		this.mSkipButton.setAdjustViewBounds(false);
+		if (mAd.getClickUrl() != null) {
+			this.mSkipButton = new ImageView(this);
+			this.mSkipButton.setAdjustViewBounds(false);
 
-		int buttonSize;
-		if (mAd.isHorizontalOrientationRequested()) {
-			buttonSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, this.skipButtonSizeLand, this.getResources().getDisplayMetrics());
-		} else {
-			buttonSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, this.skipButtonSizePort, this.getResources().getDisplayMetrics());
+			int buttonSize;
+			if (mAd.isHorizontalOrientationRequested()) {
+				buttonSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, this.skipButtonSizeLand, this.getResources().getDisplayMetrics());
+			} else {
+				buttonSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, this.skipButtonSizePort, this.getResources().getDisplayMetrics());
+			}
+
+			FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(buttonSize, buttonSize, Gravity.TOP | Gravity.RIGHT);
+
+			final int margin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, this.getResources().getDisplayMetrics());
+			params.topMargin = margin;
+			params.rightMargin = margin;
+
+			this.mSkipButton.setImageDrawable(mResourceManager.getResource(this, ResourceManager.DEFAULT_SKIP_IMAGE_RESOURCE_ID));
+
+			this.mSkipButton.setOnClickListener(this.mOnInterstitialSkipListener);
+
+			this.mCanClose = true;
+			this.mSkipButton.setVisibility(View.VISIBLE);
+
+			layout.addView(this.mSkipButton, params);
 		}
-
-		FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(buttonSize, buttonSize, Gravity.TOP | Gravity.RIGHT);
-
-		final int margin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, this.getResources().getDisplayMetrics());
-		params.topMargin = margin;
-		params.rightMargin = margin;
-
-		this.mSkipButton.setImageDrawable(mResourceManager.getResource(this, ResourceManager.DEFAULT_SKIP_IMAGE_RESOURCE_ID));
-
-		this.mSkipButton.setOnClickListener(this.mOnInterstitialSkipListener);
-
-		this.mCanClose = true;
-		this.mSkipButton.setVisibility(View.VISIBLE);
-
-		layout.addView(this.mSkipButton, params);
 
 		this.mRootLayout.addView(layout);
 	}
@@ -453,9 +453,7 @@ public class RichMediaActivity extends Activity {
 	@Override
 	protected void onResume() {
 		if (wasClicked) { // close after coming back from click.
-			RichMediaActivity.this.mResult = true;
-			RichMediaActivity.this.setResult(Activity.RESULT_OK);
-			RichMediaActivity.this.finish();
+			close();
 		}
 
 		Log.d("RichMediaActivity onResume");
@@ -468,6 +466,10 @@ public class RichMediaActivity extends Activity {
 		Log.d("RichMediaActivity onResume done");
 	}
 
-
+	public void close() {
+		mResult = true;
+		setResult(Activity.RESULT_OK);
+		finish();
+	}
 
 }
