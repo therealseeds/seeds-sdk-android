@@ -31,6 +31,8 @@ import java.util.Map;
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
+import javax.json.JsonString;
+import javax.json.JsonValue;
 
 
 public class GeneralInAppMessageProvider extends InAppMessageProvider<InAppMessageResponse> {
@@ -129,10 +131,12 @@ public class GeneralInAppMessageProvider extends InAppMessageProvider<InAppMessa
 			JsonObject jsonObject = jsonReader.readObject();
 
 			response.setText(jsonObject.getString("htmlString"));
-			JsonObject jsonClickUrl = jsonObject.getJsonObject("clickurl");
-			if (jsonClickUrl != null)
-				response.setClickUrl(jsonClickUrl.toString());
-			else
+
+			JsonValue jsonClickUrl = jsonObject.get("clickurl");
+			if (jsonClickUrl != null && !jsonClickUrl.equals(JsonValue.NULL) &&
+					(jsonClickUrl instanceof JsonString)) {
+				response.setClickUrl(((JsonString) jsonClickUrl).getString());
+			} else
 				response.setSkipOverlay(1);
 
 			String messageVariant = jsonObject.getString("messageVariant");
