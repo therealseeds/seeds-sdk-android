@@ -250,14 +250,18 @@ public class InAppMessageView extends RelativeLayout {
 	private void buildBannerView() {
 		this.webView = this.createWebView(mContext);
 		Log.d("Create view flipper");
-		final float scale = mContext.getResources().getDisplayMetrics().density;
-		if (width > 0 && height > 0) {
-			this.setLayoutParams(new RelativeLayout.LayoutParams((int) (width * scale + 0.5f), (int) (height * scale + 0.5f)));
+		if (this.response != null && this.response.getClickUrl() != null) {
+			final float scale = mContext.getResources().getDisplayMetrics().density;
+			if (width > 0 && height > 0) {
+				this.setLayoutParams(new RelativeLayout.LayoutParams((int) (width * scale + 0.5f), (int) (height * scale + 0.5f)));
+			} else {
+				this.setLayoutParams(new RelativeLayout.LayoutParams((int) (300 * scale + 0.5f), (int) (50 * scale + 0.5f)));
+			}
 		} else {
-			this.setLayoutParams(new RelativeLayout.LayoutParams((int) (300 * scale + 0.5f), (int) (50 * scale + 0.5f)));
+			this.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 		}
 
-		final RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.MATCH_PARENT);
+		final RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 		this.addView(this.webView, params);
 
 		Log.d("animation: " + this.animation);

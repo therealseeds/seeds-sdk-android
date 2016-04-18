@@ -42,6 +42,7 @@ import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -226,10 +227,17 @@ public class RichMediaActivity extends Activity {
 
 			InAppMessageView banner = new InAppMessageView(this, mAd, width, height, false, createLocalAdListener());
 
-			banner.setLayoutParams(new FrameLayout.LayoutParams(
-					(int) (width * scale + 0.5f),
-					(int) (height * scale + 0.5f),
-					Gravity.CENTER));
+			if (mAd != null && mAd.getClickUrl() != null) {
+				banner.setLayoutParams(new FrameLayout.LayoutParams(
+						(int) (width * scale + 0.5f),
+						(int) (height * scale + 0.5f),
+						Gravity.CENTER));
+			} else {
+				banner.setLayoutParams(new FrameLayout.LayoutParams(
+						ViewGroup.LayoutParams.MATCH_PARENT,
+						ViewGroup.LayoutParams.MATCH_PARENT,
+						Gravity.CENTER));
+			}
 			banner.showContent();
 			layout.addView(banner);
 		}
