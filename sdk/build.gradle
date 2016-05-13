@@ -51,7 +51,7 @@ publish {
     userOrg = 'seedsinc'
     groupId = 'com.playseeds'
     artifactId = 'android-sdk'
-    version = '0.3.3'
+    version = '0.3.4'
     description = 'Android SDK for Seeds mobile analytics'
     website = 'https://github.com/therealseeds/seeds-sdk-android'
 }
