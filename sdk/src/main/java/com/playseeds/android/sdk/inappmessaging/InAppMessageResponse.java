@@ -19,10 +19,7 @@
 package com.playseeds.android.sdk.inappmessaging;
 
 public class InAppMessageResponse implements InAppMessage {
-
-	public static final String WEB = "web";
 	public static final String OTHER = "other";
-
 	private static final long serialVersionUID = 3271938798582141269L;
 	private int type;
 	private int bannerWidth;
@@ -39,49 +36,16 @@ public class InAppMessageResponse implements InAppMessage {
 	private long timestamp;
 	private boolean horizontalOrientationRequested;
 
-	public int getBannerHeight() {
-		return this.bannerHeight;
-	}
-
-	public int getBannerWidth() {
-		return this.bannerWidth;
-	}
-
-	public ClickType getClickType() {
-		return this.clickType;
-	}
-
-	public String getClickUrl() {
-		return this.clickUrl;
-	}
-
-	public String getImageUrl() {
-		return this.imageUrl;
-	}
-
-	public int getRefresh() {
-		return this.refresh;
-	}
-
-	public String getText() {
-		return this.text;
-	}
-
-	@Override
-	public int getType() {
-		return this.type;
-	}
-
-	public String getUrlType() {
-		return this.urlType;
-	}
-
 	public boolean isScale() {
 		return this.scale;
 	}
 
 	public boolean isSkipPreflight() {
 		return this.skipPreflight;
+	}
+
+	public boolean isHorizontalOrientationRequested() {
+		return horizontalOrientationRequested;
 	}
 
 	public void setBannerHeight(final int bannerHeight) {
@@ -120,17 +84,69 @@ public class InAppMessageResponse implements InAppMessage {
 		this.text = text;
 	}
 
-	@Override
-	public void setType(final int adType) {
-		this.type = adType;
-	}
-
 	public void setUrlType(final String urlType) {
 		this.urlType = urlType;
 	}
 
 	@Override
-	public String toString() {
+	public void setType(final int adType) {
+		this.type = adType;
+	}
+
+	public void setSkipOverlay(int skipOverlay) {
+		this.skipOverlay = skipOverlay;
+	}
+
+	public void setTimestamp(long timestamp) {
+		this.timestamp = timestamp;
+	}
+
+	public void setHorizontalOrientationRequested(boolean horizontalOrientationRequested) {
+		this.horizontalOrientationRequested = horizontalOrientationRequested;
+	}
+
+	public long getTimestamp() {
+		return timestamp;
+	}
+
+	public int getBannerHeight() {
+		return this.bannerHeight;
+	}
+
+	public int getBannerWidth() {
+		return this.bannerWidth;
+	}
+
+	public ClickType getClickType() {
+		return this.clickType;
+	}
+
+	public String getClickUrl() {
+		return this.clickUrl;
+	}
+
+	public String getImageUrl() {
+		return this.imageUrl;
+	}
+
+	public int getRefresh() {
+		return this.refresh;
+	}
+
+	public String getText() {
+		return this.text;
+	}
+
+	public String getUrlType() {
+		return this.urlType;
+	}
+
+	@Override
+	public int getType() {
+		return this.type;
+	}
+
+	public String getString() {
 		return "Response [refresh=" + this.refresh + ", type=" + this.type
 				+ ", bannerWidth=" + this.bannerWidth + ", bannerHeight="
 				+ this.bannerHeight + ", text=" + this.text + ", imageUrl="
@@ -143,26 +159,4 @@ public class InAppMessageResponse implements InAppMessage {
 	public int getSkipOverlay() {
 		return skipOverlay;
 	}
-
-	public void setSkipOverlay(int skipOverlay) {
-		this.skipOverlay = skipOverlay;
-	}
-
-	public long getTimestamp() {
-		return timestamp;
-	}
-
-	public void setTimestamp(long timestamp) {
-		this.timestamp = timestamp;
-	}
-
-	public boolean isHorizontalOrientationRequested() {
-		return horizontalOrientationRequested;
-	}
-
-	public void setHorizontalOrientationRequested(boolean horizontalOrientationRequested) {
-		this.horizontalOrientationRequested = horizontalOrientationRequested;
-	}
-
-
 }

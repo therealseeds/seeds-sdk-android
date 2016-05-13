@@ -1,6 +1,7 @@
 package com.playseeds.android.demo.inappmessaging;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Handler;
@@ -23,12 +24,9 @@ import com.playseeds.demo.inappmessaging.R;
 
 public class MainActivity extends Activity implements InAppMessageListener {
 
-    //private static String YOUR_SERVER = "http://dash.playseeds.com"; // don't include trailing slash
-    //private static String YOUR_APP_KEY = "test";
-    private static String YOUR_SERVER = "http://devdash.playseeds.com";
-    private static String YOUR_APP_KEY = "aa1fd1f255b25fb89b413f216f11e8719188129d";
-    //private static String YOUR_SERVER = "http://dash.playseeds.com";
-    //private static String YOUR_APP_KEY = "30370be8c4654f0cf78cd3583431e8b9f90a9b1d";
+    private static String YOUR_SERVER = "http://dash.playseeds.com"; // don't include trailing slash
+    private static String YOUR_APP_KEY = "34ba1ca6f54ebf3a20e81a83c85a37433a92da36";
+
 
     /** Called when the activity is first created. */
     @Override
@@ -113,7 +111,13 @@ public class MainActivity extends Activity implements InAppMessageListener {
 
     @Override
     public void inAppMessageLoadSucceeded(InAppMessage inAppMessage) {
-        Toast.makeText(this, "inAppMessageLoadSucceeded", Toast.LENGTH_LONG).show();
+        final Context context = this;
+        runOnUiThread(new Runnable() {
+          public void run() {
+              Toast.makeText(context, "inAppMessageLoadSucceeded", Toast.LENGTH_LONG).show();
+          }
+      });
+
     }
 
     @Override

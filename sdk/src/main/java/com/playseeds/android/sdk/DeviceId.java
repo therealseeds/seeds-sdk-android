@@ -3,25 +3,21 @@ package com.playseeds.android.sdk;
 import android.content.Context;
 import android.util.Log;
 
-/**
- * Created by artem on 07/11/14.
- */
 
 public class DeviceId {
+    private String id;
+    private Type type;
+    private static final String TAG = "DeviceId";
+    private static final String PREFERENCE_KEY_ID_TYPE = "ly.count.android.api.DeviceId.type";
+
     /**
      * Enum used throughout Seeds which controls what kind of ID Seeds should use.
      */
-    public static enum Type {
+    public enum Type {
         DEVELOPER_SUPPLIED,
         OPEN_UDID,
         ADVERTISING_ID,
     }
-
-    private static final String TAG = "DeviceId";
-    private static final String PREFERENCE_KEY_ID_TYPE = "ly.count.android.api.DeviceId.type";
-
-    private String id;
-    private Type type;
 
     /**
      * Initialize DeviceId with Type of OPEN_UDID or ADVERTISING_ID
@@ -83,7 +79,8 @@ public class DeviceId {
                         OpenUDIDAdapter.sync(context);
                     }
                 } else {
-                    if (raiseExceptions) throw new IllegalStateException("OpenUDID is not available, please make sure that you have it in your classpath");
+                    if (raiseExceptions)
+                        throw new IllegalStateException("OpenUDID is not available, please make sure that you have it in your classpath");
                 }
                 break;
             case ADVERTISING_ID:
@@ -105,7 +102,8 @@ public class DeviceId {
                     if (Seeds.sharedInstance().isLoggingEnabled()) {
                         Log.w(TAG, "Advertising ID is not available, neither OpenUDID is");
                     }
-                    if (raiseExceptions) throw new IllegalStateException("OpenUDID is not available, please make sure that you have it in your classpath");
+                    if (raiseExceptions)
+                        throw new IllegalStateException("OpenUDID is not available, please make sure that you have it in your classpath");
                 }
                 break;
         }
@@ -117,9 +115,10 @@ public class DeviceId {
     }
 
     private Type retrieveOverriddenType(CountlyStore store) {
+        Type oldType;
+
         // Using strings is safer when it comes to extending Enum values list
         String oldTypeString = store.getPreference(PREFERENCE_KEY_ID_TYPE);
-        Type oldType;
         if (oldTypeString == null) {
             oldType = null;
         } else if (oldTypeString.equals(Type.DEVELOPER_SUPPLIED.toString())) {
@@ -132,6 +131,15 @@ public class DeviceId {
             oldType = null;
         }
         return oldType;
+    }
+
+    protected void switchToIdType(Type type, Context context, CountlyStore store) {
+        if (Seeds.sharedInstance().isLoggingEnabled()) {
+            Log.w(TAG, "Switching to device ID generation strategy " + type + " from " + this.type);
+        }
+        this.type = type;
+        storeOverriddenType(store, type);
+        init(context, store, false);
     }
 
     public String getId() {
@@ -149,15 +157,6 @@ public class DeviceId {
         this.id = id;
     }
 
-    protected void switchToIdType(Type type, Context context, CountlyStore store) {
-        if (Seeds.sharedInstance().isLoggingEnabled()) {
-            Log.w(TAG, "Switching to device ID generation strategy " + type + " from " + this.type);
-        }
-        this.type = type;
-        storeOverriddenType(store, type);
-        init(context, store, false);
-    }
-
     public Type getType() {
         return type;
     }
@@ -168,7 +167,7 @@ public class DeviceId {
      */
     static boolean deviceIDEqualsNullSafe(final String id, Type type, final DeviceId deviceId) {
         if (type == null || type == Type.DEVELOPER_SUPPLIED) {
-            final String deviceIdId = deviceId == null ? null : deviceId.getId();
+            final String deviceIdId = (deviceId == null) ? null : deviceId.getId();
             return (deviceIdId == null && id == null) || (deviceIdId != null && deviceIdId.equals(id));
         } else {
             return true;

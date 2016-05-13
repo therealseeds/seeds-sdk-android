@@ -6,7 +6,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.json.JSONException;
@@ -37,7 +36,6 @@ public class UserData {
     public static Map<String, String> custom;
     public static int byear = 0;
     public static boolean isSynced = true;
-
 
     /**
      * Sets user data values.
@@ -88,7 +86,7 @@ public class UserData {
      * @param data Map with user custom key/values
      */
     static void setCustomData(Map<String, String> data){
-        custom = new HashMap<String, String>();
+        custom = new HashMap<>();
         custom.putAll(data);
         isSynced = false;
     }
@@ -190,41 +188,6 @@ public class UserData {
         }
 
         return json;
-    }
-
-    /**
-     * Sets user data fields to values from its JSON representation.
-     * @param json JSON object to extract event data from
-     */
-    static void fromJSON(final JSONObject json) {
-        if(json != null){
-            name = json.optString(NAME_KEY, null);
-            username = json.optString(USERNAME_KEY, null);
-            email = json.optString(EMAIL_KEY, null);
-            org = json.optString(ORG_KEY, null);
-            phone = json.optString(PHONE_KEY, null);
-            picture = json.optString(PICTURE_KEY, null);
-            gender = json.optString(GENDER_KEY, null);
-            byear = json.optInt(BYEAR_KEY, 0);
-            if (!json.isNull(CUSTOM_KEY)) {
-                JSONObject customJson;
-                try {
-                    customJson = json.getJSONObject(CUSTOM_KEY);
-                    HashMap<String, String> custom = new HashMap<String, String>(customJson.length());
-                    Iterator<String> nameItr = customJson.keys();
-                    while (nameItr.hasNext()) {
-                        final String key = (String) nameItr.next();
-                        if (!customJson.isNull(key)) {
-                            custom.put(key, customJson.getString(key));
-                        }
-                    }
-                } catch (JSONException e) {
-                    if (Seeds.sharedInstance().isLoggingEnabled()) {
-                        Log.w(Seeds.TAG, "Got exception converting an Custom Json to Custom User data", e);
-                    }
-                }
-            }
-        }
     }
 
     //for url query parsing
