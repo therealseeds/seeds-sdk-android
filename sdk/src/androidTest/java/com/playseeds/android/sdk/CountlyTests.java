@@ -50,7 +50,7 @@ public class CountlyTests extends AndroidTestCase {
         mUninitedSeeds = new Seeds();
 
         mSeeds = new Seeds();
-        mSeeds.init(getContext(), "http://ly.count.android.sdk.test.count.ly", "appkey", "1234");
+        mSeeds.init(getContext(), null, "http://ly.count.android.sdk.test.count.ly", "appkey", "1234");
     }
 
     @Override
@@ -80,13 +80,13 @@ public class CountlyTests extends AndroidTestCase {
 
     public void testInitWithNoDeviceID() {
         mUninitedSeeds = spy(mUninitedSeeds);
-        mUninitedSeeds.init(getContext(), "http://ly.count.android.sdk.test.count.ly", "appkey", null);
-        verify(mUninitedSeeds).init(getContext(), "http://ly.count.android.sdk.test.count.ly", "appkey", null);
+        mUninitedSeeds.init(getContext(), null, "http://ly.count.android.sdk.test.count.ly", "appkey", null);
+        verify(mUninitedSeeds).init(getContext(), null, "http://ly.count.android.sdk.test.count.ly", "appkey", null);
     }
 
     public void testInit_nullContext() {
         try {
-            mUninitedSeeds.init(null, "http://ly.count.android.sdk.test.count.ly", "appkey", "1234");
+            mUninitedSeeds.init(null, null, "http://ly.count.android.sdk.test.count.ly", "appkey", "1234");
             fail("expected null context to throw IllegalArgumentException");
         } catch (IllegalArgumentException ignored) {
             // success!
@@ -104,7 +104,7 @@ public class CountlyTests extends AndroidTestCase {
 
     public void testInit_emptyServerURL() {
         try {
-            mUninitedSeeds.init(getContext(), "", "appkey", "1234");
+            mUninitedSeeds.init(getContext(), null, "", "appkey", "1234");
             fail("expected empty server URL to throw IllegalArgumentException");
         } catch (IllegalArgumentException ignored) {
             // success!
@@ -113,7 +113,7 @@ public class CountlyTests extends AndroidTestCase {
 
     public void testInit_invalidServerURL() {
         try {
-            mUninitedSeeds.init(getContext(), "not-a-valid-server-url", "appkey", "1234");
+            mUninitedSeeds.init(getContext(), null, "not-a-valid-server-url", "appkey", "1234");
             fail("expected invalid server URL to throw IllegalArgumentException");
         } catch (IllegalArgumentException ignored) {
             // success!
@@ -122,7 +122,7 @@ public class CountlyTests extends AndroidTestCase {
 
     public void testInit_nullAppKey() {
         try {
-            mUninitedSeeds.init(getContext(), "http://ly.count.android.sdk.test.count.ly", null, "1234");
+            mUninitedSeeds.init(getContext(), null, "http://ly.count.android.sdk.test.count.ly", null, "1234");
             fail("expected null app key to throw IllegalArgumentException");
         } catch (IllegalArgumentException ignored) {
             // success!
@@ -131,7 +131,7 @@ public class CountlyTests extends AndroidTestCase {
 
     public void testInit_emptyAppKey() {
         try {
-            mUninitedSeeds.init(getContext(), "http://ly.count.android.sdk.test.count.ly", "", "1234");
+            mUninitedSeeds.init(getContext(), null, "http://ly.count.android.sdk.test.count.ly", "", "1234");
             fail("expected empty app key to throw IllegalArgumentException");
         } catch (IllegalArgumentException ignored) {
             // success!
@@ -140,12 +140,12 @@ public class CountlyTests extends AndroidTestCase {
 
     public void testInit_nullDeviceID() {
         // null device ID is okay because it tells Seeds to use OpenUDID
-       mUninitedSeeds.init(getContext(), "http://ly.count.android.sdk.test.count.ly", "appkey", null);
+       mUninitedSeeds.init(getContext(), null, "http://ly.count.android.sdk.test.count.ly", "appkey", null);
     }
 
     public void testInit_emptyDeviceID() {
         try {
-            mUninitedSeeds.init(getContext(), "http://ly.count.android.sdk.test.count.ly", "appkey", "");
+            mUninitedSeeds.init(getContext(), null, "http://ly.count.android.sdk.test.count.ly", "appkey", "");
             fail("expected empty device ID to throw IllegalArgumentException");
         } catch (IllegalArgumentException ignored) {
             // success!
@@ -157,7 +157,7 @@ public class CountlyTests extends AndroidTestCase {
         final String appKey = "appkey";
         final String serverURL = "http://ly.count.android.sdk.test.count.ly";
 
-        mUninitedSeeds.init(getContext(), serverURL, appKey, deviceID);
+        mUninitedSeeds.init(getContext(), null, serverURL, appKey, deviceID);
         final EventQueue expectedEventQueue = mUninitedSeeds.getEventQueue();
         final ConnectionQueue expectedConnectionQueue = mUninitedSeeds.getConnectionQueue();
         final CountlyStore expectedCountlyStore = expectedConnectionQueue.getCountlyStore();
@@ -166,7 +166,7 @@ public class CountlyTests extends AndroidTestCase {
         assertNotNull(expectedCountlyStore);
 
         // second call with same params should succeed, no exception thrown
-        mUninitedSeeds.init(getContext(), serverURL, appKey, deviceID);
+        mUninitedSeeds.init(getContext(), null, serverURL, appKey, deviceID);
 
         assertSame(expectedEventQueue, mUninitedSeeds.getEventQueue());
         assertSame(expectedConnectionQueue, mUninitedSeeds.getConnectionQueue());
@@ -178,15 +178,15 @@ public class CountlyTests extends AndroidTestCase {
     }
 
     public void testInit_twiceWithDifferentContext() {
-        mUninitedSeeds.init(getContext(), "http://ly.count.android.sdk.test.count.ly", "appkey", "1234");
+        mUninitedSeeds.init(getContext(), null, "http://ly.count.android.sdk.test.count.ly", "appkey", "1234");
         // changing context is okay since SharedPrefs are global singletons
-        mUninitedSeeds.init(mock(Context.class), "http://ly.count.android.sdk.test.count.ly", "appkey", "1234");
+        mUninitedSeeds.init(mock(Context.class), null, "http://ly.count.android.sdk.test.count.ly", "appkey", "1234");
     }
 
     public void testInit_twiceWithDifferentServerURL() {
-        mUninitedSeeds.init(getContext(), "http://test1.count.ly", "appkey", "1234");
+        mUninitedSeeds.init(getContext(), null, "http://test1.count.ly", "appkey", "1234");
         try {
-            mUninitedSeeds.init(getContext(), "http://test2.count.ly", "appkey", "1234");
+            mUninitedSeeds.init(getContext(), null, "http://test2.count.ly", "appkey", "1234");
             fail("expected IllegalStateException to be thrown when calling init a second time with different serverURL");
         }
         catch (IllegalStateException ignored) {
@@ -195,9 +195,9 @@ public class CountlyTests extends AndroidTestCase {
     }
 
     public void testInit_twiceWithDifferentAppKey() {
-        mUninitedSeeds.init(getContext(), "http://ly.count.android.sdk.test.count.ly", "appkey1", "1234");
+        mUninitedSeeds.init(getContext(), null, "http://ly.count.android.sdk.test.count.ly", "appkey1", "1234");
         try {
-            mUninitedSeeds.init(getContext(), "http://ly.count.android.sdk.test.count.ly", "appkey2", "1234");
+            mUninitedSeeds.init(getContext(), null, "http://ly.count.android.sdk.test.count.ly", "appkey2", "1234");
             fail("expected IllegalStateException to be thrown when calling init a second time with different serverURL");
         }
         catch (IllegalStateException ignored) {
@@ -206,9 +206,9 @@ public class CountlyTests extends AndroidTestCase {
     }
 
     public void testInit_twiceWithDifferentDeviceID() {
-        mUninitedSeeds.init(getContext(), "http://ly.count.android.sdk.test.count.ly", "appkey", "1234");
+        mUninitedSeeds.init(getContext(), null, "http://ly.count.android.sdk.test.count.ly", "appkey", "1234");
         try {
-            mUninitedSeeds.init(getContext(), "http://ly.count.android.sdk.test.count.ly", "appkey", "4321");
+            mUninitedSeeds.init(getContext(), null, "http://ly.count.android.sdk.test.count.ly", "appkey", "4321");
             fail("expected IllegalStateException to be thrown when calling init a second time with different serverURL");
         }
         catch (IllegalStateException ignored) {
@@ -221,7 +221,7 @@ public class CountlyTests extends AndroidTestCase {
         final String appKey = "appkey";
         final String serverURL = "http://ly.count.android.sdk.test.count.ly";
 
-        mUninitedSeeds.init(getContext(), serverURL, appKey, deviceID);
+        mUninitedSeeds.init(getContext(), null, serverURL, appKey, deviceID);
 
         assertSame(getContext(), mUninitedSeeds.getConnectionQueue().getContext());
         assertEquals(serverURL, mUninitedSeeds.getConnectionQueue().getServerURL());
