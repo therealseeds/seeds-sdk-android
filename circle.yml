@@ -1,0 +1,42 @@
+#
+# Build configuration for Circle CI
+#
+
+general:
+    artifacts:
+        - /home/ubuntu/seeds-sdk-android/sdk/build/outputs/apk/
+
+machine:
+    environment:
+        ANDROID_HOME: /usr/local/android-sdk-linux
+        GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
+        _JAVA_OPTIONS: "-Xms512m -Xmx2048m"
+
+dependencies:
+    override:
+        - echo y | android update sdk --no-ui --all --filter build-tools-23.0.3,extra-google-m2repository,extra-google-google_play_services
+        - ANDROID_HOME=/usr/local/android-sdk-linux ./gradlew dependencies
+
+test:
+    pre:
+        - emulator -avd circleci-android22 -no-audio -no-window:
+            background: true
+            parallel: true
+        - circle-android wait-for-boot
+
+    override:
+        - (./gradlew assemble):
+            timeout: 500
+        - ./gradlew connectedAndroidTest --info --stacktrace
+        - ./gradlew test --info --stacktrace
+    post:
+        - bash <(curl -s https://codecov.io/bash)
+        - cp -r sdk/build/outputs $CIRCLE_ARTIFACTS
+        - cp -r sdk/build/outputs/androidTest-results $CIRCLE_TEST_REPORTS
+        - cp -r sdk/build/reports/coverage $CIRCLE_TEST_REPORTS
+
+experimental:
+  notify:
+    branches:
+      only:
+        - master

@@ -49,31 +49,19 @@ import android.widget.RelativeLayout;
 
 @SuppressLint({ "ViewConstructor", "SetJavaScriptEnabled" })
 public class InAppMessageView extends RelativeLayout {
-	public static final int LIVE = 0;
-	public static final int TEST = 1;
-
 	private boolean animation;
-
-	private boolean isInternalBrowser = false;
-	private boolean wasUserAction = false;
-
 	private InAppMessageResponse response;
-	private Animation fadeInAnimation = null;
-	// private Animation fadeOutAnimation = null;
 	private WebSettings webSettings;
-
-	private Context mContext = null;
-	protected boolean mIsInForeground;
-
 	private WebView webView;
-
 	private int width;
 	private int height;
-
 	private BannerAdViewListener adListener;
-
 	private static Method mWebView_SetLayerType;
 	private static Field mWebView_LAYER_TYPE_SOFTWARE;
+
+	private boolean wasUserAction = false;
+	private Animation fadeInAnimation = null;
+	private Context mContext = null;
 
 	public InAppMessageView(final Context context, final InAppMessageResponse response, int width, int height, final boolean animation, final BannerAdViewListener adListener) {
 		super(context);
@@ -83,12 +71,11 @@ public class InAppMessageView extends RelativeLayout {
 		this.height = height;
 		this.animation = animation;
 		this.adListener = adListener;
-		this.initialize(context);
+		this.initialize();
 	}
 
-	private WebView createWebView(final Context context) {
+	private WebView createWebView() {
 		final WebView webView = new WebView(this.getContext()) {
-
 			@Override
 			public boolean onTouchEvent(MotionEvent event) {
 				wasUserAction = true;
@@ -120,7 +107,6 @@ public class InAppMessageView extends RelativeLayout {
 				}
 				return false;
 			}
-
 		});
 
 		webView.setVerticalScrollBarEnabled(false);
@@ -140,12 +126,10 @@ public class InAppMessageView extends RelativeLayout {
 				Intent i = new Intent(Intent.ACTION_VIEW);
 				i.setDataAndType(Uri.parse(url), "video/mp4");
 				startActivity(i);
-				// this.getContext().startActivity(intent);
 			} else {
 				final Intent intent = new Intent(this.getContext(), InAppWebView.class);
 				intent.putExtra(Const.REDIRECT_URI, url);
 				startActivity(intent);
-				// this.getContext().startActivity(intent);
 			}
 		} else if (url.equals("about:close")) {
 			if (getContext() instanceof RichMediaActivity) {
@@ -155,7 +139,6 @@ public class InAppMessageView extends RelativeLayout {
 		} else {
 			final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
 			startActivity(intent);
-			// this.getContext().startActivity(intent);
 		}
 	}
 
@@ -177,7 +160,6 @@ public class InAppMessageView extends RelativeLayout {
 
 	private void makeTrackingRequest(final String clickUrl) {
 		AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
-
 			@Override
 			protected Void doInBackground(Void... params) {
 				if (clickUrl.startsWith("market")) { // just to stay safe
@@ -198,15 +180,13 @@ public class InAppMessageView extends RelativeLayout {
 				}
 				return null;
 			}
-
 		};
 		task.execute();
-
 	}
 
 	static {
 		initCompatibility();
-	};
+	}
 
 	private static void initCompatibility() {
 		try {
@@ -222,10 +202,8 @@ public class InAppMessageView extends RelativeLayout {
 			Log.v("set1 layer " + mWebView_LAYER_TYPE_SOFTWARE);
 
 		} catch (SecurityException e) {
-
 			Log.v("SecurityException");
 		} catch (NoSuchFieldException e) {
-
 			Log.v("NoSuchFieldException");
 		}
 	}
@@ -248,7 +226,7 @@ public class InAppMessageView extends RelativeLayout {
 	}
 
 	private void buildBannerView() {
-		this.webView = this.createWebView(mContext);
+		this.webView = this.createWebView();
 		Log.d("Create view flipper");
 		if (this.response != null && this.response.getClickUrl() != null) {
 			final float scale = mContext.getResources().getDisplayMetrics().density;
@@ -266,46 +244,23 @@ public class InAppMessageView extends RelativeLayout {
 
 		Log.d("animation: " + this.animation);
 		if (this.animation) {
-
 			this.fadeInAnimation = new TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, +1.0f, Animation.RELATIVE_TO_PARENT, 0.0f);
 			this.fadeInAnimation.setDuration(1000);
-
-			// this.fadeOutAnimation = new TranslateAnimation(
-			// Animation.RELATIVE_TO_PARENT, 0.0f,
-			// Animation.RELATIVE_TO_PARENT, 0.0f,
-			// Animation.RELATIVE_TO_PARENT, 0.0f,
-			// Animation.RELATIVE_TO_PARENT, -1.0f);
-			// this.fadeOutAnimation.setDuration(1000);
 			this.webView.setAnimation(fadeInAnimation);
 		}
 	}
 
-	private void initialize(final Context context) {
+	private void initialize() {
 		initCompatibility();
 		buildBannerView();
 	}
 
-	public boolean isInternalBrowser() {
-		return this.isInternalBrowser;
-	}
-
 	private void openLink() {
-
 		if (this.response != null && this.response.getClickUrl() != null)
 			this.doOpenUrl(this.response.getClickUrl());
-
-	}
-
-	public void setAdListener(final BannerAdViewListener bannerListener) {
-		this.adListener = bannerListener;
-	}
-
-	public void setInternalBrowser(final boolean isInternalBrowser) {
-		this.isInternalBrowser = isInternalBrowser;
 	}
 
 	public void showContent() {
-
 		try {
 			if (this.response.getType() == Const.IMAGE) {
 
@@ -336,11 +291,28 @@ public class InAppMessageView extends RelativeLayout {
 	}
 
 	public interface BannerAdViewListener {
-		public void onLoad();
+		void onLoad();
 
-		public void onClick();
+		void onClick();
 
-		public void onError();
+		void onError();
 	}
 
+	/**
+	 * This method is added to enable testing
+	 * See: InAppMessageViewTest
+	 * @return BannerAdViewListener
+     */
+	public BannerAdViewListener getAdListener() {
+		return adListener;
+	}
+
+	/**
+	 * This method is added to enable testing
+	 * See: InAppMessageViewTest
+	 * @return InAppMessageResponse
+	 */
+	public InAppMessageResponse getResponse() {
+		return response;
+	}
 }

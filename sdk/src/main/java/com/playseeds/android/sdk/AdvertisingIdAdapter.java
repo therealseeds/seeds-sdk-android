@@ -11,7 +11,7 @@ public class AdvertisingIdAdapter {
     private final static String ADVERTISING_ID_CLIENT_CLASS_NAME = "com.google.android.gms.ads.identifier.AdvertisingIdClient";
 
     public static boolean isAdvertisingIdAvailable() {
-        boolean  advertisingIdAvailable = false;
+        boolean advertisingIdAvailable = false;
         try {
             Class.forName(ADVERTISING_ID_CLIENT_CLASS_NAME);
             advertisingIdAvailable = true;
