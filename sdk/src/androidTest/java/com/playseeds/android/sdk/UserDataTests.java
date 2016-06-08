@@ -33,7 +33,7 @@ public class UserDataTests extends AndroidTestCase {
         assertEquals("+1234567890", UserData.phone);
         assertEquals("M", UserData.gender);
         assertEquals("http://domain.com/ly.count.android.sdk.test.png", UserData.picture);
-        assertEquals("2000", UserData.byear);
+        assertEquals(2000, UserData.byear);
 	}
 	
 	public void testJSON() throws JSONException{
@@ -56,7 +56,7 @@ public class UserDataTests extends AndroidTestCase {
         assertEquals("+1234567890", json.getString("phone"));
         assertEquals("M", json.getString("gender"));
         assertEquals("http://domain.com/ly.count.android.sdk.test.png", json.getString("picture"));
-        assertEquals("2000", json.getInt("byear"));
+        assertEquals(2000, json.getInt("byear"));
 	}
 
 	
