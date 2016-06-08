@@ -159,16 +159,21 @@ public class CountlyStore {
      * Sets location of user and sends it with next request
      */
     void setLocation(final double lat, final double lon) {
-        preferences_.edit().putString(LOCATION_PREFERENCE, lat + "," + lon).commit();
+        if (preferences_ != null) {
+            preferences_.edit().putString(LOCATION_PREFERENCE, lat + "," + lon).commit();
+        }
     }
 
     /**
      * Get location or empty string in case if no location is specified
      */
     String getAndRemoveLocation() {
-        String location = preferences_.getString(LOCATION_PREFERENCE, "");
-        if (!location.equals("")) {
-            preferences_.edit().remove(LOCATION_PREFERENCE).commit();
+        String location = null;
+        if (preferences_ != null) {
+            location = preferences_.getString(LOCATION_PREFERENCE, "");
+            if (!location.equals("")) {
+                preferences_.edit().remove(LOCATION_PREFERENCE).commit();
+            }
         }
         return location;
     }

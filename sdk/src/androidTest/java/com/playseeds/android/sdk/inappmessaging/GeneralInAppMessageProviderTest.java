@@ -2,14 +2,6 @@ package com.playseeds.android.sdk.inappmessaging;
 
 import android.test.AndroidTestCase;
 
-
-import junit.framework.AssertionFailedError;
-
-import java.io.InputStream;
-import java.util.List;
-import java.util.Map;
-
-
 public class GeneralInAppMessageProviderTest extends AndroidTestCase {
     GeneralInAppMessageProvider generalInAppMessageProvider;
 
@@ -18,14 +10,11 @@ public class GeneralInAppMessageProviderTest extends AndroidTestCase {
     }
 
     public void testParseCountlyJsonWithNullValues() throws Exception {
-        InputStream inputStream = null;
-        Map<String, List<String>> header = null;
-
         try {
-            generalInAppMessageProvider.parseCountlyJSON(inputStream, header);
+            generalInAppMessageProvider.parseCountlyJSON(null, null);
+            fail("RequestException expected");
         } catch (RequestException e) {
-
+            // success
         }
     }
-
 }

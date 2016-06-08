@@ -27,12 +27,6 @@ import com.playseeds.demo.inappmessaging.R;
 
 
 public class MainActivity extends Activity implements InAppMessageListener {
-
-    //private static String YOUR_SERVER = "http://dash.playseeds.com"; // don't include trailing slash
-    //private static String YOUR_APP_KEY = "test";
-    //private static String messageId0 = null;
-    //private static String messageId1 = null;
-
     private static String YOUR_SERVER = "http://staging.playseeds.com";
     private static String YOUR_APP_KEY = "71ac2900e9d31647d68d0ddc6f0aaf52611a612d";
     private static String messageId0 = "575f872a64bc1e5b0eca506f";
