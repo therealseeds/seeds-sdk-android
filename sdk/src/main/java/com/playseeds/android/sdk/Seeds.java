@@ -301,14 +301,10 @@ public class Seeds {
      * Initializes the Seeds InAppMessaging part of the MessagingSDK. Call from your main Activity's onCreate() method.
      * @return Seeds instance for easy method chaining
      */
-
     public synchronized Seeds initInAppMessaging() {
-
-
         Log.d(Seeds.TAG, "deviceId: " + connectionQueue_.getDeviceId() + connectionQueue_.getDeviceId().getId() + connectionQueue_.getDeviceId().getType());
 
         InAppMessageManager.sharedInstance().init(connectionQueue_.getContext(), connectionQueue_.getServerURL(), connectionQueue_.getAppKey(), connectionQueue_.getDeviceId().getId(), connectionQueue_.getDeviceId().getType());
-
 
         return this;
     }
