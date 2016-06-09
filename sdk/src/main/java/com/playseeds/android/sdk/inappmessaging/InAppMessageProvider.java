@@ -28,18 +28,15 @@ import java.util.Map;
 
 public abstract class InAppMessageProvider<T> {
 
-	InputStream is;
-
 	public T obtainInAppMessage(InAppMessageRequest request) throws RequestException {
-
 		Log.i("sendCountlyRequest");
+		Log.d("Parse Real");
 
-		Log.d("Parse Real"); // log.d not working?
 		String url = request.countlyUriToString();
+		HttpURLConnection urlConnection = null;
 
 		Log.i("InAppMessage RequestPerform HTTP Get Url: " + url);
 
-		HttpURLConnection urlConnection = null;
 		try {
 			urlConnection = (HttpURLConnection) new URL(url).openConnection();
 			urlConnection.setRequestProperty("User-Agent", System.getProperty("http.agent"));
