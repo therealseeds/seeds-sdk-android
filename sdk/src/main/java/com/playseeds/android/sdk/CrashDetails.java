@@ -55,7 +55,7 @@ import java.util.regex.Pattern;
  *
  */
 class CrashDetails {
-    private static ArrayList<String> logs = new ArrayList<String>();
+    private static ArrayList<String> logs = new ArrayList<>();
     private static int startTime = Seeds.currentTimestamp();
     private static Map<String,String> customSegments = null;
     private static boolean inBackground = true;
@@ -63,8 +63,9 @@ class CrashDetails {
 
     private static long getTotalRAM() {
         if(totalMemory == 0) {
-            RandomAccessFile reader = null;
-            String load = null;
+            RandomAccessFile reader;
+            String load;
+
             try {
                 reader = new RandomAccessFile("/proc/meminfo", "r");
                 load = reader.readLine();
@@ -133,7 +134,7 @@ class CrashDetails {
      * like versions of dependency libraries.
      */
     static void setCustomSegments(Map<String,String> segments) {
-        customSegments = new HashMap<String, String>();
+        customSegments = new HashMap<>();
         customSegments.putAll(segments);
     }
 
@@ -146,7 +147,6 @@ class CrashDetails {
         else
             return null;
     }
-
 
     /**
      * Returns the current device manufacturer.
@@ -199,7 +199,7 @@ class CrashDetails {
     /**
      * Returns the total device RAM amount.
      */
-    static String getRamTotal(Context context) {
+    static String getRamTotal() {
         return Long.toString(getTotalRAM());
     }
 
@@ -212,8 +212,7 @@ class CrashDetails {
             long   total  = (statFs.getBlockCount() * statFs.getBlockSize());
             long   free   = (statFs.getAvailableBlocks() * statFs.getBlockSize());
             return Long.toString((total - free)/ 1048576L);
-        }
-        else{
+        } else{
             StatFs statFs = new StatFs(Environment.getRootDirectory().getAbsolutePath());
             long   total  = (statFs.getBlockCountLong() * statFs.getBlockSizeLong());
             long   free   = (statFs.getAvailableBlocksLong() * statFs.getBlockSizeLong());
@@ -229,8 +228,7 @@ class CrashDetails {
             StatFs statFs = new StatFs(Environment.getRootDirectory().getAbsolutePath());
             long   total  = (statFs.getBlockCount() * statFs.getBlockSize());
             return Long.toString(total/ 1048576L);
-        }
-        else{
+        } else{
             StatFs statFs = new StatFs(Environment.getRootDirectory().getAbsolutePath());
             long   total  = (statFs.getBlockCountLong() * statFs.getBlockSizeLong());
             return Long.toString(total/ 1048576L);
@@ -241,20 +239,18 @@ class CrashDetails {
      * Returns the current device battery level.
      */
     static String getBatteryLevel(Context context) {
-        try {
-            Intent batteryIntent = context.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-            int level = batteryIntent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-            int scale = batteryIntent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+        Intent batteryIntent = context.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        assert batteryIntent != null;
+        int level = batteryIntent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+        int scale = batteryIntent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
 
-            // Error checking that probably isn't needed but I added just in case.
-            if (level > -1 && scale > 0) {
-                return Float.toString(((float) level / (float) scale) * 100.0f);
-            }
+        // Error checking that probably isn't needed but I added just in case.
+        if (level > -1 && scale > 0) {
+            return Float.toString(((float) level / (float) scale) * 100.0f);
         }
-        catch(Exception e){
-            if (Seeds.sharedInstance().isLoggingEnabled()) {
-                Log.i(Seeds.TAG, "Can't get batter level");
-            }
+
+        if (Seeds.sharedInstance().isLoggingEnabled()) {
+            Log.i(Seeds.TAG, "Can't get battery level");
         }
 
         return null;
@@ -305,8 +301,7 @@ class CrashDetails {
     static String isOnline(Context context) {
         try {
             ConnectivityManager conMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-            if (conMgr != null && conMgr.getActiveNetworkInfo() != null
-                    && conMgr.getActiveNetworkInfo().isAvailable()
+            if (conMgr != null && conMgr.getActiveNetworkInfo() != null && conMgr.getActiveNetworkInfo().isAvailable()
                     && conMgr.getActiveNetworkInfo().isConnected()) {
 
                 return "true";
@@ -357,7 +352,7 @@ class CrashDetails {
                 "_cpu", getCpu(),
                 "_opengl", getOpenGL(context),
                 "_ram_current", getRamCurrent(context),
-                "_ram_total", getRamTotal(context),
+                "_ram_total", getRamTotal(),
                 "_disk_current", getDiskCurrent(),
                 "_disk_total", getDiskTotal(),
                 "_bat", getBatteryLevel(context),
