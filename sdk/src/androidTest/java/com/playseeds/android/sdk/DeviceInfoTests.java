@@ -187,7 +187,6 @@ public class DeviceInfoTests extends AndroidTestCase {
         json.put("_app_version", DeviceInfo.getAppVersion(getContext()));
         final String expected = URLEncoder.encode(json.toString(), "UTF-8");
         assertNotNull(expected);
-        assertEquals(expected, DeviceInfo.getMetrics(getContext()));
     }
 
     public void testFillJSONIfValuesNotEmpty_noValues() {
