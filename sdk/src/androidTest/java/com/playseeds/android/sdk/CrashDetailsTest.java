@@ -6,10 +6,6 @@ import java.util.HashMap;
 
 public class CrashDetailsTest extends AndroidTestCase {
 
-    public void setUp() throws Exception {
-
-    }
-
     public void testAddLog() throws Exception {
         String record = "This is a new log";
         CrashDetails.addLog(record);
