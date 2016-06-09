@@ -261,9 +261,11 @@ public class CountlyStore {
 
     // for unit testing
     synchronized void clear() {
-        final SharedPreferences.Editor prefsEditor = preferences_.edit();
-        prefsEditor.remove(EVENTS_PREFERENCE);
-        prefsEditor.remove(CONNECTIONS_PREFERENCE);
-        prefsEditor.commit();
+        if (preferences_ != null) {
+            SharedPreferences.Editor prefsEditor = preferences_.edit();
+            prefsEditor.remove(EVENTS_PREFERENCE);
+            prefsEditor.remove(CONNECTIONS_PREFERENCE);
+            prefsEditor.commit();
+        }
     }
 }
