@@ -67,7 +67,7 @@ public class DeviceIdTests extends AndroidTestCase {
     public void testDeviceIdEqualsNullSafe_WhenIdIsNull() throws Exception {
         deviceType = DeviceId.Type.ADVERTISING_ID;
 
-        assertFalse(DeviceId.deviceIDEqualsNullSafe(null, deviceType, new DeviceId(deviceType)));
+        assertTrue(DeviceId.deviceIDEqualsNullSafe(null, deviceType, new DeviceId(deviceType)));
     }
 
     public void testDeviceIdEqualsNullSafe_WhenTypeIsNull() throws Exception {

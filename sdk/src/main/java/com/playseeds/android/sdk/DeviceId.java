@@ -3,9 +3,6 @@ package com.playseeds.android.sdk;
 import android.content.Context;
 import android.util.Log;
 
-/**
- * Created by artem on 07/11/14.
- */
 
 public class DeviceId {
     private String id;
