@@ -4,7 +4,7 @@
 
 general:
     artifacts:
-        - /home/ubuntu/seeds-sdk-android/app/build/outputs/apk/
+        - /home/ubuntu/seeds-sdk-android/sdk/build/outputs/apk/
 
 machine:
     environment:
@@ -15,8 +15,22 @@ dependencies:
         - echo y | android update sdk --no-ui --all --filter tools,platform-tools,build-tools-21.1.2,android-21,extra-google-m2repository,extra-google-google_play_services,extra-android-support
         - ANDROID_HOME=/usr/local/android-sdk-linux ./gradlew dependencies
 
-
 test:
+    pre:
+        - emulator -avd circleci-android22 -no-audio -no-window:
+            background: true
+            parallel: true
+        - circle-android wait-for-boot
+
     override:
         - (./gradlew assemble):
             timeout: 360
+        - adb install sdk/build/outputs/apk/sdk-debug-androidTest-unaligned.apk
+        - ./gradlew connectedAndroidTest
+        - ./gradlew test
+
+    post:
+        - cp -r sdk/build/outputs $CIRCLE_ARTIFACTS
+        - cp -r sdk/build/outputs $CIRCLE_TEST_REPORTS
+
+
