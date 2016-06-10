@@ -67,11 +67,6 @@ public class InAppMessageResponse implements InAppMessage {
 		return this.text;
 	}
 
-	@Override
-	public int getType() {
-		return this.type;
-	}
-
 	public String getUrlType() {
 		return this.urlType;
 	}
@@ -125,12 +120,16 @@ public class InAppMessageResponse implements InAppMessage {
 		this.type = adType;
 	}
 
+	@Override
+	public int getType() {
+		return this.type;
+	}
+
 	public void setUrlType(final String urlType) {
 		this.urlType = urlType;
 	}
 
-	@Override
-	public String toString() {
+	public String getString() {
 		return "Response [refresh=" + this.refresh + ", type=" + this.type
 				+ ", bannerWidth=" + this.bannerWidth + ", bannerHeight="
 				+ this.bannerHeight + ", text=" + this.text + ", imageUrl="

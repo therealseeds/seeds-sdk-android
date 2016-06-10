@@ -20,7 +20,7 @@ package com.playseeds.android.sdk.inappmessaging;
 import java.io.Serializable;
 
 public interface InAppMessage extends Serializable {
-	public int getType();
+	int getType();
 
-	public void setType(int adType);
+	void setType(int adType);
 }

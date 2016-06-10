@@ -87,7 +87,6 @@ public class GeneralInAppMessageProvider extends InAppMessageProvider<InAppMessa
 			throw new RequestException("Cannot read Response", t);
 		}
 
-		Log.i("InAppMessageResponse: " + response);
 		return response;
 	}
 }

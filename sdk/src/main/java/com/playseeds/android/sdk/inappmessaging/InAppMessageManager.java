@@ -25,53 +25,45 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.InputStream;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.URLEncoder;
 import java.util.HashMap;
-import java.util.List;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.location.Location;
 import android.os.Handler;
+import android.os.Looper;
 
 import com.google.gson.Gson;
 import com.playseeds.android.sdk.DeviceId;
 import com.playseeds.android.sdk.Seeds;
 
 public class InAppMessageManager {
-
-	private static HashMap<Long, InAppMessageManager> sRunningAds = new HashMap<Long, InAppMessageManager>();
-
 	private String mAppKey;
-	private String androidAdId;
 	private boolean adDoNotTrack;
 	private boolean mIncludeLocation;
 	private static Context mContext;
 	private Thread mRequestThread;
 	private Handler mHandler;
-	private InAppMessageRequest request = null;
 	private InAppMessageListener mListener;
-	private boolean mEnabled = true;
 	private InAppMessageResponse mResponse;
 	private String interstitialRequestURL;
 	private String mDeviceID;
 	private DeviceId.Type mIdMode;
 	private boolean alreadyRequestedInterstitial;
 	private boolean requestedHorizontalAd;
-	private Gender userGender;
-	private int userAge;
-	private List<String> keywords;
-
-	private boolean doNotShow = false;
-
 	private HashMap<String, String> segmentation;
 
-	// see http://stackoverflow.com/questions/7048198/thread-safe-singletons-in-java
-	private static class SingletonHolder {
-		static final InAppMessageManager instance = new InAppMessageManager();
+	private boolean doNotShow = false;
+	private InAppMessageRequest request = null;
+	private static HashMap<Long, InAppMessageManager> sRunningAds = new HashMap<>();
+
+	/**
+	 * Private Constructor
+	 */
+	private InAppMessageManager() {
 	}
 
 	/**
@@ -81,29 +73,37 @@ public class InAppMessageManager {
 		return SingletonHolder.instance;
 	}
 
-	public void init(Context ctx, final String interstitialRequestURL, final String appKey, final String deviceID, final DeviceId.Type idMode) {
-		Util.prepareAndroidAdId(ctx);
-		InAppMessageManager.setmContext(ctx);
+	// see http://stackoverflow.com/questions/7048198/thread-safe-singletons-in-java
+	private static class SingletonHolder {
+		static final InAppMessageManager instance = new InAppMessageManager();
+	}
+
+	public void init(Context context, final String interstitialRequestURL, final String appKey, final String deviceID, final DeviceId.Type idMode) {
+		threadInit();
+		Util.prepareAndroidAdId(context);
+		InAppMessageManager.setmContext(context);
 		this.interstitialRequestURL = interstitialRequestURL;
 		mAppKey = appKey;
 		mDeviceID= deviceID;
 		mIdMode = idMode;
-		//this.mIncludeLocation = includeLocation;
 		sharedInstance().mRequestThread = null;
-		sharedInstance().mHandler = new Handler();
-		//return this;
 	}
 
-	public static InAppMessageManager getAdManager(InAppMessageResponse ad) {
-		InAppMessageManager inAppMessageManager = sRunningAds.remove(ad.getTimestamp());
-		if (inAppMessageManager == null) {
-			Log.d("Cannot find InAppMessageManager with running ad:" + ad.getTimestamp());
-		}
-		return inAppMessageManager;
+	// TODO: write a brief description. This method handles sending notifications to the listeners
+	public void threadInit() {
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				Looper.prepare();
+				sharedInstance().mHandler = new Handler();
+				Looper.loop();
+			}
+		}).start();
 	}
 
 	public static void closeRunningInAppMessage(InAppMessageResponse ad, boolean result) {
 		InAppMessageManager inAppMessageManager = sRunningAds.remove(ad.getTimestamp());
+
 		if (inAppMessageManager == null) {
 			Log.d("Cannot find InAppMessageManager with running ad:" + ad.getTimestamp());
 			return;
@@ -119,23 +119,11 @@ public class InAppMessageManager {
 		}
 	}
 
-	private InAppMessageManager() {
-	}
-
-	public void setListener(InAppMessageListener listener) {
-		this.mListener = listener;
-	}
-
 	public void requestInAppMessage() {
 		requestInAppMessageInternal(false);
 	}
 
 	private void requestInAppMessageInternal(boolean keepFlags) {
-
-		if (!mEnabled) {
-			Log.w("Cannot request rich adds on low memory devices");
-			return;
-		}
 		if (!keepFlags) {
 			alreadyRequestedInterstitial = false;
 		}
@@ -144,90 +132,7 @@ public class InAppMessageManager {
 			Log.d("Requesting InAppMessage (v" + Const.VERSION + "-" + Const.PROTOCOL_VERSION + ")");
 			mResponse = null;
 
-			mRequestThread = new Thread(new Runnable() {
-				@Override
-				public void run() {
-					while (ResourceManager.isDownloading()) {
-						try {
-							Thread.sleep(200);
-						} catch (InterruptedException e) {
-						}
-					}
-					Log.d("starting request thread");
-					try {
-						GeneralInAppMessageProvider requestAd = new GeneralInAppMessageProvider();
-						if (!alreadyRequestedInterstitial) {
-							request = getInterstitialRequest();
-							alreadyRequestedInterstitial = true;
-						} else {
-							Log.d("Already requested interstitial");
-							notifyNoAdFound();
-							mRequestThread = null;
-							return;
-						}
-
-						try {
-							mResponse = requestAd.obtainInAppMessage(request);
-						} catch (Exception e) {
-							File cachedInAppMessageFile = new File(mContext.getCacheDir(),
-									URLEncoder.encode(request.countlyUriToString(), "UTF-8"));
-							if (cachedInAppMessageFile.exists()) {
-								BufferedReader cacheReader = new BufferedReader(new FileReader(cachedInAppMessageFile));
-								mResponse = new Gson().fromJson(cacheReader, InAppMessageResponse.class);
-								cacheReader.close();
-							}
-						}
-						if (mResponse.getType() == Const.NO_AD) {
-							 if (!alreadyRequestedInterstitial) {
-								request = getInterstitialRequest();
-								alreadyRequestedInterstitial = true;
-								mResponse = requestAd.obtainInAppMessage(request);
-							}
-						}
-
-						//TODO: remove debug code
-						Log.i("mResponse is: " + mResponse);
-
-						if (mResponse.getType() == Const.TEXT || mResponse.getType() == Const.IMAGE) {
-							notifyAdLoaded(mResponse);
-
-							BufferedWriter cacheWriter = null;
-							try {
-								File cachedInAppMessageFile = new File(mContext.getCacheDir(),
-										URLEncoder.encode(request.countlyUriToString(), "UTF-8"));
-								cacheWriter = new BufferedWriter(new FileWriter(cachedInAppMessageFile));
-								cacheWriter.write(new Gson().toJson(mResponse));
-							} catch (Exception e) {
-								Log.e("Cache", e);
-							} finally {
-								try {
-									// Close the writer regardless of what happens...
-									cacheWriter.close();
-								} catch (Exception e) {
-								}
-							}
-						} else if (mResponse.getType() == Const.NO_AD) {
-							Log.d("response NO AD received");
-							notifyNoAdFound();
-						} else {
-							notifyNoAdFound();
-						}
-					} catch (Throwable t) {
-						Log.e("ad request failed", t);
-
-						if (!alreadyRequestedInterstitial) {
-							mRequestThread = null;
-							requestInAppMessageInternal(true);
-						} else {
-							mResponse = new InAppMessageResponse();
-							mResponse.setType(Const.AD_FAILED);
-							notifyNoAdFound();
-						}
-					}
-					Log.d("finishing ad request thread");
-					mRequestThread = null;
-				}
-			});
+			mRequestThread = getRequestThread();
 			mRequestThread.setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
 
 				@Override
@@ -244,84 +149,101 @@ public class InAppMessageManager {
 		}
 	}
 
-	public void setInterstitialRequestURL(String requestURL) {
-		this.interstitialRequestURL = requestURL;
+	private Thread getRequestThread() {
+		Runnable runnable = new Runnable() {
+			@Override
+			public void run() {
+				while (ResourceManager.isDownloading()) {
+					try {
+						Thread.sleep(200);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+				Log.d("starting request thread");
+
+				try {
+					GeneralInAppMessageProvider requestAd = new GeneralInAppMessageProvider();
+					if (!alreadyRequestedInterstitial) {
+						request = getInterstitialRequest();
+						alreadyRequestedInterstitial = true;
+					} else {
+						Log.d("Already requested interstitial");
+						notifyNoAdFound();
+						mRequestThread = null;
+						return;
+					}
+
+					try {
+						mResponse = requestAd.obtainInAppMessage(request);
+					} catch (Exception e) {
+						File cachedInAppMessageFile = new File(mContext.getCacheDir(),
+								URLEncoder.encode(request.countlyUriToString(), "UTF-8"));
+						if (cachedInAppMessageFile.exists()) {
+							BufferedReader cacheReader = new BufferedReader(new FileReader(cachedInAppMessageFile));
+							mResponse = new Gson().fromJson(cacheReader, InAppMessageResponse.class);
+							cacheReader.close();
+						}
+					}
+					if (mResponse.getType() == Const.NO_AD) {
+						if (!alreadyRequestedInterstitial) {
+							request = getInterstitialRequest();
+							alreadyRequestedInterstitial = true;
+							mResponse = requestAd.obtainInAppMessage(request);
+						}
+					}
+
+					if (mResponse.getType() == Const.TEXT || mResponse.getType() == Const.IMAGE) {
+						notifyAdLoaded(mResponse);
+
+						BufferedWriter cacheWriter = null;
+						try {
+							File cachedInAppMessageFile = new File(mContext.getCacheDir(),
+									URLEncoder.encode(request.countlyUriToString(), "UTF-8"));
+							cacheWriter = new BufferedWriter(new FileWriter(cachedInAppMessageFile));
+							cacheWriter.write(new Gson().toJson(mResponse));
+						} catch (Exception e) {
+							Log.e("Cache", e);
+						} finally {
+							try {
+								// Close the writer regardless of what happens...
+								cacheWriter.close();
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
+					} else if (mResponse.getType() == Const.NO_AD) {
+						Log.d("response NO AD received");
+						notifyNoAdFound();
+					} else {
+						notifyNoAdFound();
+					}
+				} catch (Throwable t) {
+					Log.e("ad request failed", t);
+
+					if (!alreadyRequestedInterstitial) {
+						mRequestThread = null;
+						requestInAppMessageInternal(true);
+					} else {
+						mResponse = new InAppMessageResponse();
+						mResponse.setType(Const.AD_FAILED);
+						notifyNoAdFound();
+					}
+				}
+				Log.d("finishing ad request thread");
+				mRequestThread = null;
+			}
+		};
+
+		return new Thread(runnable);
 	}
 
 	public boolean isInAppMessageLoaded() {
 		return (mResponse != null);
 	}
 
-	public void requestInAppMessageAndShow(long timeout) {
-		InAppMessageListener l = mListener;
-
-		mListener = null;
-		requestInAppMessage();
-		long now = System.currentTimeMillis();
-		long timeoutTime = now + timeout;
-		while ((!isInAppMessageLoaded()) && (now < timeoutTime)) {
-			try {
-				Thread.sleep(200);
-			} catch (InterruptedException e) {
-			}
-			now = System.currentTimeMillis();
-		}
-		mListener = l;
-		showInAppMessage();
-	}
-
-	public void showInAppMessage() {
-
-		if (((mResponse == null)
-				|| (mResponse.getType() == Const.NO_AD)
-				|| (mResponse.getType() == Const.AD_FAILED))
-				|| doNotShow) {
-			notifyAdShown(mResponse, false);
-			return;
-		}
-
-		InAppMessageResponse ad = mResponse;
-		boolean result = false;
-		try {
-			if (Util.isNetworkAvailable(getContext())) {
-				ad.setTimestamp(System.currentTimeMillis());
-				ad.setHorizontalOrientationRequested(requestedHorizontalAd);
-				Log.v("Showing InAppMessage:" + ad);
-
-				Intent intent = new Intent(getContext(), RichMediaActivity.class);
-				intent.putExtra(AD_EXTRA, ad);
-				getContext().startActivity(intent);
-
-				result = true;
-				sRunningAds.put(ad.getTimestamp(), this);
-			} else {
-				Log.d("No network available. Cannot show InAppMessage.");
-			}
-		} catch (Exception e) {
-			Log.e("Unknown exception when showing InAppMessage", e);
-		} finally {
-			notifyAdShown(ad, result);
-		}
-	}
-
-	private void initialize() throws IllegalArgumentException {
-		Log.d("InAppMessage SDK Version:" + Const.VERSION);
-
-		this.androidAdId = Util.getAndroidAdId();
-		this.adDoNotTrack = Util.hasAdDoNotTrack();
-
-		if ((mAppKey == null) || (mAppKey.length() == 0)) {
-			Log.e("Publisher Id cannot be null or empty");
-			throw new IllegalArgumentException("User Id cannot be null or empty");
-		}
-
-		Log.d("InAppMessageManager Publisher Id:" + mAppKey + " Advertising Id:" + androidAdId);
-		mEnabled = (Util.getMemoryClass(getContext()) > 16);
-	}
-
 	private void notifyNoAdFound() {
 		if (mListener != null) {
-			Log.d("No ad found.");
 			mHandler.post(new Runnable() {
 				@Override
 				public void run() {
@@ -332,22 +254,9 @@ public class InAppMessageManager {
 		this.mResponse = null;
 	}
 
-	private void notifyAdLoaded(final InAppMessageResponse ad) {
-		if (mListener != null) {
-			mHandler.post(new Runnable() {
-
-				@Override
-				public void run() {
-					mListener.inAppMessageLoadSucceeded(ad);
-				}
-			});
-		}
-	}
-
 	private void notifyAdClicked() {
 		if (mListener != null) {
 			mHandler.post(new Runnable() {
-
 				@Override
 				public void run() {
 					mListener.inAppMessageClicked();
@@ -357,10 +266,26 @@ public class InAppMessageManager {
 
 		setSegmentation();
 		Seeds.sharedInstance().recordEvent("message clicked", segmentation, 1);
-
 		Seeds.sharedInstance().setAdClicked(true);
 		android.util.Log.d("Main", "message shown: " + segmentation);
+	}
 
+	private void notifyAdLoaded(final InAppMessageResponse ad) {
+		if (mListener != null) {
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					mListener.inAppMessageLoadSucceeded(ad);
+				}
+			}).start();
+//			mHandler.post(new Runnable() {
+//
+//				@Override
+//				public void run() {
+//					mListener.inAppMessageLoadSucceeded(ad);
+//				}
+//			});
+		}
 	}
 
 	private void notifyAdShown(final InAppMessageResponse ad, final boolean ok) {
@@ -394,6 +319,7 @@ public class InAppMessageManager {
 				}
 			});
 		}
+
 	}
 
 	private InAppMessageRequest getInterstitialRequest() {
@@ -405,12 +331,11 @@ public class InAppMessageManager {
 			request.setUserAgent2(Util.buildUserAgent());
 		}
 		Location location = null;
-//		request.setGender(userGender);
-//		request.setUserAge(userAge);
-//		request.setKeywords(keywords);
 
-		if (this.mIncludeLocation)
+		if (this.mIncludeLocation) {
 			location = Util.getLocation(mContext);
+		}
+
 		if (location != null) {
 			Log.d("location is longitude: " + location.getLongitude() + ", latitude: " + location.getLatitude());
 			request.setLatitude(location.getLatitude());
@@ -419,14 +344,11 @@ public class InAppMessageManager {
 			request.setLatitude(0.0);
 			request.setLongitude(0.0);
 		}
+
 		if (mContext.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
 			requestedHorizontalAd = true;
- 			//this.request.setAdspaceHeight(320);
-			//this.request.setAdspaceWidth(480);
 		} else {
 			requestedHorizontalAd = false;
-			//this.request.setAdspaceHeight(480);
-			//this.request.setAdspaceWidth(320);
 		}
 
 		this.request.setAdspaceStrict(false);
@@ -434,13 +356,54 @@ public class InAppMessageManager {
 		request.setConnectionType(Util.getConnectionType(getContext()));
 		request.setIpAddress(Util.getLocalIpAddress());
 		request.setTimestamp(System.currentTimeMillis());
-
 		request.setRequestURL(interstitialRequestURL);
 		request.setOrientation(getOrientation());
 		request.setAppKey(mAppKey);
 		request.setDeviceId(mDeviceID);
 		request.setIdMode(mIdMode);
 		return request;
+	}
+
+	public void showInAppMessage() {
+		InAppMessageResponse ad = mResponse;
+		boolean result = false;
+
+		if (((mResponse == null)
+				|| (mResponse.getType() == Const.NO_AD)
+				|| (mResponse.getType() == Const.AD_FAILED))
+				|| doNotShow) {
+			notifyAdShown(mResponse, false);
+			return;
+		}
+
+		try {
+			if (Util.isNetworkAvailable(getContext())) {
+				ad.setTimestamp(System.currentTimeMillis());
+				ad.setHorizontalOrientationRequested(requestedHorizontalAd);
+				Log.v("Showing InAppMessage:" + ad);
+
+				Intent intent = new Intent(getContext(), RichMediaActivity.class);
+				intent.putExtra(AD_EXTRA, ad);
+				getContext().startActivity(intent);
+
+				result = true;
+				sRunningAds.put(ad.getTimestamp(), this);
+			} else {
+				Log.d("No network available. Cannot show InAppMessage.");
+			}
+		} catch (Exception e) {
+			Log.e("Unknown exception when showing InAppMessage", e);
+		} finally {
+			notifyAdShown(ad, result);
+		}
+	}
+
+	public void setListener(InAppMessageListener listener) {
+		this.mListener = listener;
+	}
+
+	protected void setRunningAds(HashMap<Long, InAppMessageManager> ads) {
+		sRunningAds = ads;
 	}
 
 	private String getOrientation() {
@@ -463,25 +426,12 @@ public class InAppMessageManager {
 		InAppMessageManager.mContext = mContext;
 	}
 
-	public void setUserGender(Gender userGender) {
-		this.userGender = userGender;
-	}
-
-	public void setUserAge(int userAge) {
-		this.userAge = userAge;
-	}
-
-	public void setKeywords(List<String> keywords) {
-		this.keywords = keywords;
-	}
-
 	public void setSegmentation() {
-		segmentation = new HashMap<String, String>();
+		segmentation = new HashMap<>();
 		segmentation.put("message", Seeds.sharedInstance().getMessageVariantName());
 	}
 
 	public void doNotShow(boolean doNotShow) {
 		this.doNotShow = doNotShow;
 	}
-
 }
