@@ -26,6 +26,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.MessageFormat;
 
@@ -47,19 +49,31 @@ import android.widget.RelativeLayout;
 
 @SuppressLint({ "ViewConstructor", "SetJavaScriptEnabled" })
 public class InAppMessageView extends RelativeLayout {
+	public static final int LIVE = 0;
+	public static final int TEST = 1;
+
 	private boolean animation;
-	private InAppMessageResponse response;
-	private WebSettings webSettings;
-	private WebView webView;
-	private int width;
-	private int height;
-	private BannerAdViewListener adListener;
-	private static Method mWebView_SetLayerType;
-	private static Field mWebView_LAYER_TYPE_SOFTWARE;
-	private Context mContext = null;
-	private Animation fadeInAnimation = null;
+
+	private boolean isInternalBrowser = false;
 	private boolean wasUserAction = false;
 
+	private InAppMessageResponse response;
+	private Animation fadeInAnimation = null;
+	// private Animation fadeOutAnimation = null;
+	private WebSettings webSettings;
+
+	private Context mContext = null;
+	protected boolean mIsInForeground;
+
+	private WebView webView;
+
+	private int width;
+	private int height;
+
+	private BannerAdViewListener adListener;
+
+	private static Method mWebView_SetLayerType;
+	private static Field mWebView_LAYER_TYPE_SOFTWARE;
 
 	public InAppMessageView(final Context context, final InAppMessageResponse response, int width, int height, final boolean animation, final BannerAdViewListener adListener) {
 		super(context);
@@ -69,11 +83,12 @@ public class InAppMessageView extends RelativeLayout {
 		this.height = height;
 		this.animation = animation;
 		this.adListener = adListener;
-		this.initialize();
+		this.initialize(context);
 	}
 
-	private WebView createWebView() {
-		final WebView webView = new WebView(mContext) {
+	private WebView createWebView(final Context context) {
+		final WebView webView = new WebView(this.getContext()) {
+
 			@Override
 			public boolean onTouchEvent(MotionEvent event) {
 				wasUserAction = true;
@@ -140,6 +155,7 @@ public class InAppMessageView extends RelativeLayout {
 		} else {
 			final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
 			startActivity(intent);
+			// this.getContext().startActivity(intent);
 		}
 	}
 
@@ -185,11 +201,12 @@ public class InAppMessageView extends RelativeLayout {
 
 		};
 		task.execute();
+
 	}
 
 	static {
 		initCompatibility();
-	}
+	};
 
 	private static void initCompatibility() {
 		try {
@@ -203,9 +220,12 @@ public class InAppMessageView extends RelativeLayout {
 			Log.v("set layer " + mWebView_SetLayerType);
 			mWebView_LAYER_TYPE_SOFTWARE = WebView.class.getField("LAYER_TYPE_SOFTWARE");
 			Log.v("set1 layer " + mWebView_LAYER_TYPE_SOFTWARE);
+
 		} catch (SecurityException e) {
+
 			Log.v("SecurityException");
 		} catch (NoSuchFieldException e) {
+
 			Log.v("NoSuchFieldException");
 		}
 	}
@@ -228,7 +248,7 @@ public class InAppMessageView extends RelativeLayout {
 	}
 
 	private void buildBannerView() {
-		this.webView = this.createWebView();
+		this.webView = this.createWebView(mContext);
 		Log.d("Create view flipper");
 		if (this.response != null && this.response.getClickUrl() != null) {
 			final float scale = mContext.getResources().getDisplayMetrics().density;
@@ -260,9 +280,13 @@ public class InAppMessageView extends RelativeLayout {
 		}
 	}
 
-	private void initialize() {
+	private void initialize(final Context context) {
 		initCompatibility();
 		buildBannerView();
+	}
+
+	public boolean isInternalBrowser() {
+		return this.isInternalBrowser;
 	}
 
 	private void openLink() {
@@ -272,7 +296,16 @@ public class InAppMessageView extends RelativeLayout {
 
 	}
 
+	public void setAdListener(final BannerAdViewListener bannerListener) {
+		this.adListener = bannerListener;
+	}
+
+	public void setInternalBrowser(final boolean isInternalBrowser) {
+		this.isInternalBrowser = isInternalBrowser;
+	}
+
 	public void showContent() {
+
 		try {
 			if (this.response.getType() == Const.IMAGE) {
 
@@ -301,10 +334,11 @@ public class InAppMessageView extends RelativeLayout {
 	}
 
 	public interface BannerAdViewListener {
-		void onLoad();
+		public void onLoad();
 
-		void onClick();
+		public void onClick();
 
-		void onError();
+		public void onError();
 	}
+
 }

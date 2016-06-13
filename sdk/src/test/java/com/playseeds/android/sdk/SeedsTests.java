@@ -47,37 +47,18 @@ public class SeedsTests {
                         SERVER, UNLIMITED_ADS_APP_KEY, null, DeviceId.Type.ADVERTISING_ID);
     }
 
-    @Test
-    public void testSeedInAppMessageLoadSucceeded() throws Exception {
-        InAppMessageLoadListener listener = new InAppMessageLoadListener();
-
-        Seeds.sharedInstance()
-                .init(ShadowApplication.getInstance().getApplicationContext(), listener,
-                        SERVER, UNLIMITED_ADS_APP_KEY);
-        Seeds.sharedInstance().requestInAppMessage();
-        synchronized (listener) {
-            listener.wait(50000);
-        }
-        Assert.assertTrue(listener.isLoadSucceeded);
-    }
-
-    @Test
-    public void testSeedInAppMessageLoadFailed() throws Exception {
-        InAppMessageLoadListener listener = new InAppMessageLoadListener();
-
-        Seeds.sharedInstance()
-                .init(ShadowApplication.getInstance().getApplicationContext(), listener,
-                        SERVER, NO_ADS_APP_KEY);
-        Seeds.sharedInstance().requestInAppMessage();
-        synchronized (listener) {
-            listener.wait(50000);
-        }
-        Assert.assertFalse(listener.isLoadSucceeded);
-    }
-
     private class InAppMessageLoadListener implements InAppMessageListener {
-        boolean isLoadSucceeded = false;
+        private Boolean wasLoaded = null;
 
+        public boolean hasResult() {
+            return wasLoaded != null;
+        }
+
+        public boolean getWasLoaded() throws Exception {
+            if (wasLoaded == null)
+                throw new Exception();
+            return wasLoaded;
+        }
 
         @Override
         public void inAppMessageClicked() {}
@@ -87,7 +68,10 @@ public class SeedsTests {
 
         @Override
         public void inAppMessageLoadSucceeded(InAppMessage inAppMessage) {
-            isLoadSucceeded = true;
+            synchronized (this) {
+                wasLoaded = true;
+                notifyAll();
+            }
         }
 
         @Override
@@ -95,6 +79,40 @@ public class SeedsTests {
 
         @Override
         public void noInAppMessageFound() {
+            synchronized (this) {
+                wasLoaded = false;
+                notifyAll();
+            }
         }
+    }
+
+    @Test
+    public void testSeedInAppMessageLoadSucceeded() throws InterruptedException, Exception {
+        InAppMessageLoadListener listener = new InAppMessageLoadListener();
+
+        Seeds.sharedInstance()
+                .init(ShadowApplication.getInstance().getApplicationContext(), listener,
+                        SERVER, UNLIMITED_ADS_APP_KEY);
+        Seeds.sharedInstance().requestInAppMessage();
+        synchronized (listener) {
+            if (!listener.hasResult())
+                listener.wait(10000);
+        }
+        Assert.assertTrue(listener.getWasLoaded());
+    }
+
+    @Test
+    public void testSeedInAppMessageLoadFailed() throws InterruptedException, Exception {
+        InAppMessageLoadListener listener = new InAppMessageLoadListener();
+
+        Seeds.sharedInstance()
+                .init(ShadowApplication.getInstance().getApplicationContext(), listener,
+                        SERVER, NO_ADS_APP_KEY);
+        Seeds.sharedInstance().requestInAppMessage();
+        synchronized (listener) {
+            if (!listener.hasResult())
+                listener.wait(10000);
+        }
+        Assert.assertFalse(listener.getWasLoaded());
     }
 }

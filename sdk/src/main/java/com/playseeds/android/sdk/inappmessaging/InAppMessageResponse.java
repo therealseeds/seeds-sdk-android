@@ -19,7 +19,10 @@
 package com.playseeds.android.sdk.inappmessaging;
 
 public class InAppMessageResponse implements InAppMessage {
+
+	public static final String WEB = "web";
 	public static final String OTHER = "other";
+
 	private static final long serialVersionUID = 3271938798582141269L;
 	private int type;
 	private int bannerWidth;
@@ -56,8 +59,32 @@ public class InAppMessageResponse implements InAppMessage {
 		return this.imageUrl;
 	}
 
+	public int getRefresh() {
+		return this.refresh;
+	}
+
 	public String getText() {
 		return this.text;
+	}
+
+	public String getUrlType() {
+		return this.urlType;
+	}
+
+	public boolean isScale() {
+		return this.scale;
+	}
+
+	public boolean isSkipPreflight() {
+		return this.skipPreflight;
+	}
+
+	public void setBannerHeight(final int bannerHeight) {
+		this.bannerHeight = bannerHeight;
+	}
+
+	public void setBannerWidth(final int bannerWidth) {
+		this.bannerWidth = bannerWidth;
 	}
 
 	public void setClickType(final ClickType clickType) {
@@ -66,6 +93,10 @@ public class InAppMessageResponse implements InAppMessage {
 
 	public void setClickUrl(final String clickUrl) {
 		this.clickUrl = clickUrl;
+	}
+
+	public void setImageUrl(final String imageUrl) {
+		this.imageUrl = imageUrl;
 	}
 
 	public void setRefresh(final int refresh) {
@@ -92,6 +123,10 @@ public class InAppMessageResponse implements InAppMessage {
 	@Override
 	public int getType() {
 		return this.type;
+	}
+
+	public void setUrlType(final String urlType) {
+		this.urlType = urlType;
 	}
 
 	public String getString() {
@@ -127,4 +162,6 @@ public class InAppMessageResponse implements InAppMessage {
 	public void setHorizontalOrientationRequested(boolean horizontalOrientationRequested) {
 		this.horizontalOrientationRequested = horizontalOrientationRequested;
 	}
+
+
 }

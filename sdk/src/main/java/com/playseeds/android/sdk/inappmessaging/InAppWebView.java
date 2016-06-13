@@ -31,6 +31,9 @@ import android.webkit.WebViewClient;
 import android.widget.Toast;
 
 public class InAppWebView extends Activity {
+
+	public static final String URL_EXTRA = "extra_url";
+
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -50,6 +53,7 @@ public class InAppWebView extends Activity {
 		WebSettings webSettings = webView.getSettings();
 
 		webSettings.setJavaScriptEnabled(true);
+
 		webSettings.setSupportZoom(true);
 		webSettings.setBuiltInZoomControls(true);
 		webSettings.setUseWideViewPort(true);
@@ -81,7 +85,9 @@ public class InAppWebView extends Activity {
 
 				finish();
 				return true;
+
 			}
+
 		});
 
 		webView.setWebChromeClient(new WebChromeClient() {
@@ -95,4 +101,5 @@ public class InAppWebView extends Activity {
 		});
 		webView.loadUrl(intent.getStringExtra(Const.REDIRECT_URI));
 	}
+
 }
