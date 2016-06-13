@@ -166,9 +166,12 @@ public class CountlyStore {
      * Get location or empty string in case if no location is specified
      */
     String getAndRemoveLocation() {
-        String location = preferences_.getString(LOCATION_PREFERENCE, "");
-        if (!location.equals("")) {
-            preferences_.edit().remove(LOCATION_PREFERENCE).commit();
+        String location = null;
+        if (preferences_ != null) {
+            location = preferences_.getString(LOCATION_PREFERENCE, "");
+            if (!location.equals("")) {
+                preferences_.edit().remove(LOCATION_PREFERENCE).commit();
+            }
         }
         return location;
     }

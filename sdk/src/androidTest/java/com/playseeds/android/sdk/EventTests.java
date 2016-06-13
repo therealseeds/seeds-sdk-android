@@ -31,7 +31,8 @@ import java.util.Map;
 
 import com.playseeds.android.sdk.Event;
 
-public class EventTests extends AndroidTestCase {
+public class
+EventTests extends AndroidTestCase {
     public void testConstructor() {
         final Event event = new Event();
         assertNull(event.key);
