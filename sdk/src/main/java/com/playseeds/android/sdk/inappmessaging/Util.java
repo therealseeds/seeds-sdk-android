@@ -18,22 +18,16 @@
 package com.playseeds.android.sdk.inappmessaging;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.net.URL;
 import java.util.Enumeration;
 import java.util.Locale;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
@@ -52,8 +46,6 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 public class Util {
 	private static String androidAdId;
 	private static boolean adDoNotTrack = false;
-
-
 	private static final float MINIMAL_ACCURACY = 1000;
 	private static final long MINIMAL_TIME_FROM_FIX = 1000 * 60 * 20;
 
@@ -61,7 +53,6 @@ public class Util {
 		int networkStatePermission = ctx.checkCallingOrSelfPermission(Manifest.permission.ACCESS_NETWORK_STATE);
 
 		if (networkStatePermission == PackageManager.PERMISSION_GRANTED) {
-
 			ConnectivityManager mConnectivity = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
 
 			// Skip if no connection, or background data disabled
@@ -221,16 +212,6 @@ public class Util {
 		return userAgent;
 	}
 
-	public static int getMemoryClass(Context context) {
-		try {
-			Method getMemoryClassMethod = ActivityManager.class.getMethod("getMemoryClass");
-			ActivityManager ac = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-			return (Integer) getMemoryClassMethod.invoke(ac, new Object[] {});
-		} catch (Exception ex) {
-			return 16;
-		}
-	}
-
 	public static void prepareAndroidAdId(final Context context) {
 
 		if (androidAdId == null && GooglePlayServicesUtil.isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS) {
@@ -271,22 +252,4 @@ public class Util {
 		}
 		return androidAdId;
 	}
-
-	public static boolean hasAdDoNotTrack() {
-		return adDoNotTrack;
-	}
-
-	public static Bitmap loadBitmap (String url) {
-		Bitmap bitmap = null;
-		try {
-			InputStream in = new URL(url).openStream();
-			bitmap = BitmapFactory.decodeStream(in);
-		} catch (Throwable t) { //to catch also out of memory error when decoding bitmap.
-			bitmap = null;
-			Log.e("Decoding bitmap failed!");
-		}
-		
-		return bitmap;
-	}
-
 }

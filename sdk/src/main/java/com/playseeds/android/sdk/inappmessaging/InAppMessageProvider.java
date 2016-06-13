@@ -39,7 +39,6 @@ public abstract class InAppMessageProvider<T> {
 
 		try {
 			urlConnection = (HttpURLConnection) new URL(url).openConnection();
-			//urlConnection.setRequestProperty("User-Agent", System.getProperty("http.agent"));
 			InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
 			int responseCode = urlConnection.getResponseCode();
 			if (responseCode == HttpURLConnection.HTTP_OK) {

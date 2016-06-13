@@ -26,7 +26,8 @@ public class InAppMessageManagerTest extends AndroidTestCase {
         InAppMessageManager.sharedInstance().setListener(inAppMessageListener);
         Seeds.sharedInstance().init(getContext(), inAppMessageListener, "https://mobfox.com", "12345");
         Seeds.sharedInstance().setMessageVariantName("Test message");
-        InAppMessageManager.sharedInstance().init(getContext(), "https://mobfox.com", "12345", "Nexus-XLR", DeviceId.Type.ADVERTISING_ID);
+        InAppMessageManager.sharedInstance().init(getContext(), "https://mobfox.com",
+                "ef2444ec9f590d24db5054fad8385991138a394b", "Nexus-XLR", DeviceId.Type.ADVERTISING_ID);
     }
 
     public void testNotifyInAppMessageClick() throws Exception {
@@ -45,7 +46,7 @@ public class InAppMessageManagerTest extends AndroidTestCase {
     public void testRequestInAppMessage_WhenBadRequest() throws Exception {
         InAppMessageManager.sharedInstance().requestInAppMessage();
         synchronized (inAppMessageListener) {
-            inAppMessageListener.wait(1000);
+            inAppMessageListener.wait(20000);
         }
         assertTrue(inAppMessageListener.notFound);
     }
@@ -54,9 +55,17 @@ public class InAppMessageManagerTest extends AndroidTestCase {
         InAppMessageManager.sharedInstance().init(getContext(), "http://devdash.playseeds.com", "c30f02a55541cbe362449d29d83d777c125c8dd6", "Nexus-XLR", DeviceId.Type.ADVERTISING_ID);
         InAppMessageManager.sharedInstance().requestInAppMessage();
         synchronized (inAppMessageListener) {
-            inAppMessageListener.wait(1000);
+            inAppMessageListener.wait(20000);
         }
         assertTrue(inAppMessageListener.isLoadSucceeded);
+    }
+
+    public void testShowInAppMessage() throws Exception {
+        InAppMessageManager.sharedInstance().showInAppMessage();
+        synchronized(inAppMessageListener) {
+            inAppMessageListener.wait(1000);
+        }
+        assertTrue(inAppMessageListener.isShown);
     }
 
     private class testInAppMessageListener implements InAppMessageListener {

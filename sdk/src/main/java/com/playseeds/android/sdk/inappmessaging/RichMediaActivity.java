@@ -58,73 +58,32 @@ import android.widget.ImageView;
 import com.playseeds.android.sdk.inappmessaging.InAppMessageView.BannerAdViewListener;
 
 public class RichMediaActivity extends Activity {
-
-	class CanSkipTask extends TimerTask {
-
-		private final RichMediaActivity mActivity;
-
-		public CanSkipTask(final RichMediaActivity activity) {
-			this.mActivity = activity;
-		}
-
-		@Override
-		public void run() {
-
-			Log.v("###########TRACKING CAN CLOSE INTERSTITIAL");
-			this.mActivity.mCanClose = true;
-			if (this.mActivity.mSkipButton != null)
-				this.mActivity.runOnUiThread(new Runnable() {
-
-					@Override
-					public void run() {
-						CanSkipTask.this.mActivity.mSkipButton.setVisibility(View.VISIBLE);
-					}
-				});
-		}
-	}
-
-
 	public static final int TYPE_UNKNOWN = -1;
-
 	public static final int TYPE_BROWSER = 0;
-
 	public static final int TYPE_INTERSTITIAL = 2;
 
 	private ResourceManager mResourceManager;
 	private FrameLayout mRootLayout;
-
 	private ImageView mSkipButton;
 	private InAppMessageResponse mAd;
-
-
 	private Uri uri;
-
 	private int mWindowWidth;
 	private int mWindowHeight;
-
 	private boolean mCanClose;
-	protected boolean mInterstitialAutocloseReset;
 	private int mType;
 	private boolean wasClicked;
-
 	private boolean mResult;
 
 	DisplayMetrics metrics;
 
-	int paddingArg = 5;
-
-	int marginArg = 8;
-
 	int skipButtonSizeLand = 40;
-
 	int skipButtonSizePort = 40;
 
 	static class ResourceHandler extends Handler {
-
 		WeakReference<RichMediaActivity> richMediaActivity;
 
 		public ResourceHandler(RichMediaActivity activity) {
-			richMediaActivity = new WeakReference<RichMediaActivity>(activity);
+			richMediaActivity = new WeakReference<>(activity);
 		}
 
 		@Override
@@ -134,20 +93,19 @@ public class RichMediaActivity extends Activity {
 				wRichMediaActivity.handleMessage(msg);
 			}
 		}
-	};
+	}
 
 	public void handleMessage(final Message msg) {
 		switch (msg.what) {
 		case ResourceManager.RESOURCE_LOADED_MSG:
 			switch (msg.arg1) {
-			case ResourceManager.DEFAULT_SKIP_IMAGE_RESOURCE_ID:
-				if (RichMediaActivity.this.mSkipButton != null) {
-					RichMediaActivity.this.mSkipButton.setImageDrawable(mResourceManager.getResource(this, ResourceManager.DEFAULT_SKIP_IMAGE_RESOURCE_ID));
-				}
+				case ResourceManager.DEFAULT_SKIP_IMAGE_RESOURCE_ID:
+					if (RichMediaActivity.this.mSkipButton != null) {
+						RichMediaActivity.this.mSkipButton.setImageDrawable(mResourceManager.getResource(this, ResourceManager.DEFAULT_SKIP_IMAGE_RESOURCE_ID));
+					}
 				break;
 			}
 			break;
-
 		}
 	}
 
@@ -156,7 +114,6 @@ public class RichMediaActivity extends Activity {
 
 		@Override
 		public void onClick(final View v) {
-
 			Log.v("###########TRACKING SKIP INTERSTITIAL");
 
 			RichMediaActivity.this.close();
@@ -176,16 +133,7 @@ public class RichMediaActivity extends Activity {
 		super.finish();
 	}
 
-	public int getDipSize(final int argSize) {
-		return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, argSize, this.getResources().getDisplayMetrics());
-	}
-
-	public FrameLayout getRootLayout() {
-		return this.mRootLayout;
-	}
-
 	public void goBack() {
-
 		switch (this.mType) {
 			case TYPE_INTERSTITIAL:
 				this.mResult = true;
@@ -196,10 +144,7 @@ public class RichMediaActivity extends Activity {
 				this.finish();
 				break;
 		}
-
 	}
-
-
 
 	private void initInterstitialFromBannerView() {
 		final FrameLayout layout = new FrameLayout(this);
@@ -302,20 +247,6 @@ public class RichMediaActivity extends Activity {
 		this.mRootLayout.setBackgroundColor(Color.argb(128, 0, 0, 0));
 	}
 
-
-	public void navigate(final String clickUrl) {
-		notifyAdClicked();
-		switch (this.mType) {
-/*		case TYPE_BROWSER:
-			this.mWebBrowserView.loadUrl(clickUrl);
-			break;*/
-		default:
-			final Intent intent = new Intent(this, RichMediaActivity.class);
-			intent.setData(Uri.parse(clickUrl));
-			this.startActivity(intent);
-		}
-	}
-
 	@Override
 	public void onConfigurationChanged(final Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
@@ -326,7 +257,6 @@ public class RichMediaActivity extends Activity {
 	@SuppressWarnings("deprecation")
 	@Override
 	public void onCreate(final Bundle icicle) {
-
 		Log.d("RichMediaActivity onCreate");
 		super.onCreate(icicle);
 
@@ -368,7 +298,7 @@ public class RichMediaActivity extends Activity {
 
 			mHandler = new ResourceHandler(this);
 
-			this.mResourceManager = new ResourceManager(this, this.mHandler);
+			this.mResourceManager = new ResourceManager(this.mHandler);
 			this.initRootLayout();
 
 /*			if (this.mType == RichMediaActivity.TYPE_BROWSER) {
@@ -428,7 +358,6 @@ public class RichMediaActivity extends Activity {
 
 	@Override
 	protected void onDestroy() {
-
 		if (mResourceManager != null)
 			mResourceManager.releaseInstance();
 
@@ -437,8 +366,6 @@ public class RichMediaActivity extends Activity {
 
 		Log.d("RichMediaActivity onDestroy done");
 	}
-
-
 
 	@Override
 	public boolean onKeyDown(final int keyCode, final KeyEvent event) {
@@ -451,7 +378,6 @@ public class RichMediaActivity extends Activity {
 
 	@Override
 	protected void onPause() {
-
 		Log.d("RichMediaActivity onPause");
 		super.onPause();
 
@@ -479,5 +405,4 @@ public class RichMediaActivity extends Activity {
 		setResult(Activity.RESULT_OK);
 		finish();
 	}
-
 }

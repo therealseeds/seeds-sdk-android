@@ -58,12 +58,14 @@ public class InAppMessageManager {
 
 	private boolean doNotShow = false;
 	private InAppMessageRequest request = null;
+	private static boolean isRunning = false;
 	private static HashMap<Long, InAppMessageManager> sRunningAds = new HashMap<>();
 
 	/**
 	 * Private Constructor
 	 */
 	private InAppMessageManager() {
+		threadInit();
 	}
 
 	/**
@@ -79,7 +81,6 @@ public class InAppMessageManager {
 	}
 
 	public void init(Context context, final String interstitialRequestURL, final String appKey, final String deviceID, final DeviceId.Type idMode) {
-		threadInit();
 		Util.prepareAndroidAdId(context);
 		InAppMessageManager.setmContext(context);
 		this.interstitialRequestURL = interstitialRequestURL;
@@ -89,7 +90,10 @@ public class InAppMessageManager {
 		sharedInstance().mRequestThread = null;
 	}
 
-	// TODO: write a brief description. This method handles sending notifications to the listeners
+	/**
+	 * This method initializes a thread used to run a message loop
+	 * It handles sending notifications to the InAppMessageListener
+	 */
 	public void threadInit() {
 		new Thread(new Runnable() {
 			@Override
@@ -131,7 +135,6 @@ public class InAppMessageManager {
 		if (mRequestThread == null) {
 			Log.d("Requesting InAppMessage (v" + Const.VERSION + "-" + Const.PROTOCOL_VERSION + ")");
 			mResponse = null;
-
 			mRequestThread = getRequestThread();
 			mRequestThread.setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
 
@@ -160,7 +163,6 @@ public class InAppMessageManager {
 						e.printStackTrace();
 					}
 				}
-				Log.d("starting request thread");
 
 				try {
 					GeneralInAppMessageProvider requestAd = new GeneralInAppMessageProvider();
@@ -272,19 +274,12 @@ public class InAppMessageManager {
 
 	private void notifyAdLoaded(final InAppMessageResponse ad) {
 		if (mListener != null) {
-			new Thread(new Runnable() {
+			mHandler.post(new Runnable() {
 				@Override
 				public void run() {
 					mListener.inAppMessageLoadSucceeded(ad);
 				}
-			}).start();
-//			mHandler.post(new Runnable() {
-//
-//				@Override
-//				public void run() {
-//					mListener.inAppMessageLoadSucceeded(ad);
-//				}
-//			});
+			});
 		}
 	}
 
