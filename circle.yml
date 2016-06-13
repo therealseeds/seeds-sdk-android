@@ -25,10 +25,8 @@ test:
     override:
         - (./gradlew assemble):
             timeout: 360
-        - adb install sdk/build/outputs/apk/sdk-debug-androidTest-unaligned.apk
         - ./gradlew connectedAndroidTest --stacktrace
         - ./gradlew test --stacktrace
-
     post:
         - cp -r sdk/build/outputs $CIRCLE_ARTIFACTS
         - cp -r sdk/build/outputs $CIRCLE_TEST_REPORTS
