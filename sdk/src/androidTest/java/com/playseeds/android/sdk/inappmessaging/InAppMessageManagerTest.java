@@ -31,6 +31,9 @@ public class InAppMessageManagerTest extends AndroidTestCase {
 
     public void testNotifyInAppMessageClick() throws Exception {
         InAppMessageManager.notifyInAppMessageClick(inAppMessageResponse);
+        synchronized (inAppMessageListener) {
+            inAppMessageListener.wait(1000);
+        }
         assertTrue(inAppMessageListener.isClicked);
     }
 
@@ -45,7 +48,7 @@ public class InAppMessageManagerTest extends AndroidTestCase {
     public void testRequestInAppMessage_WhenBadRequest() throws Exception {
         InAppMessageManager.sharedInstance().requestInAppMessage();
         synchronized (inAppMessageListener) {
-            inAppMessageListener.wait(1000);
+            inAppMessageListener.wait(50000);
         }
         assertTrue(inAppMessageListener.notFound);
     }
@@ -54,7 +57,7 @@ public class InAppMessageManagerTest extends AndroidTestCase {
         InAppMessageManager.sharedInstance().init(getContext(), "http://devdash.playseeds.com", "c30f02a55541cbe362449d29d83d777c125c8dd6", "Nexus-XLR", DeviceId.Type.ADVERTISING_ID);
         InAppMessageManager.sharedInstance().requestInAppMessage();
         synchronized (inAppMessageListener) {
-            inAppMessageListener.wait(1000);
+            inAppMessageListener.wait(10000);
         }
         assertTrue(inAppMessageListener.isLoadSucceeded);
     }
