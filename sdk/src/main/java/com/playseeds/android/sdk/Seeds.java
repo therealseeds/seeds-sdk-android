@@ -46,6 +46,19 @@ import java.util.concurrent.TimeUnit;
  * Get more details <a href="https://github.com/the-real-sseds/seeds-sdk-android">here</a>.
  */
 public class Seeds {
+    private ConnectionQueue connectionQueue_;
+    @SuppressWarnings("FieldCanBeLocal")
+    private ScheduledExecutorService timerService_;
+    private EventQueue eventQueue_;
+    private long prevSessionDurationStartTime_;
+    private int activityCount_;
+    private boolean disableUpdateSessionRequests_;
+    private boolean enableLogging_;
+    private Seeds.CountlyMessagingMode messagingMode_;
+    private Context context_;
+    protected static List<String> publicKeyPinCertificates;
+
+    private boolean adClicked = false;
 
     /**
      * Current version of the Count.ly Android SDK as a displayable string.
@@ -71,53 +84,6 @@ public class Seeds {
      */
     private static final long TIMER_DELAY_IN_SECONDS = 60;
 
-    protected static List<String> publicKeyPinCertificates;
-
-    /**
-     * Enum used in Seeds.initMessaging() method which controls what kind of
-     * app installation it is. Later (in Seeds Dashboard or when calling Seeds API method),
-     * you'll be able to choose whether you want to send a message to ly.count.android.sdk.test devices,
-     * or to production ones.
-     */
-    public static enum CountlyMessagingMode {
-        TEST,
-        PRODUCTION,
-    }
-
-    // see http://stackoverflow.com/questions/7048198/thread-safe-singletons-in-java
-    private static class SingletonHolder {
-        static final Seeds instance = new Seeds();
-    }
-
-    private ConnectionQueue connectionQueue_;
-    @SuppressWarnings("FieldCanBeLocal")
-    private ScheduledExecutorService timerService_;
-    private EventQueue eventQueue_;
-    private DeviceId deviceId_Manager_;
-    private long prevSessionDurationStartTime_;
-    private int activityCount_;
-    private boolean disableUpdateSessionRequests_;
-    private boolean enableLogging_;
-    private Seeds.CountlyMessagingMode messagingMode_;
-    private Context context_;
-
-    public boolean isAdClicked() {
-        return adClicked;
-    }
-
-    public void setAdClicked(boolean adClicked) {
-        this.adClicked = adClicked;
-    }
-
-    private boolean adClicked = false;
-
-    /**
-     * Returns the Seeds singleton.
-     */
-    public static Seeds sharedInstance() {
-        return SingletonHolder.instance;
-    }
-
     /**
      * Constructs a Seeds object.
      * Creates a new ConnectionQueue and initializes the session timer.
@@ -133,6 +99,28 @@ public class Seeds {
         }, TIMER_DELAY_IN_SECONDS, TIMER_DELAY_IN_SECONDS, TimeUnit.SECONDS);
     }
 
+    // see http://stackoverflow.com/questions/7048198/thread-safe-singletons-in-java
+    private static class SingletonHolder {
+        static final Seeds instance = new Seeds();
+    }
+
+    /**
+     * Returns the Seeds singleton.
+     */
+    public static Seeds sharedInstance() {
+        return SingletonHolder.instance;
+    }
+
+    /**
+     * Enum used in Seeds.initMessaging() method which controls what kind of
+     * app installation it is. Later (in Seeds Dashboard or when calling Seeds API method),
+     * you'll be able to choose whether you want to send a message to ly.count.android.sdk.test devices,
+     * or to production ones.
+     */
+    public enum CountlyMessagingMode {
+        TEST,
+        PRODUCTION,
+    }
 
     /**
      * Initializes the Seeds SDK. Call from your main Activity's onCreate() method.
@@ -269,6 +257,7 @@ public class Seeds {
     public Seeds initMessaging(Activity activity, Class<? extends Activity> activityClass, String projectID, Seeds.CountlyMessagingMode mode) {
         return initMessaging(activity, activityClass, projectID, null, mode);
     }
+
     /**
      * Initializes the Seeds MessagingSDK. Call from your main Activity's onCreate() method.
      * @param activity application activity which acts as a final destination for notifications
@@ -863,5 +852,11 @@ public class Seeds {
         InAppMessageManager.sharedInstance().showInAppMessage();
     }
 
+    public boolean isAdClicked() {
+        return adClicked;
+    }
 
+    public void setAdClicked(boolean adClicked) {
+        this.adClicked = adClicked;
+    }
 }

@@ -64,6 +64,7 @@ public class InAppMessageManager {
 	 * Private Constructor
 	 */
 	private InAppMessageManager() {
+		threadInit();
 	}
 
 	/**
@@ -79,7 +80,6 @@ public class InAppMessageManager {
 	}
 
 	public void init(Context context, final String interstitialRequestURL, final String appKey, final String deviceID, final DeviceId.Type idMode) {
-		threadInit();
 		Util.prepareAndroidAdId(context);
 		InAppMessageManager.setmContext(context);
 		this.interstitialRequestURL = interstitialRequestURL;
@@ -89,7 +89,9 @@ public class InAppMessageManager {
 		sharedInstance().mRequestThread = null;
 	}
 
-	// TODO: write a brief description. This method handles sending notifications to the listeners
+	/**
+	 * This method handles sending notifications to the listeners
+	 */
 	public void threadInit() {
 		new Thread(new Runnable() {
 			@Override
@@ -207,6 +209,7 @@ public class InAppMessageManager {
 						} finally {
 							try {
 								// Close the writer regardless of what happens...
+								assert cacheWriter != null;
 								cacheWriter.close();
 							} catch (Exception e) {
 								e.printStackTrace();
@@ -278,13 +281,6 @@ public class InAppMessageManager {
 					mListener.inAppMessageLoadSucceeded(ad);
 				}
 			}).start();
-//			mHandler.post(new Runnable() {
-//
-//				@Override
-//				public void run() {
-//					mListener.inAppMessageLoadSucceeded(ad);
-//				}
-//			});
 		}
 	}
 

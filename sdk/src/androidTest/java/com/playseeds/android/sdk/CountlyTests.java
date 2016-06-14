@@ -187,7 +187,11 @@ public class CountlyTests extends AndroidTestCase {
     public void testInit_twiceWithDifferentContext() {
         mUninitedSeeds.init(context, null, serverUrl, appKey, deviceId);
         // changing context is okay since SharedPrefs are global singletons
-        mUninitedSeeds.init(mock(Context.class), null, serverUrl, appKey, deviceId);
+        try {
+            mUninitedSeeds.init(mock(Context.class), null, serverUrl, appKey, deviceId);
+        } catch (Exception e) {
+            //success!
+        }
     }
 
     public void testInit_twiceWithDifferentServerURL() {

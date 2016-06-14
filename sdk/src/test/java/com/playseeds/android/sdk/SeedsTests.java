@@ -87,7 +87,7 @@ public class SeedsTests {
     }
 
     @Test
-    public void testSeedInAppMessageLoadSucceeded() throws InterruptedException, Exception {
+    public void testSeedInAppMessageLoadSucceeded() throws Exception {
         InAppMessageLoadListener listener = new InAppMessageLoadListener();
 
         Seeds.sharedInstance()
@@ -102,16 +102,16 @@ public class SeedsTests {
     }
 
     @Test
-    public void testSeedInAppMessageLoadFailed() throws InterruptedException, Exception {
+    public void testSeedInAppMessageLoadFailed() throws Exception {
         InAppMessageLoadListener listener = new InAppMessageLoadListener();
 
         Seeds.sharedInstance()
                 .init(ShadowApplication.getInstance().getApplicationContext(), listener,
-                        SERVER, NO_ADS_APP_KEY);
+                       "http://fake.url.com", UNLIMITED_ADS_APP_KEY);
         Seeds.sharedInstance().requestInAppMessage();
         synchronized (listener) {
             if (!listener.hasResult())
-                listener.wait(10000);
+                listener.wait(50000);
         }
         Assert.assertFalse(listener.getWasLoaded());
     }

@@ -1,5 +1,6 @@
 package com.playseeds.android.sdk.inappmessaging;
 
+import android.content.Context;
 import android.test.AndroidTestCase;
 
 import com.playseeds.android.sdk.DeviceId;
@@ -13,20 +14,24 @@ public class InAppMessageManagerTest extends AndroidTestCase {
     testInAppMessageListener inAppMessageListener;
     HashMap<Long, InAppMessageManager> runningAds;
     Long timeStamp;
+    String serverUrl;
+    Context context;
 
     public void setUp() throws Exception {
         timeStamp = new Date().getTime();
         inAppMessageResponse = new InAppMessageResponse();
         inAppMessageListener = new testInAppMessageListener();
         runningAds = new HashMap<>();
+        context = getContext();
+        serverUrl = "http://devdash.playseeds.com";
 
         inAppMessageResponse.setTimestamp(timeStamp);
         runningAds.put(timeStamp, InAppMessageManager.sharedInstance());
         InAppMessageManager.sharedInstance().setRunningAds(runningAds);
         InAppMessageManager.sharedInstance().setListener(inAppMessageListener);
-        Seeds.sharedInstance().init(getContext(), inAppMessageListener, "https://mobfox.com", "12345");
+        Seeds.sharedInstance().init(context, inAppMessageListener, serverUrl, "12345");
         Seeds.sharedInstance().setMessageVariantName("Test message");
-        InAppMessageManager.sharedInstance().init(getContext(), "https://mobfox.com", "12345", "Nexus-XLR", DeviceId.Type.ADVERTISING_ID);
+        InAppMessageManager.sharedInstance().init(context, serverUrl, "c30f02a55541cbe362449d29d83d777c125c8dd6", "Nexus-XLR", DeviceId.Type.ADVERTISING_ID);
     }
 
     public void testNotifyInAppMessageClick() throws Exception {
@@ -46,6 +51,7 @@ public class InAppMessageManagerTest extends AndroidTestCase {
     }
 
     public void testRequestInAppMessage_WhenBadRequest() throws Exception {
+        InAppMessageManager.sharedInstance().init(context, "http://dev.playseeds.co", "1234", "Nexus-XLR", DeviceId.Type.ADVERTISING_ID);
         InAppMessageManager.sharedInstance().requestInAppMessage();
         synchronized (inAppMessageListener) {
             inAppMessageListener.wait(50000);
@@ -54,7 +60,6 @@ public class InAppMessageManagerTest extends AndroidTestCase {
     }
 
     public void testRequestInAppMessage() throws Exception {
-        InAppMessageManager.sharedInstance().init(getContext(), "http://devdash.playseeds.com", "c30f02a55541cbe362449d29d83d777c125c8dd6", "Nexus-XLR", DeviceId.Type.ADVERTISING_ID);
         InAppMessageManager.sharedInstance().requestInAppMessage();
         synchronized (inAppMessageListener) {
             inAppMessageListener.wait(10000);
