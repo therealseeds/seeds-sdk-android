@@ -31,4 +31,8 @@ test:
         - cp -r sdk/build/outputs $CIRCLE_ARTIFACTS
         - cp -r sdk/build/outputs $CIRCLE_TEST_REPORTS
 
-
+experimental:
+  notify:
+    branches:
+      only:
+        - master
