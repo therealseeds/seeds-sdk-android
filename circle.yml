@@ -28,8 +28,10 @@ test:
         - ./gradlew connectedAndroidTest --info --stacktrace
         - ./gradlew test --info --stacktrace
     post:
+        - bash <(curl -s https://codecov.io/bash)
         - cp -r sdk/build/outputs $CIRCLE_ARTIFACTS
-        - cp -r sdk/build/outputs $CIRCLE_TEST_REPORTS
+        - cp -r sdk/build/outputs/androidTest-results $CIRCLE_TEST_REPORTS
+        - cp -r sdk/build/reports/coverage $CIRCLE_TEST_REPORTS
 
 experimental:
   notify:
