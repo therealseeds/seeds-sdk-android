@@ -33,8 +33,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.location.Location;
-import android.os.Handler;
-import android.os.Looper;
 
 import com.google.gson.Gson;
 import com.playseeds.android.sdk.DeviceId;
@@ -46,7 +44,6 @@ public class InAppMessageManager {
 	private boolean mIncludeLocation;
 	private static Context mContext;
 	private Thread mRequestThread;
-	private Handler mHandler;
 	private InAppMessageListener mListener;
 	private InAppMessageResponse mResponse;
 	private String interstitialRequestURL;
@@ -64,7 +61,6 @@ public class InAppMessageManager {
 	 * Private Constructor
 	 */
 	private InAppMessageManager() {
-		threadInit();
 	}
 
 	/**
@@ -87,20 +83,6 @@ public class InAppMessageManager {
 		mDeviceID= deviceID;
 		mIdMode = idMode;
 		sharedInstance().mRequestThread = null;
-	}
-
-	/**
-	 * This method handles sending notifications to the listeners
-	 */
-	public void threadInit() {
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				Looper.prepare();
-				sharedInstance().mHandler = new Handler();
-				Looper.loop();
-			}
-		}).start();
 	}
 
 	public static void closeRunningInAppMessage(InAppMessageResponse ad, boolean result) {
@@ -247,7 +229,8 @@ public class InAppMessageManager {
 
 	private void notifyNoAdFound() {
 		if (mListener != null) {
-			mHandler.post(new Runnable() {
+
+			sendNotification(new Runnable() {
 				@Override
 				public void run() {
 					mListener.noInAppMessageFound();
@@ -259,7 +242,7 @@ public class InAppMessageManager {
 
 	private void notifyAdClicked() {
 		if (mListener != null) {
-			mHandler.post(new Runnable() {
+			sendNotification(new Runnable() {
 				@Override
 				public void run() {
 					mListener.inAppMessageClicked();
@@ -275,19 +258,19 @@ public class InAppMessageManager {
 
 	private void notifyAdLoaded(final InAppMessageResponse ad) {
 		if (mListener != null) {
-			new Thread(new Runnable() {
+			sendNotification(new Runnable() {
 				@Override
 				public void run() {
 					mListener.inAppMessageLoadSucceeded(ad);
 				}
-			}).start();
+			});
 		}
 	}
 
 	private void notifyAdShown(final InAppMessageResponse ad, final boolean ok) {
 		if (mListener != null) {
 			Log.d("InAppMessage Shown. Result:" + ok);
-			mHandler.post(new Runnable() {
+			sendNotification(new Runnable() {
 				@Override
 				public void run() {
 					mListener.inAppMessageShown(ad, ok);
@@ -308,7 +291,7 @@ public class InAppMessageManager {
 	private void notifyAdClose(final InAppMessageResponse ad, final boolean ok) {
 		if (mListener != null) {
 			Log.d("InAppMessage Close. Result:" + ok);
-			mHandler.post(new Runnable() {
+			sendNotification(new Runnable() {
 				@Override
 				public void run() {
 					mListener.inAppMessageClosed(ad, ok);
@@ -392,6 +375,13 @@ public class InAppMessageManager {
 		} finally {
 			notifyAdShown(ad, result);
 		}
+	}
+
+	/**
+	 * This method handles sending notifications to the listeners
+	 */
+	private void sendNotification(Runnable runnable) {
+		new Thread(runnable).start();
 	}
 
 	public void setListener(InAppMessageListener listener) {
