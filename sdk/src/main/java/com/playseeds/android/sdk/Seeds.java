@@ -40,7 +40,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-
 /**
  * This class is the public API for the Seeds Android SDK.
  * Get more details <a href="https://github.com/the-real-sseds/seeds-sdk-android">here</a>.
@@ -57,6 +56,8 @@ public class Seeds {
     private Seeds.CountlyMessagingMode messagingMode_;
     private Context context_;
     protected static List<String> publicKeyPinCertificates;
+    // Seeds message identification stuff
+    private String messageVariantName;
 
     private boolean adClicked = false;
 
@@ -64,11 +65,13 @@ public class Seeds {
      * Current version of the Count.ly Android SDK as a displayable string.
      */
     public static final String COUNTLY_SDK_VERSION_STRING = "15.06";
+
     /**
      * Default string used in the begin session metrics if the
      * app version cannot be found.
      */
     public static final String DEFAULT_APP_VERSION = "1.0";
+
     /**
      * Tag used in all logging in the Count.ly SDK.
      */
@@ -79,6 +82,7 @@ public class Seeds {
      * an attempt is made to submit them to a Count.ly server.
      */
     private static final int EVENT_QUEUE_SIZE_THRESHOLD = 10;
+
     /**
      * How often onTimer() is called.
      */
@@ -232,7 +236,6 @@ public class Seeds {
 
         initInAppMessaging();
         InAppMessageManager.sharedInstance().setListener(listener);
-
 
         return this;
     }
@@ -816,21 +819,41 @@ public class Seeds {
     }
 
     // for unit testing
-    ConnectionQueue getConnectionQueue() { return connectionQueue_; }
-    void setConnectionQueue(final ConnectionQueue connectionQueue) { connectionQueue_ = connectionQueue; }
-    ExecutorService getTimerService() { return timerService_; }
-    EventQueue getEventQueue() { return eventQueue_; }
-    void setEventQueue(final EventQueue eventQueue) { eventQueue_ = eventQueue; }
-    long getPrevSessionDurationStartTime() { return prevSessionDurationStartTime_; }
-    void setPrevSessionDurationStartTime(final long prevSessionDurationStartTime) { prevSessionDurationStartTime_ = prevSessionDurationStartTime; }
-    int getActivityCount() { return activityCount_; }
-    boolean getDisableUpdateSessionRequests() { return disableUpdateSessionRequests_; }
+    ConnectionQueue getConnectionQueue() {
+        return connectionQueue_;
+    }
 
+    void setConnectionQueue(final ConnectionQueue connectionQueue) {
+        connectionQueue_ = connectionQueue;
+    }
 
-    // Seeds message identification stuff
+    ExecutorService getTimerService() {
+        return timerService_;
+    }
 
-    private String messageVariantName;
+    EventQueue getEventQueue() {
+        return eventQueue_;
+    }
 
+    void setEventQueue(final EventQueue eventQueue) {
+        eventQueue_ = eventQueue;
+    }
+
+    long getPrevSessionDurationStartTime() {
+        return prevSessionDurationStartTime_;
+    }
+
+    void setPrevSessionDurationStartTime(final long prevSessionDurationStartTime) {
+        prevSessionDurationStartTime_ = prevSessionDurationStartTime;
+    }
+
+    int getActivityCount() {
+        return activityCount_;
+    }
+
+    boolean getDisableUpdateSessionRequests() {
+        return disableUpdateSessionRequests_;
+    }
 
     public void setMessageVariantName(String messageVariantName) {
         this.messageVariantName = messageVariantName;
@@ -858,5 +881,13 @@ public class Seeds {
 
     public void setAdClicked(boolean adClicked) {
         this.adClicked = adClicked;
+    }
+
+    /**
+     * This method is added solely for the purposes of testing
+     * Check: SeedsTests.java
+     */
+    protected void clear() {
+        sharedInstance().eventQueue_ = null;
     }
 }
