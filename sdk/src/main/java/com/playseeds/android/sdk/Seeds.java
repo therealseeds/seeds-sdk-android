@@ -462,8 +462,6 @@ public class Seeds {
 
 
     public void trackPurchase(String key, final double price) {
-
-
         if (isAdClicked()) {
             recordSeedsIAPEvent(key, price);
             setAdClicked(false);

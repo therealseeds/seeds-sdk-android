@@ -306,7 +306,7 @@ public class InAppMessageManager {
 			this.request = new InAppMessageRequest();
 
 			request.setAdDoNotTrack(adDoNotTrack);
-			request.setUserAgent(Util.getDefaultUserAgentString(mContext));
+			request.setUserAgent(Util.getDefaultUserAgentString());
 			request.setUserAgent2(Util.buildUserAgent());
 		}
 		Location location = null;

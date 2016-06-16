@@ -281,7 +281,7 @@ public class RichMediaActivity extends Activity {
 			}
 
 			ResourceHandler mHandler = new ResourceHandler(this);
-			this.mResourceManager = new ResourceManager(this, mHandler);
+			this.mResourceManager = new ResourceManager(mHandler);
 			this.initRootLayout();
 
 				this.mAd = (InAppMessageResponse) extras.getSerializable(Const.AD_EXTRA);
