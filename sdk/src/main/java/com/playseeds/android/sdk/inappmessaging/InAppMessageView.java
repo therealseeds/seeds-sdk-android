@@ -59,7 +59,6 @@ public class InAppMessageView extends RelativeLayout {
 	private static Method mWebView_SetLayerType;
 	private static Field mWebView_LAYER_TYPE_SOFTWARE;
 
-	private boolean isInternalBrowser = false;
 	private boolean wasUserAction = false;
 	private Animation fadeInAnimation = null;
 	private Context mContext = null;
@@ -108,7 +107,6 @@ public class InAppMessageView extends RelativeLayout {
 				}
 				return false;
 			}
-
 		});
 
 		webView.setVerticalScrollBarEnabled(false);
