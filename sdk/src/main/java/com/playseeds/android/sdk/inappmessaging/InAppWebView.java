@@ -85,9 +85,7 @@ public class InAppWebView extends Activity {
 
 				finish();
 				return true;
-
 			}
-
 		});
 
 		webView.setWebChromeClient(new WebChromeClient() {
@@ -101,5 +99,4 @@ public class InAppWebView extends Activity {
 		});
 		webView.loadUrl(intent.getStringExtra(Const.REDIRECT_URI));
 	}
-
 }
