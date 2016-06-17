@@ -27,7 +27,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 
@@ -62,6 +61,9 @@ public class ResourceManager {
 	public static final String CLOSE_BUTTON_PRESSED_IMAGE_DRAWABLE = "close_button_pressed";
 	private static HashMap<Integer, Drawable> sResources = new HashMap<>();
 	private HashMap<Integer, Drawable> mResources = new HashMap<>();
+
+	public ResourceManager() {
+	}
 
 	public void releaseInstance(){
 		Iterator<Entry<Integer, Drawable>> it = mResources.entrySet().iterator();
@@ -171,10 +173,6 @@ public class ResourceManager {
 		sResources.clear();
 	}
 
-	public ResourceManager(Handler h) {
-		Handler mHandler = h;
-	}
-
 	public Drawable getResource(Context ctx, int resourceId) {
 		BitmapDrawable d;
 		d = (BitmapDrawable) mResources.get(resourceId);
@@ -186,12 +184,17 @@ public class ResourceManager {
 
 	public static Drawable getStaticResource(Context ctx, int resourceId) {
 		BitmapDrawable d = (BitmapDrawable) sResources.get(resourceId);
-		if (d == null || d.getBitmap().isRecycled()) {
+		boolean isNull = d == null;
+		if (isNull || d.getBitmap().isRecycled()) {
 
 			initDefaultResource(ctx, resourceId);
 
 			d = (BitmapDrawable) sResources.get(resourceId);
 		}
 		return d;
+	}
+
+	protected HashMap<Integer, Drawable> getsResources() {
+		return sResources;
 	}
 }
