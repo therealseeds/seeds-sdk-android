@@ -54,7 +54,7 @@ import java.util.regex.Pattern;
  * the current device and operating environment for crash reporting purposes.
  *
  */
-class CrashDetails {
+public class CrashDetails {
     private static ArrayList<String> logs = new ArrayList<>();
     private static int startTime = Seeds.currentTimestamp();
     private static Map<String,String> customSegments = null;

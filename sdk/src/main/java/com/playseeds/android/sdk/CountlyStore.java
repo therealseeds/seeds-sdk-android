@@ -159,7 +159,9 @@ public class CountlyStore {
      * Sets location of user and sends it with next request
      */
     void setLocation(final double lat, final double lon) {
-        preferences_.edit().putString(LOCATION_PREFERENCE, lat + "," + lon).commit();
+        if (preferences_ != null) {
+            preferences_.edit().putString(LOCATION_PREFERENCE, lat + "," + lon).commit();
+        }
     }
 
     /**
