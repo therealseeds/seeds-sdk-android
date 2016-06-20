@@ -6,20 +6,14 @@ import android.test.AndroidTestCase;
 
 import com.playseeds.android.sdk.inappmessaging.InAppMessageListener;
 
-import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 
 import static org.mockito.Mockito.doCallRealMethod;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 
 public class SeedsTest extends AndroidTestCase {
@@ -40,7 +34,6 @@ public class SeedsTest extends AndroidTestCase {
         mockQueue.setServerURL("https://devdash.com");
         mockQueue.setCountlyStore(mock(CountlyStore.class));
         mockQueue.setExecutor(mockService);
-        seedsSpy.setConnectionQueue(mockQueue);
     }
 
     public void testInitMessaging() throws Exception {
@@ -57,7 +50,7 @@ public class SeedsTest extends AndroidTestCase {
             seeds.initMessaging(new Activity(), testActivity.class, null, null);
             fail("IllegalStateException expected");
         } catch(IllegalStateException e) {
-
+            // success
         }
     }
 
@@ -81,6 +74,7 @@ public class SeedsTest extends AndroidTestCase {
     public void testSetUserData() throws Exception {
         Map<String, String> data = new HashMap<>();
         doCallRealMethod().when(seedsSpy).setUserData(data, data);
+        seedsSpy.setConnectionQueue(mockQueue);
         seedsSpy.setUserData(data, data);
 
         verify(seedsSpy).setUserData(data, data);
@@ -89,6 +83,7 @@ public class SeedsTest extends AndroidTestCase {
     public void testSetCustomUserData() throws Exception {
         Map<String, String> data = new HashMap<>();
         doCallRealMethod().when(seedsSpy).setCustomUserData(data);
+        seedsSpy.setConnectionQueue(mockQueue);
         seedsSpy.setCustomUserData(data);
 
         verify(seedsSpy).setCustomUserData(data);
@@ -96,6 +91,7 @@ public class SeedsTest extends AndroidTestCase {
 
     public void testSetLocation() throws Exception {
         doCallRealMethod().when(seedsSpy).setLocation(2.34, 3.45);
+        seedsSpy.setConnectionQueue(mockQueue);
         seedsSpy.setLocation(2.34, 3.45);
 
         verify(seedsSpy).setLocation(2.34, 3.45);
@@ -119,6 +115,7 @@ public class SeedsTest extends AndroidTestCase {
     public void testLogException() throws Exception {
         Exception e = new Exception();
         doCallRealMethod().when(seedsSpy).logException(e);
+        seedsSpy.setConnectionQueue(mockQueue);
         seedsSpy.logException(e);
 
         verify(seedsSpy).logException(e);
@@ -126,6 +123,7 @@ public class SeedsTest extends AndroidTestCase {
 
     public void testLogExceptionWhenString() throws Exception {
         doCallRealMethod().when(seedsSpy).logException("Exception");
+        seedsSpy.setConnectionQueue(mockQueue);
         seedsSpy.logException("Exception");
 
         verify(seedsSpy).logException("Exception");
