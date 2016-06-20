@@ -57,7 +57,7 @@ public class EventQueueTests extends AndroidTestCase {
         final String eventKey = "eventKey";
         final int count = 42;
         final double sum = 3.0d;
-        final Map<String, String> segmentation = new HashMap<String, String>(1);
+        final Map<String, String> segmentation = new HashMap<>(1);
         final int timestamp = Seeds.currentTimestamp();
         final ArgumentCaptor<Integer> arg = ArgumentCaptor.forClass(Integer.class);
 
@@ -77,7 +77,7 @@ public class EventQueueTests extends AndroidTestCase {
     }
 
     public void testEvents_emptyList() throws UnsupportedEncodingException {
-        final List<Event> eventsList = new ArrayList<Event>();
+        final List<Event> eventsList = new ArrayList<>();
         when(mMockCountlyStore.eventsList()).thenReturn(eventsList);
 
         final String expected = URLEncoder.encode("[]", "UTF-8");
@@ -87,7 +87,7 @@ public class EventQueueTests extends AndroidTestCase {
     }
 
     public void testEvents_nonEmptyList() throws UnsupportedEncodingException {
-        final List<Event> eventsList = new ArrayList<Event>();
+        final List<Event> eventsList = new ArrayList<>();
         final Event event1 = new Event();
         event1.key = "event1Key";
         eventsList.add(event1);

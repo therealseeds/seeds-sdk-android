@@ -14,10 +14,19 @@ public class SeedsTestsRunner extends RobolectricGradleTestRunner {
 
     @Override
     protected AndroidManifest getAppManifest(Config config) {
-        final String manifestProperty = "src/test/AndroidManifest.xml";
-        final String resProperty = "src/main/res";
-        final String assetsProperty = "src/main/assets";
-        return new AndroidManifest(Fs.fileFromPath(manifestProperty), Fs.fileFromPath(resProperty),
-                Fs.fileFromPath(assetsProperty));
+        String manifestProperty = System.getProperty("android.manifest");
+        if (config.manifest().equals(Config.DEFAULT) && manifestProperty != null) {
+            String resProperty = System.getProperty("android.resources");
+            String assetsProperty = System.getProperty("android.assets");
+            AndroidManifest androidManifest = new AndroidManifest(
+                    Fs.fileFromPath(manifestProperty),
+                    Fs.fileFromPath(resProperty),
+                    Fs.fileFromPath(assetsProperty));
+            androidManifest.setPackageName("com.testPackage");
+            return androidManifest;
+        }
+        return super.getAppManifest(config);
     }
+
+
 }

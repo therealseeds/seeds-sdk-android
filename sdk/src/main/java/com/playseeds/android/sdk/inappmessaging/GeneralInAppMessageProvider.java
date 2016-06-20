@@ -20,10 +20,6 @@ package com.playseeds.android.sdk.inappmessaging;
 
 import com.playseeds.android.sdk.Seeds;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
@@ -37,107 +33,34 @@ import javax.json.JsonValue;
 
 public class GeneralInAppMessageProvider extends InAppMessageProvider<InAppMessageResponse> {
 
-	private final static int RELOAD_AFTER_NO_AD = 20;
-
 	public GeneralInAppMessageProvider() {
 	}
-
-	public GeneralInAppMessageProvider(InputStream xmlArg) {
-		is = xmlArg;
-		Log.d("Parse is null" + (is == null));
-	}
-
-	private int getInteger(final String text) {
-		if (text == null)
-			return 0;
-		try {
-			return Integer.parseInt(text);
-		} catch (final NumberFormatException ex) {
-			// do nothing, 0 is returned
-		}
-		return 0;
-	}
-
-	private String getAttribute(final Document document, final String elementName, final String attributeName) {
-
-		NodeList nodeList = document.getElementsByTagName(elementName);
-		final Element element = (Element) nodeList.item(0);
-		if (element != null) {
-			String attribute = element.getAttribute(attributeName);
-			if (attribute.length() != 0) {
-				return attribute;
-			}
-		}
-		return null;
-	}
-
-	private String getValue(final Document document, final String name) {
-
-		NodeList nodeList = document.getElementsByTagName(name);
-		final Element element = (Element) nodeList.item(0);
-		if (element != null) {
-			nodeList = element.getChildNodes();
-			if (nodeList.getLength() > 0)
-				// if (Log.isLoggable(TAG, Log.DEBUG)) {
-				// Log.d(TAG, "node value for " + name + ": " +
-				// nodeList.item(0).getNodeValue());
-				// }
-				return nodeList.item(0).getNodeValue();
-		}
-		return null;
-	}
-
-
-	private boolean getValueAsBoolean(final Document document, final String name) {
-		return "yes".equalsIgnoreCase(this.getValue(document, name));
-	}
-
-	private int getValueAsInt(final Document document, final String name) {
-		return this.getInteger(this.getValue(document, name));
-	}
-
-	private String convertStreamToString(java.io.InputStream is) {
-		try {
-			return new java.util.Scanner(is).useDelimiter("\\A").next();
-		} catch (java.util.NoSuchElementException e) {
-			return "";
-		}
-	}
-
-
 
 	public InAppMessageResponse parseCountlyJSON(final InputStream inputStream,  Map<String, List<String>> headers) throws RequestException {
 
 		Log.i("Starting parseCountlyJSON");
 
 		final InAppMessageResponse response = new InAppMessageResponse();
-
 		response.setType(Const.TEXT);
 
-//		String skipOverlay = this.getAttribute(doc, "htmlString", "skipoverlaybutton");
-//		if (skipOverlay != null) {
-//			response.setSkipOverlay(Integer.parseInt(skipOverlay));
-//		}
-		final ClickType clickType = ClickType.getValue("inapp");
+		ClickType clickType = ClickType.getValue("inapp");
 		response.setClickType(clickType);
 		response.setRefresh(60);
 		response.setScale(false);
 		response.setSkipPreflight(true);
-		try {
 
-			//String sResponse = convertStreamToString(inputStream);
-			//Log.i("InAppMessage RequestPerform HTTP Response: " + sResponse);
+		try {
 			JsonReader jsonReader = Json.createReader(inputStream);
 			JsonObject jsonObject = jsonReader.readObject();
-
 			response.setText(jsonObject.getString("htmlString"));
-
 			JsonValue jsonClickUrl = jsonObject.get("clickurl");
+
 			if (jsonClickUrl != null && !jsonClickUrl.equals(JsonValue.NULL) &&
 					(jsonClickUrl instanceof JsonString)) {
 				response.setClickUrl(((JsonString) jsonClickUrl).getString());
-			} else
+			} else {
 				response.setSkipOverlay(1);
+			}
 
 			String messageVariant = jsonObject.getString("messageVariant");
 
@@ -148,13 +71,10 @@ public class GeneralInAppMessageProvider extends InAppMessageProvider<InAppMessa
 				Seeds.sharedInstance().setMessageVariantName("none");
 			}
 
-
 			// result of policies such as do not show to paying users
 			if (jsonObject.containsKey("doNotShow")) {
-
 				boolean doNotShow = jsonObject.getBoolean("doNotShow");
 				InAppMessageManager.sharedInstance().doNotShow(doNotShow);
-
 			} else {
 				// show it!
 				InAppMessageManager.sharedInstance().doNotShow(false);
@@ -167,8 +87,6 @@ public class GeneralInAppMessageProvider extends InAppMessageProvider<InAppMessa
 			throw new RequestException("Cannot read Response", t);
 		}
 
-		Log.i("InAppMessageResponse: " + response);
 		return response;
 	}
-
 }
