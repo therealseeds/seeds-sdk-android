@@ -47,8 +47,6 @@ public class DeviceInfoTests extends AndroidTestCase {
     Context mockContext;
 
     protected void setUp() throws Exception {
-        super.setUp();
-
         mockContext = mock(Context.class);
     }
 
