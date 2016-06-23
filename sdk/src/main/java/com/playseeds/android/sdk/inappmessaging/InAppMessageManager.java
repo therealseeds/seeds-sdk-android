@@ -251,12 +251,9 @@ public class InAppMessageManager {
 								Log.e("BillingService", e);
 							}
 						}
-
-						if (mResponse.getFormattedPrice() != null) {
-							String text = mResponse.getText();
-							text = text.replace("%{LocalizedPrice}", mResponse.getFormattedPrice());
-							mResponse.setText(text);
-						}
+						String text = mResponse.getText();
+						text = text.replace("%{LocalizedPrice}", mResponse.getFormattedPrice() != null ? mResponse.getFormattedPrice() : "BUY");
+						mResponse.setText(text);
 
 						//TODO: remove debug code
 						Log.i("mResponse is: " + mResponse);
