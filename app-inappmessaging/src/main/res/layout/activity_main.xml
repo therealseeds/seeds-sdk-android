@@ -14,12 +14,21 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Show In-App Message"
-        android:id="@+id/iamButton"
-        android:onClick="iamButtonClicked"
+        android:text="Show In-App Message 1"
+        android:id="@+id/iamButton0"
+        android:onClick="iamButtonClicked0"
         android:layout_below="@+id/textView"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="71dp" />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Show In-App Message 2"
+        android:id="@+id/iamButton1"
+        android:onClick="iamButtonClicked1"
+        android:layout_below="@id/iamButton0"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp" />
 
     <Button
     android:layout_width="wrap_content"

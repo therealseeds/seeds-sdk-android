@@ -21,14 +21,14 @@ package com.playseeds.android.sdk.inappmessaging;
 
 public interface InAppMessageListener {
 
-	public void inAppMessageClicked();
+	void inAppMessageClicked(String messageId, InAppMessage inAppMessage);
 
-	public void inAppMessageClosed(InAppMessage inAppMessage, boolean completed);
+	void inAppMessageClosed(String messageId, InAppMessage inAppMessage, boolean completed);
 
-	public void inAppMessageLoadSucceeded(InAppMessage inAppMessage);
+	void inAppMessageLoadSucceeded(String messageId, InAppMessage inAppMessage);
 
-	public void inAppMessageShown(InAppMessage inAppMessage, boolean succeeded);
+	void inAppMessageShown(String messageId, InAppMessage inAppMessage, boolean succeeded);
 
-	public void noInAppMessageFound();
+	void noInAppMessageFound(String messageId);
 
 }

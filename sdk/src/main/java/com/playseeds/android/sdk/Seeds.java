@@ -864,7 +864,11 @@ public class Seeds {
     }
 
     public boolean isInAppMessageLoaded() {
-        return InAppMessageManager.sharedInstance().isInAppMessageLoaded();
+        return InAppMessageManager.sharedInstance().isInAppMessageLoaded(null);
+    }
+
+    public boolean isInAppMessageLoaded(String messageId) {
+        return InAppMessageManager.sharedInstance().isInAppMessageLoaded(messageId);
     }
 
     public void showInAppMessage() {

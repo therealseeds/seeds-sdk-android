@@ -116,7 +116,7 @@ public class InAppMessageManager {
 	public static void notifyInAppMessageClick(InAppMessageResponse ad) {
 		InAppMessageManager inAppMessageManager = sRunningAds.get(ad.getTimestamp());
 		if (inAppMessageManager != null) {
-			inAppMessageManager.notifyAdClicked();
+			inAppMessageManager.notifyAdClicked(ad);
 		}
 	}
 
@@ -169,12 +169,14 @@ public class InAppMessageManager {
 
 						try {
 							mResponse = requestAd.obtainInAppMessage(request);
+							mResponse.setMessageIdRequested(requestedMessageId);
 						} catch (Exception e) {
 							File cachedInAppMessageFile = new File(mContext.getCacheDir(),
 									URLEncoder.encode(request.countlyUriToString(), "UTF-8"));
 							if (cachedInAppMessageFile.exists()) {
 								BufferedReader cacheReader = new BufferedReader(new FileReader(cachedInAppMessageFile));
 								mResponse = new Gson().fromJson(cacheReader, InAppMessageResponse.class);
+								mResponse.setMessageIdRequested(requestedMessageId);
 								cacheReader.close();
 							}
 						}
@@ -183,6 +185,7 @@ public class InAppMessageManager {
 								request = getInterstitialRequest(messageId);
 								alreadyRequestedInterstitial = true;
 								mResponse = requestAd.obtainInAppMessage(request);
+								 mResponse.setMessageIdRequested(requestedMessageId);
 							}
 						}
 
@@ -222,6 +225,7 @@ public class InAppMessageManager {
 						} else {
 							mResponse = new InAppMessageResponse();
 							mResponse.setType(Const.AD_FAILED);
+							mResponse.setMessageIdRequested(requestedMessageId);
 							notifyNoAdFound();
 						}
 					}
@@ -235,6 +239,7 @@ public class InAppMessageManager {
 				public void uncaughtException(Thread thread, Throwable ex) {
 					mResponse = new InAppMessageResponse();
 					mResponse.setType(Const.AD_FAILED);
+					mResponse.setMessageIdRequested(requestedMessageId);
 					Log.e("Handling exception in ad request thread", ex);
 					mRequestThread = null;
 				}
@@ -274,12 +279,14 @@ public class InAppMessageManager {
 						GeneralInAppMessageProvider requestAd = new GeneralInAppMessageProvider(xml);
 						request = getInterstitialRequest(messageId);
 						mResponse = requestAd.obtainInAppMessage(request);
+						mResponse.setMessageIdRequested(requestedMessageId);
 
 						if (mResponse.getType() == Const.NO_AD) {
 							if (!alreadyRequestedInterstitial) {
 								request = getInterstitialRequest(messageId);
 								alreadyRequestedInterstitial = true;
 								mResponse = requestAd.obtainInAppMessage(request);
+								mResponse.setMessageIdRequested(requestedMessageId);
 							}
 						}
 
@@ -294,6 +301,7 @@ public class InAppMessageManager {
 
 						mResponse = new InAppMessageResponse();
 						mResponse.setType(Const.AD_FAILED);
+						mResponse.setMessageIdRequested(requestedMessageId);
 						notifyNoAdFound();
 					}
 					Log.d("finishing ad request thread");
@@ -306,6 +314,7 @@ public class InAppMessageManager {
 				public void uncaughtException(Thread thread, Throwable ex) {
 					mResponse = new InAppMessageResponse();
 					mResponse.setType(Const.AD_FAILED);
+					mResponse.setMessageIdRequested(requestedMessageId);
 					Log.e("Handling exception in ad request thread", ex);
 					mRequestThread = null;
 				}
@@ -316,8 +325,10 @@ public class InAppMessageManager {
 		}
 	}
 
-	public boolean isInAppMessageLoaded() {
-		return (mResponse != null);
+	public boolean isInAppMessageLoaded(String messageId) {
+		if (mResponse == null)
+			return false;
+		return messageId == null || messageId.equals(mResponse.getMessageIdRequested());
 	}
 
 	public void requestInAppMessageAndShow(final String messageId, long timeout) {
@@ -327,7 +338,7 @@ public class InAppMessageManager {
 		requestInAppMessage(messageId);
 		long now = System.currentTimeMillis();
 		long timeoutTime = now + timeout;
-		while ((!isInAppMessageLoaded()) && (now < timeoutTime)) {
+		while ((!isInAppMessageLoaded(messageId)) && (now < timeoutTime)) {
 			try {
 				Thread.sleep(200);
 			} catch (InterruptedException e) {
@@ -394,11 +405,11 @@ public class InAppMessageManager {
 
 	private void notifyNoAdFound() {
 		if (mListener != null) {
-			Log.d("No ad found.");
+			Log.d("No ad found " + requestedMessageId);
 			mHandler.post(new Runnable() {
 				@Override
 				public void run() {
-					mListener.noInAppMessageFound();
+					mListener.noInAppMessageFound(requestedMessageId);
 				}
 			});
 		}
@@ -411,19 +422,19 @@ public class InAppMessageManager {
 
 				@Override
 				public void run() {
-					mListener.inAppMessageLoadSucceeded(ad);
+					mListener.inAppMessageLoadSucceeded(ad.getMessageIdRequested(), ad);
 				}
 			});
 		}
 	}
 
-	private void notifyAdClicked() {
+	private void notifyAdClicked(final InAppMessageResponse ad) {
 		if (mListener != null) {
 			mHandler.post(new Runnable() {
 
 				@Override
 				public void run() {
-					mListener.inAppMessageClicked();
+					mListener.inAppMessageClicked(ad.getMessageIdRequested(), ad);
 				}
 			});
 		}
@@ -442,7 +453,7 @@ public class InAppMessageManager {
 			mHandler.post(new Runnable() {
 				@Override
 				public void run() {
-					mListener.inAppMessageShown(ad, ok);
+					mListener.inAppMessageShown(ad.getMessageIdRequested(), ad, ok);
 				}
 			});
 		}
@@ -463,7 +474,7 @@ public class InAppMessageManager {
 			mHandler.post(new Runnable() {
 				@Override
 				public void run() {
-					mListener.inAppMessageClosed(ad, ok);
+					mListener.inAppMessageClosed(ad.getMessageIdRequested(), ad, ok);
 				}
 			});
 		}
