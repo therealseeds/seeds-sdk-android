@@ -198,7 +198,7 @@ public class InAppMessageManager {
 							 }
 						}
 
-						boolean fakeBillingService = true;
+						boolean fakeBillingService = false;
 
 						if (mResponse.getProductId() != null && (mBillingService != null || fakeBillingService)) {
 							try {
