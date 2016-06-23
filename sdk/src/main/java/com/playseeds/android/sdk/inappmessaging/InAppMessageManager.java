@@ -61,6 +61,7 @@ public class InAppMessageManager {
 	private DeviceId.Type mIdMode;
 	private boolean alreadyRequestedInterstitial;
 	private boolean requestedHorizontalAd;
+	private String requestedMessageId;
 	private Gender userGender;
 	private int userAge;
 	private List<String> keywords;
@@ -126,11 +127,11 @@ public class InAppMessageManager {
 		this.mListener = listener;
 	}
 
-	public void requestInAppMessage() {
-		requestInAppMessageInternal(false);
+	public void requestInAppMessage(String messageId) {
+		requestInAppMessageInternal(messageId, false);
 	}
 
-	private void requestInAppMessageInternal(boolean keepFlags) {
+	private void requestInAppMessageInternal(final String messageId, boolean keepFlags) {
 
 		if (!mEnabled) {
 			Log.w("Cannot request rich adds on low memory devices");
@@ -157,7 +158,7 @@ public class InAppMessageManager {
 					try {
 						GeneralInAppMessageProvider requestAd = new GeneralInAppMessageProvider();
 						if (!alreadyRequestedInterstitial) {
-							request = getInterstitialRequest();
+							request = getInterstitialRequest(messageId);
 							alreadyRequestedInterstitial = true;
 						} else {
 							Log.d("Already requested interstitial");
@@ -179,7 +180,7 @@ public class InAppMessageManager {
 						}
 						if (mResponse.getType() == Const.NO_AD) {
 							 if (!alreadyRequestedInterstitial) {
-								request = getInterstitialRequest();
+								request = getInterstitialRequest(messageId);
 								alreadyRequestedInterstitial = true;
 								mResponse = requestAd.obtainInAppMessage(request);
 							}
@@ -217,7 +218,7 @@ public class InAppMessageManager {
 
 						if (!alreadyRequestedInterstitial) {
 							mRequestThread = null;
-							requestInAppMessageInternal(true);
+							requestInAppMessageInternal(messageId, true);
 						} else {
 							mResponse = new InAppMessageResponse();
 							mResponse.setType(Const.AD_FAILED);
@@ -248,7 +249,7 @@ public class InAppMessageManager {
 		this.interstitialRequestURL = requestURL;
 	}
 
-	public void requestInAppMessage(final InputStream xml) {
+	public void requestInAppMessage(final String messageId, final InputStream xml) {
 		if (!mEnabled) {
 			Log.w("Cannot request rich adds on low memory devices");
 			return;
@@ -271,12 +272,12 @@ public class InAppMessageManager {
 					Log.d("starting request thread");
 					try {
 						GeneralInAppMessageProvider requestAd = new GeneralInAppMessageProvider(xml);
-						request = getInterstitialRequest();
+						request = getInterstitialRequest(messageId);
 						mResponse = requestAd.obtainInAppMessage(request);
 
 						if (mResponse.getType() == Const.NO_AD) {
 							if (!alreadyRequestedInterstitial) {
-								request = getInterstitialRequest();
+								request = getInterstitialRequest(messageId);
 								alreadyRequestedInterstitial = true;
 								mResponse = requestAd.obtainInAppMessage(request);
 							}
@@ -319,11 +320,11 @@ public class InAppMessageManager {
 		return (mResponse != null);
 	}
 
-	public void requestInAppMessageAndShow(long timeout) {
+	public void requestInAppMessageAndShow(final String messageId, long timeout) {
 		InAppMessageListener l = mListener;
 
 		mListener = null;
-		requestInAppMessage();
+		requestInAppMessage(messageId);
 		long now = System.currentTimeMillis();
 		long timeoutTime = now + timeout;
 		while ((!isInAppMessageLoaded()) && (now < timeoutTime)) {
@@ -334,15 +335,19 @@ public class InAppMessageManager {
 			now = System.currentTimeMillis();
 		}
 		mListener = l;
-		showInAppMessage();
+		showInAppMessage(messageId);
 	}
 
-	public void showInAppMessage() {
-
+	public void showInAppMessage(String messageId) {
 		if (((mResponse == null)
 				|| (mResponse.getType() == Const.NO_AD)
 				|| (mResponse.getType() == Const.AD_FAILED))
 				|| doNotShow) {
+			notifyAdShown(mResponse, false);
+			return;
+		}
+
+		if (messageId != null && !messageId.equals(requestedMessageId)) {
 			notifyAdShown(mResponse, false);
 			return;
 		}
@@ -353,6 +358,7 @@ public class InAppMessageManager {
 			if (Util.isNetworkAvailable(getContext())) {
 				ad.setTimestamp(System.currentTimeMillis());
 				ad.setHorizontalOrientationRequested(requestedHorizontalAd);
+				ad.setMessageIdRequested(requestedMessageId);
 				Log.v("Showing InAppMessage:" + ad);
 
 				Intent intent = new Intent(getContext(), RichMediaActivity.class);
@@ -463,7 +469,7 @@ public class InAppMessageManager {
 		}
 	}
 
-	private InAppMessageRequest getInterstitialRequest() {
+	private InAppMessageRequest getInterstitialRequest(String messageId) {
 		if (this.request == null) {
 			this.request = new InAppMessageRequest();
 
@@ -495,6 +501,7 @@ public class InAppMessageManager {
 			//this.request.setAdspaceHeight(480);
 			//this.request.setAdspaceWidth(320);
 		}
+		requestedMessageId = messageId;
 
 		this.request.setAdspaceStrict(false);
 
@@ -507,6 +514,7 @@ public class InAppMessageManager {
 		request.setAppKey(mAppKey);
 		request.setDeviceId(mDeviceID);
 		request.setIdMode(mIdMode);
+		request.setMessageId(messageId);
 		return request;
 	}
 

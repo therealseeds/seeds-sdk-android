@@ -856,7 +856,11 @@ public class Seeds {
     }
 
     public void requestInAppMessage() {
-        InAppMessageManager.sharedInstance().requestInAppMessage();
+        InAppMessageManager.sharedInstance().requestInAppMessage(null);
+    }
+
+    public void requestInAppMessage(String messageId) {
+        InAppMessageManager.sharedInstance().requestInAppMessage(messageId);
     }
 
     public boolean isInAppMessageLoaded() {
@@ -864,8 +868,10 @@ public class Seeds {
     }
 
     public void showInAppMessage() {
-        InAppMessageManager.sharedInstance().showInAppMessage();
+        InAppMessageManager.sharedInstance().showInAppMessage(null);
     }
 
-
+    public void showInAppMessage(String messageId) {
+        InAppMessageManager.sharedInstance().showInAppMessage(messageId);
+    }
 }

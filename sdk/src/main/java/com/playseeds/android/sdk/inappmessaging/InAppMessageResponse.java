@@ -38,6 +38,7 @@ public class InAppMessageResponse implements InAppMessage {
 	private boolean skipPreflight;
 	private long timestamp;
 	private boolean horizontalOrientationRequested;
+	private String messageIdRequested;
 
 	public int getBannerHeight() {
 		return this.bannerHeight;
@@ -164,5 +165,11 @@ public class InAppMessageResponse implements InAppMessage {
 		this.horizontalOrientationRequested = horizontalOrientationRequested;
 	}
 
+	public String getMessageIdRequested() {
+		return messageIdRequested;
+	}
 
+	public void setMessageIdRequested(String messageIdRequested) {
+		this.messageIdRequested = messageIdRequested;
+	}
 }

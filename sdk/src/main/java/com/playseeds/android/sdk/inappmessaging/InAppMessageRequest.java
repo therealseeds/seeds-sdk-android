@@ -39,6 +39,7 @@ public class InAppMessageRequest {
 	private String appKey;
 	private String deviceId;
 	private DeviceId.Type idMode;
+	private String messageId;
 
 	private double longitude = 0.0;
 	private double latitude = 0.0;
@@ -73,6 +74,13 @@ public class InAppMessageRequest {
 		this.idMode = idMode;
 	}
 
+	public String getMessageId() {
+		return messageId;
+	}
+
+	public void setMessageId(String messageId) {
+		this.messageId = messageId;
+	}
 
 	public String getAndroidVersion() {
 		return Build.VERSION.RELEASE;
@@ -227,6 +235,8 @@ public class InAppMessageRequest {
 		}
 		b.appendQueryParameter("device_id", deviceId);
 		//b.appendQueryParameter("device_id_type", idMode.toString()); //currently unused
+		if (messageId != null)
+			b.appendQueryParameter("message_id", messageId);
 
 		return b.build();
 	}
