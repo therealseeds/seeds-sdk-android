@@ -22,28 +22,28 @@ public class SeedsTests {
     @Test
     public void testSeedsCustomId() {
         Seeds.sharedInstance()
-                .init(ShadowApplication.getInstance().getApplicationContext( ), null,
+                .init(ShadowApplication.getInstance().getApplicationContext( ), null, null,
                         SERVER, UNLIMITED_ADS_APP_KEY, "some fake");
     }
 
     @Test
     public void testSeedsCustomIdExplicit() {
         Seeds.sharedInstance()
-                .init(ShadowApplication.getInstance().getApplicationContext( ), null,
+                .init(ShadowApplication.getInstance().getApplicationContext( ), null, null,
                         SERVER, UNLIMITED_ADS_APP_KEY, "some fake", DeviceId.Type.DEVELOPER_SUPPLIED);
     }
 
     @Test
     public void testSeedsUDIDUsage() {
         Seeds.sharedInstance()
-                .init(ShadowApplication.getInstance().getApplicationContext( ), null,
+                .init(ShadowApplication.getInstance().getApplicationContext( ), null, null,
                         SERVER, UNLIMITED_ADS_APP_KEY, null, DeviceId.Type.OPEN_UDID);
     }
 
     @Test
     public void testSeedsAdIdUsage() {
         Seeds.sharedInstance()
-                .init(ShadowApplication.getInstance().getApplicationContext(), null,
+                .init(ShadowApplication.getInstance().getApplicationContext(), null, null,
                         SERVER, UNLIMITED_ADS_APP_KEY, null, DeviceId.Type.ADVERTISING_ID);
     }
 
@@ -61,13 +61,13 @@ public class SeedsTests {
         }
 
         @Override
-        public void inAppMessageClicked() {}
+        public void inAppMessageClicked(String messageId, InAppMessage inAppMessage) {}
 
         @Override
-        public void inAppMessageClosed(InAppMessage inAppMessage, boolean completed) {}
+        public void inAppMessageClosed(String messageId, InAppMessage inAppMessage, boolean completed) {}
 
         @Override
-        public void inAppMessageLoadSucceeded(InAppMessage inAppMessage) {
+        public void inAppMessageLoadSucceeded(String messageId, InAppMessage inAppMessage) {
             synchronized (this) {
                 wasLoaded = true;
                 notifyAll();
@@ -75,10 +75,10 @@ public class SeedsTests {
         }
 
         @Override
-        public void inAppMessageShown(InAppMessage inAppMessage, boolean succeeded) {}
+        public void inAppMessageShown(String messageId, InAppMessage inAppMessage, boolean succeeded) {}
 
         @Override
-        public void noInAppMessageFound() {
+        public void noInAppMessageFound(String messageId) {
             synchronized (this) {
                 wasLoaded = false;
                 notifyAll();
@@ -91,7 +91,7 @@ public class SeedsTests {
         InAppMessageLoadListener listener = new InAppMessageLoadListener();
 
         Seeds.sharedInstance()
-                .init(ShadowApplication.getInstance().getApplicationContext(), listener,
+                .init(ShadowApplication.getInstance().getApplicationContext(), null, listener,
                         SERVER, UNLIMITED_ADS_APP_KEY);
         Seeds.sharedInstance().requestInAppMessage();
         synchronized (listener) {
@@ -106,7 +106,7 @@ public class SeedsTests {
         InAppMessageLoadListener listener = new InAppMessageLoadListener();
 
         Seeds.sharedInstance()
-                .init(ShadowApplication.getInstance().getApplicationContext(), listener,
+                .init(ShadowApplication.getInstance().getApplicationContext(), null, listener,
                         SERVER, NO_ADS_APP_KEY);
         Seeds.sharedInstance().requestInAppMessage();
         synchronized (listener) {
