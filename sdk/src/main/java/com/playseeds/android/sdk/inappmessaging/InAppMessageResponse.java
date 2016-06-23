@@ -30,6 +30,38 @@ public class InAppMessageResponse implements InAppMessage {
 	private String text;
 	private int skipOverlay = 0;
 	private String imageUrl;
+	private String productId;
+	private String formattedPrice;
+	private String exactPrice;
+
+	public String getPriceCurrencyCode() {
+		return priceCurrencyCode;
+	}
+
+	public InAppMessageResponse setPriceCurrencyCode(String priceCurrencyCode) {
+		this.priceCurrencyCode = priceCurrencyCode;
+		return this;
+	}
+
+	public String getFormattedPrice() {
+		return formattedPrice;
+	}
+
+	public InAppMessageResponse setFormattedPrice(String formattedPrice) {
+		this.formattedPrice = formattedPrice;
+		return this;
+	}
+
+	public String getExactPrice() {
+		return exactPrice;
+	}
+
+	public InAppMessageResponse setExactPrice(String exactPrice) {
+		this.exactPrice = exactPrice;
+		return this;
+	}
+
+	private String priceCurrencyCode;
 	private ClickType clickType;
 	private String clickUrl;
 	private String urlType;
@@ -54,6 +86,10 @@ public class InAppMessageResponse implements InAppMessage {
 
 	public String getClickUrl() {
 		return this.clickUrl;
+	}
+
+	public String getProductId() {
+		return this.productId;
 	}
 
 	public String getImageUrl() {
@@ -101,6 +137,10 @@ public class InAppMessageResponse implements InAppMessage {
 		this.clickUrl = clickUrl;
 	}
 
+	public void setProductId(final String productId) {
+		this.productId = productId;
+	}
+
 	public void setImageUrl(final String imageUrl) {
 		this.imageUrl = imageUrl;
 	}
@@ -135,7 +175,7 @@ public class InAppMessageResponse implements InAppMessage {
 		return "Response [refresh=" + this.refresh + ", type=" + this.type
 				+ ", bannerWidth=" + this.bannerWidth + ", bannerHeight="
 				+ this.bannerHeight + ", text=" + this.text + ", imageUrl="
-				+ this.imageUrl + ", clickType=" + this.clickType
+				+ this.imageUrl + ", productId=" + this.productId + ", clickType=" + this.clickType
 				+ ", clickUrl=" + this.clickUrl + ", urlType=" + this.urlType
 				+ ", scale=" + this.scale + ", skipPreflight="
 				+ this.skipPreflight + "]";

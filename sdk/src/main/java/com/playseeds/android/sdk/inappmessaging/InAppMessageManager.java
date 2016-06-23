@@ -26,8 +26,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -35,9 +37,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.location.Location;
+import android.os.Bundle;
 import android.os.Handler;
 
+import com.android.vending.billing.IInAppBillingService;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.playseeds.android.sdk.DeviceId;
 import com.playseeds.android.sdk.Seeds;
 
@@ -50,6 +57,7 @@ public class InAppMessageManager {
 	private boolean adDoNotTrack;
 	private boolean mIncludeLocation;
 	private static Context mContext;
+	private static IInAppBillingService mBillingService;
 	private Thread mRequestThread;
 	private Handler mHandler;
 	private InAppMessageRequest request = null;
@@ -82,9 +90,10 @@ public class InAppMessageManager {
 		return SingletonHolder.instance;
 	}
 
-	public void init(Context ctx, final String interstitialRequestURL, final String appKey, final String deviceID, final DeviceId.Type idMode) {
+	public void init(Context ctx, IInAppBillingService billingService, final String interstitialRequestURL, final String appKey, final String deviceID, final DeviceId.Type idMode) {
 		Util.prepareAndroidAdId(ctx);
 		InAppMessageManager.setmContext(ctx);
+		InAppMessageManager.setmBillingService(billingService);
 		this.interstitialRequestURL = interstitialRequestURL;
 		mAppKey = appKey;
 		mDeviceID= deviceID;
@@ -185,8 +194,68 @@ public class InAppMessageManager {
 								request = getInterstitialRequest(messageId);
 								alreadyRequestedInterstitial = true;
 								mResponse = requestAd.obtainInAppMessage(request);
-								 mResponse.setMessageIdRequested(requestedMessageId);
+								mResponse.setMessageIdRequested(requestedMessageId);
+							 }
+						}
+
+						boolean fakeBillingService = true;
+
+						if (mResponse.getProductId() != null && (mBillingService != null || fakeBillingService)) {
+							try {
+								ArrayList<String> productsList = new ArrayList<String>();
+								productsList.add(mResponse.getProductId());
+								Bundle skuBundle = new Bundle();
+								skuBundle.putStringArrayList("ITEM_ID_LIST", productsList);
+
+								Bundle productsDetails;
+								if (fakeBillingService) {
+									productsDetails = new Bundle();
+									productsDetails.putInt("RESPONSE_CODE", 0);
+									ArrayList<String> detailsList = new ArrayList<String>();
+									detailsList.add("{" +
+											"\"productId\":\"" + mResponse.getProductId() + "\"," +
+											"\"price\":\"$9.99\"," +
+											"\"price_amount_micros\":\"9990000\"," +
+											"\"price_currency_code\":\"USD\"}");
+									productsDetails.putStringArrayList("DETAILS_LIST", detailsList);
+								} else {
+									productsDetails = mBillingService.getSkuDetails(3,
+											mContext.getPackageName(), "inapp", skuBundle);
+								}
+
+								if (productsDetails.getInt("RESPONSE_CODE", -1) == 0) {
+									ArrayList<String> productsDetailsCollection
+											= productsDetails.getStringArrayList("DETAILS_LIST");
+									Log.i("detailsCollection = " + productsDetailsCollection);
+
+									for (String productDetails : productsDetailsCollection) {
+										JsonObject jsonProductDetails = new JsonParser().parse(productDetails).getAsJsonObject();
+
+										String productId = jsonProductDetails.get("productId").getAsString();
+										if (!mResponse.getProductId().equals(productId))
+											continue;
+
+										String formattedPrice = jsonProductDetails.get("price").getAsString();
+										mResponse.setFormattedPrice(formattedPrice);
+
+										String exactPrice = jsonProductDetails.get("price_amount_micros").getAsString();
+										mResponse.setExactPrice(exactPrice);
+
+										String currencyCode = jsonProductDetails.get("price_currency_code").getAsString();
+										mResponse.setPriceCurrencyCode(currencyCode);
+
+										break;
+									}
+								}
+							} catch(Exception e) {
+								Log.e("BillingService", e);
 							}
+						}
+
+						if (mResponse.getFormattedPrice() != null) {
+							String text = mResponse.getText();
+							text = text.replace("%{LocalizedPrice}", mResponse.getFormattedPrice());
+							mResponse.setText(text);
 						}
 
 						//TODO: remove debug code
@@ -547,6 +616,10 @@ public class InAppMessageManager {
 
 	private static void setmContext(Context mContext) {
 		InAppMessageManager.mContext = mContext;
+	}
+
+	private static void setmBillingService(IInAppBillingService mBillingService) {
+		InAppMessageManager.mBillingService = mBillingService;
 	}
 
 	public void setUserGender(Gender userGender) {

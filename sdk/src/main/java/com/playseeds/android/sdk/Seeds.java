@@ -310,12 +310,12 @@ public class Seeds {
      */
 
     public synchronized Seeds initInAppMessaging() {
+        Log.d(Seeds.TAG, "deviceId: " + connectionQueue_.getDeviceId() +
+                connectionQueue_.getDeviceId().getId() + connectionQueue_.getDeviceId().getType());
 
-
-        Log.d(Seeds.TAG, "deviceId: " + connectionQueue_.getDeviceId() + connectionQueue_.getDeviceId().getId() + connectionQueue_.getDeviceId().getType());
-
-        InAppMessageManager.sharedInstance().init(connectionQueue_.getContext(), connectionQueue_.getServerURL(), connectionQueue_.getAppKey(), connectionQueue_.getDeviceId().getId(), connectionQueue_.getDeviceId().getType());
-
+        InAppMessageManager.sharedInstance().init(connectionQueue_.getContext(), billingService,
+                connectionQueue_.getServerURL(), connectionQueue_.getAppKey(),
+                connectionQueue_.getDeviceId().getId(), connectionQueue_.getDeviceId().getType());
 
         return this;
     }

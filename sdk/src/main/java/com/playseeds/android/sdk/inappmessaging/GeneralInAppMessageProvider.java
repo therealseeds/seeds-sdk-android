@@ -140,7 +140,6 @@ public class GeneralInAppMessageProvider extends InAppMessageProvider<InAppMessa
 				response.setSkipOverlay(1);
 
 			String messageVariant = jsonObject.getString("messageVariant");
-
 			if (messageVariant != null) {
 				Seeds.sharedInstance().setMessageVariantName(messageVariant);
 			} else {
@@ -148,6 +147,11 @@ public class GeneralInAppMessageProvider extends InAppMessageProvider<InAppMessa
 				Seeds.sharedInstance().setMessageVariantName("none");
 			}
 
+			JsonValue jsonProductId = jsonObject.get("productIdAndroid");
+			if (jsonProductId != null && !jsonProductId.equals(JsonValue.NULL) &&
+					(jsonProductId instanceof JsonString)) {
+				response.setProductId(((JsonString) jsonProductId).getString());
+			}
 
 			// result of policies such as do not show to paying users
 			if (jsonObject.containsKey("doNotShow")) {
