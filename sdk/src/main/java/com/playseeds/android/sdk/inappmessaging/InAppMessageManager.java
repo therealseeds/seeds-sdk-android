@@ -252,7 +252,10 @@ public class InAppMessageManager {
 							}
 						}
 						String text = mResponse.getText();
-						text = text.replace("%{LocalizedPrice}", mResponse.getFormattedPrice() != null ? mResponse.getFormattedPrice() : "BUY");
+						text = text.replace("%{LocalizedPrice}",
+								mResponse.getFormattedPrice() != null
+										? mResponse.getFormattedPrice()
+										: "BUY");
 						mResponse.setText(text);
 
 						//TODO: remove debug code

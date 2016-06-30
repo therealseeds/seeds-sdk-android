@@ -314,7 +314,8 @@ public class InAppMessageView extends RelativeLayout {
 				if (!text.contains("<html>")) {
 					text = "<html><head></head><body style='margin:0;padding:0;'>" + Const.HIDE_BORDER + text + "</body></html>";
 				}
-				webView.loadData(text, "text/html", Const.ENCODING);
+				webView.getSettings().setDefaultTextEncodingName("utf-8");
+				webView.loadData(text, "text/html; charset=utf-8", Const.ENCODING);
 				adListener.onLoad();
 			} else if (this.response.getType() == Const.TEXT) {
 				String text = this.response.getText();
@@ -322,7 +323,8 @@ public class InAppMessageView extends RelativeLayout {
 				if (!text.contains("<html>")) {
 					text = "<html><head></head><body style='margin:0;padding:0;'>" + Const.HIDE_BORDER + text + "</body></html>";
 				}
-				webView.loadData(text, "text/html", Const.ENCODING);
+				webView.getSettings().setDefaultTextEncodingName("utf-8");
+				webView.loadData(text, "text/html; charset=utf-8", Const.ENCODING);
 				adListener.onLoad();
 			}
 			if (animation) {
