@@ -29,9 +29,9 @@ public class InAppMessageManagerTest extends AndroidTestCase {
         runningAds.put(timeStamp, InAppMessageManager.sharedInstance());
         InAppMessageManager.sharedInstance().setRunningAds(runningAds);
         InAppMessageManager.sharedInstance().setListener(inAppMessageListener);
-        Seeds.sharedInstance().init(context, inAppMessageListener, serverUrl, "12345");
+        Seeds.sharedInstance().init(context, null, inAppMessageListener, serverUrl, "12345");
         Seeds.sharedInstance().setMessageVariantName("Test message");
-        InAppMessageManager.sharedInstance().init(context, serverUrl, "c30f02a55541cbe362449d29d83d777c125c8dd6", "Nexus-XLR", DeviceId.Type.ADVERTISING_ID);
+        InAppMessageManager.sharedInstance().init(context, null, serverUrl, "c30f02a55541cbe362449d29d83d777c125c8dd6", "Nexus-XLR", DeviceId.Type.ADVERTISING_ID);
     }
 
     public void testNotifyInAppMessageClick() throws Exception {
@@ -51,8 +51,8 @@ public class InAppMessageManagerTest extends AndroidTestCase {
     }
 
     public void testRequestInAppMessage_WhenBadRequest() throws Exception {
-        InAppMessageManager.sharedInstance().init(context, "http://dev.playseeds.co", "1234", "Nexus-XLR", DeviceId.Type.ADVERTISING_ID);
-        InAppMessageManager.sharedInstance().requestInAppMessage();
+        InAppMessageManager.sharedInstance().init(context, null, "http://dev.playseeds.co", "1234", "Nexus-XLR", DeviceId.Type.ADVERTISING_ID);
+        InAppMessageManager.sharedInstance().requestInAppMessage(null);
         synchronized (inAppMessageListener) {
             inAppMessageListener.wait(50000);
         }
@@ -60,7 +60,7 @@ public class InAppMessageManagerTest extends AndroidTestCase {
     }
 
     public void testRequestInAppMessage() throws Exception {
-        InAppMessageManager.sharedInstance().requestInAppMessage();
+        InAppMessageManager.sharedInstance().requestInAppMessage(null);
         synchronized (inAppMessageListener) {
             inAppMessageListener.wait(10000);
         }
@@ -75,27 +75,27 @@ public class InAppMessageManagerTest extends AndroidTestCase {
         boolean notFound = false;
 
         @Override
-        public void inAppMessageClicked() {
+        public void inAppMessageClicked(String messageId, InAppMessage inAppMessage) {
             isClicked = true;
         }
 
         @Override
-        public void inAppMessageClosed(InAppMessage inAppmessage, boolean completed) {
+        public void inAppMessageClosed(String messageId, InAppMessage inAppmessage, boolean completed) {
             isClosed = true;
         }
 
         @Override
-        public void inAppMessageShown(InAppMessage inAppMessage, boolean succeeded) {
+        public void inAppMessageShown(String messageId, InAppMessage inAppMessage, boolean succeeded) {
             isShown = true;
         }
 
         @Override
-        public void inAppMessageLoadSucceeded(InAppMessage inAppMessage) {
+        public void inAppMessageLoadSucceeded(String messageId, InAppMessage inAppMessage) {
             isLoadSucceeded = true;
         }
 
         @Override
-        public void noInAppMessageFound() {
+        public void noInAppMessageFound(String messageId) {
             notFound = true;
         }
     }

@@ -36,22 +36,23 @@ public class SeedsTests {
 
     @Test
     public void testSeedsCustomId() {
-        seeds.init(context, null, SERVER, UNLIMITED_ADS_APP_KEY, "some fake");
+        seeds.init(context, null, null, SERVER, UNLIMITED_ADS_APP_KEY, "some fake");
     }
 
     @Test
     public void testSeedsCustomIdExplicit() {
-        seeds.init(context, null, SERVER, UNLIMITED_ADS_APP_KEY, "some fake", DeviceId.Type.ADVERTISING_ID);
+        seeds.init(context, null, null, SERVER, UNLIMITED_ADS_APP_KEY, "some fake", DeviceId.Type.ADVERTISING_ID);
     }
 
     @Test
     public void testSeedsUDIDUsage() {
-        seeds.init(context, null, SERVER, UNLIMITED_ADS_APP_KEY, null, DeviceId.Type.OPEN_UDID);
+        seeds.init(context, null, null, SERVER, UNLIMITED_ADS_APP_KEY, null, DeviceId.Type.OPEN_UDID);
+
     }
 
     @Test
     public void testSeedsAdIdUsage() {
-        seeds.init(context, null, SERVER, UNLIMITED_ADS_APP_KEY, null, DeviceId.Type.ADVERTISING_ID);
+        seeds.init(context, null, null, SERVER, UNLIMITED_ADS_APP_KEY, null, DeviceId.Type.ADVERTISING_ID);
     }
 
     private class InAppMessageLoadListener implements InAppMessageListener {
@@ -64,13 +65,13 @@ public class SeedsTests {
         }
 
         @Override
-        public void inAppMessageClicked() {}
+        public void inAppMessageClicked(String messageId, InAppMessage inAppMessage) {}
 
         @Override
-        public void inAppMessageClosed(InAppMessage inAppMessage, boolean completed) {}
+        public void inAppMessageClosed(String messageId, InAppMessage inAppMessage, boolean completed) {}
 
         @Override
-        public void inAppMessageLoadSucceeded(InAppMessage inAppMessage) {
+        public void inAppMessageLoadSucceeded(String messageId, InAppMessage inAppMessage) {
             synchronized (this) {
                 wasLoaded = true;
                 notifyAll();
@@ -78,10 +79,10 @@ public class SeedsTests {
         }
 
         @Override
-        public void inAppMessageShown(InAppMessage inAppMessage, boolean succeeded) {}
+        public void inAppMessageShown(String messageId, InAppMessage inAppMessage, boolean succeeded) {}
 
         @Override
-        public void noInAppMessageFound() {
+        public void noInAppMessageFound(String messageId) {
             synchronized (this) {
                 wasLoaded = false;
                 notifyAll();
@@ -93,7 +94,7 @@ public class SeedsTests {
     public void testSeedInAppMessageLoadSucceeded() throws Exception {
         InAppMessageLoadListener listener = new InAppMessageLoadListener();
 
-        seeds.init(context, listener, SERVER, UNLIMITED_ADS_APP_KEY);
+        seeds.init(context, null, listener, SERVER, UNLIMITED_ADS_APP_KEY);
         seeds.requestInAppMessage();
         synchronized (listener) {
             listener.wait(50000);
@@ -105,7 +106,7 @@ public class SeedsTests {
     public void testSeedInAppMessageLoadFailed() throws Exception {
         InAppMessageLoadListener listener = new InAppMessageLoadListener();
 
-        seeds.init(context, listener, SERVER, NO_ADS_APP_KEY);
+        seeds.init(context, null, listener, SERVER, NO_ADS_APP_KEY);
         seeds.requestInAppMessage();
         synchronized (listener) {
             listener.wait(50000);

@@ -27,6 +27,38 @@ public class InAppMessageResponse implements InAppMessage {
 	private String text;
 	private int skipOverlay = 0;
 	private String imageUrl;
+	private String productId;
+	private String formattedPrice;
+	private String exactPrice;
+
+	public String getPriceCurrencyCode() {
+		return priceCurrencyCode;
+	}
+
+	public InAppMessageResponse setPriceCurrencyCode(String priceCurrencyCode) {
+		this.priceCurrencyCode = priceCurrencyCode;
+		return this;
+	}
+
+	public String getFormattedPrice() {
+		return formattedPrice;
+	}
+
+	public InAppMessageResponse setFormattedPrice(String formattedPrice) {
+		this.formattedPrice = formattedPrice;
+		return this;
+	}
+
+	public String getExactPrice() {
+		return exactPrice;
+	}
+
+	public InAppMessageResponse setExactPrice(String exactPrice) {
+		this.exactPrice = exactPrice;
+		return this;
+	}
+
+	private String priceCurrencyCode;
 	private ClickType clickType;
 	private String clickUrl;
 	private String urlType;
@@ -35,6 +67,11 @@ public class InAppMessageResponse implements InAppMessage {
 	private boolean skipPreflight;
 	private long timestamp;
 	private boolean horizontalOrientationRequested;
+	private String messageIdRequested;
+
+	public String getProductId() {
+		return this.productId;
+	}
 
 	public boolean isScale() {
 		return this.scale;
@@ -62,6 +99,10 @@ public class InAppMessageResponse implements InAppMessage {
 
 	public void setClickUrl(final String clickUrl) {
 		this.clickUrl = clickUrl;
+	}
+
+	public void setProductId(final String productId) {
+		this.productId = productId;
 	}
 
 	public void setImageUrl(final String imageUrl) {
@@ -158,5 +199,13 @@ public class InAppMessageResponse implements InAppMessage {
 
 	public int getSkipOverlay() {
 		return skipOverlay;
+	}
+
+	public String getMessageIdRequested() {
+		return messageIdRequested;
+	}
+
+	public void setMessageIdRequested(String messageIdRequested) {
+		this.messageIdRequested = messageIdRequested;
 	}
 }

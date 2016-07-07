@@ -35,6 +35,8 @@ public class InAppMessageRequest {
 	private String appKey;
 	private String deviceId;
 	private DeviceId.Type idMode;
+	private String messageId;
+
 	private double longitude = 0.0;
 	private double latitude = 0.0;
 	private boolean adspaceStrict;
@@ -59,6 +61,14 @@ public class InAppMessageRequest {
 
 	public void setGender(Gender gender) {
 		this.gender = gender;
+	}
+
+	public String getMessageId() {
+		return messageId;
+	}
+
+	public void setMessageId(String messageId) {
+		this.messageId = messageId;
 	}
 
 	public void setUserAge(int userAge) {
@@ -175,6 +185,8 @@ public class InAppMessageRequest {
 		}
 		b.appendQueryParameter("device_id", deviceId);
 		//b.appendQueryParameter("device_id_type", idMode.toString()); //currently unused
+		if (messageId != null)
+			b.appendQueryParameter("message_id", messageId);
 
 		return b.build();
 	}
