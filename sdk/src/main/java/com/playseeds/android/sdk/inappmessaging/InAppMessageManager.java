@@ -92,13 +92,14 @@ public class InAppMessageManager {
 	}
 
 	public void init(Context context, IInAppBillingService billingService, final String interstitialRequestURL, final String appKey, final String deviceID, final DeviceId.Type idMode) {
-			Util.prepareAndroidAdId(context);
-			InAppMessageManager.setmContext(context);
+		Util.prepareAndroidAdId(context);
+		InAppMessageManager.setmContext(context);
 		InAppMessageManager.setmBillingService(billingService);
 		this.interstitialRequestURL = interstitialRequestURL;
 		mAppKey = appKey;
 		mDeviceID= deviceID;
 		mIdMode = idMode;
+		mContext = context;
 		sharedInstance().mRequestThread = null;
 	}
 
@@ -302,101 +303,6 @@ public class InAppMessageManager {
 			}
 		});
 	}
-
-	public void setInterstitialRequestURL(String requestURL) {
-		this.interstitialRequestURL = requestURL;
-	}
-
-//	public void requestInAppMessage(final String messageId, final InputStream xml) {
-//		alreadyRequestedInterstitial = false;
-//
-//				try {
-//					GeneralInAppMessageProvider requestAd = new GeneralInAppMessageProvider();
-//					if (!alreadyRequestedInterstitial) {
-//						request = getInterstitialRequest();
-//						alreadyRequestedInterstitial = true;
-//					} else {
-//						Log.d("Already requested interstitial");
-//						notifyNoAdFound();
-//						mRequestThread = null;
-//						return;
-//					}
-//
-//					try {
-//						mResponse = requestAd.obtainInAppMessage(request);
-//					} catch (Exception e) {
-//						File cachedInAppMessageFile = new File(mContext.getCacheDir(),
-//								URLEncoder.encode(request.countlyUriToString(), "UTF-8"));
-//						if (cachedInAppMessageFile.exists()) {
-//							BufferedReader cacheReader = new BufferedReader(new FileReader(cachedInAppMessageFile));
-//							mResponse = new Gson().fromJson(cacheReader, InAppMessageResponse.class);
-//							cacheReader.close();
-//
-//						GeneralInAppMessageProvider requestAd = new GeneralInAppMessageProvider(xml);
-//						request = getInterstitialRequest(messageId);
-//						mResponse = requestAd.obtainInAppMessage(request);
-//						mResponse.setMessageIdRequested(requestedMessageId);
-//
-//						if (mResponse.getType() == Const.NO_AD) {
-//							if (!alreadyRequestedInterstitial) {
-//								request = getInterstitialRequest(messageId);
-//								alreadyRequestedInterstitial = true;
-//								mResponse = requestAd.obtainInAppMessage(request);
-//								mResponse.setMessageIdRequested(requestedMessageId);
-//							}
-//						}
-//					}
-//					if (mResponse.getType() == Const.NO_AD) {
-//						if (!alreadyRequestedInterstitial) {
-//							request = getInterstitialRequest();
-//							alreadyRequestedInterstitial = true;
-//							mResponse = requestAd.obtainInAppMessage(request);
-//						}
-//					}
-//
-//					if (mResponse.getType() == Const.TEXT || mResponse.getType() == Const.IMAGE) {
-//						notifyAdLoaded(mResponse);
-//
-//						BufferedWriter cacheWriter = null;
-//						try {
-//							File cachedInAppMessageFile = new File(mContext.getCacheDir(),
-//									URLEncoder.encode(request.countlyUriToString(), "UTF-8"));
-//							cacheWriter = new BufferedWriter(new FileWriter(cachedInAppMessageFile));
-//							cacheWriter.write(new Gson().toJson(mResponse));
-//						} catch (Exception e) {
-//							Log.e("Cache", e);
-//						} finally {
-//							try {
-//								// Close the writer regardless of what happens...
-//								assert cacheWriter != null;
-//								cacheWriter.close();
-//							} catch (Exception e) {
-//								e.printStackTrace();
-//							}
-//						}
-//					} else if (mResponse.getType() == Const.NO_AD) {
-//						Log.d("response NO AD received");
-//						notifyNoAdFound();
-//					} else {
-//						notifyNoAdFound();
-//					}
-//				} catch (Throwable t) {
-//					Log.e("ad request failed", t);
-//
-//					if (!alreadyRequestedInterstitial) {
-//						mRequestThread = null;
-//						requestInAppMessageInternal(true);
-//					} else {
-//						mResponse = new InAppMessageResponse();
-//						mResponse.setType(Const.AD_FAILED);
-//						mResponse.setMessageIdRequested(requestedMessageId);
-//						notifyNoAdFound();
-//					}
-//				}
-//				Log.d("finishing ad request thread");
-//				mRequestThread = null;
-//			}
-//		};
 
 	public void requestInAppMessageAndShow(final String messageId, long timeout) {
 		InAppMessageListener l = mListener;
@@ -616,7 +522,9 @@ public class InAppMessageManager {
 	 * This method handles sending notifications to the listeners
 	 */
 	private void sendNotification(Runnable runnable) {
-		new Thread(runnable).start();
+		Handler mainHandler = new Handler(mContext.getMainLooper());
+		mainHandler.post(runnable);
+		//new Thread(runnable).start();
 	}
 
 	public void setListener(InAppMessageListener listener) {
