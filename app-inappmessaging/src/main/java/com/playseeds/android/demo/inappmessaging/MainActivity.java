@@ -104,7 +104,6 @@ public class MainActivity extends Activity implements InAppMessageListener {
                     if (Seeds.sharedInstance().isInAppMessageLoaded(messageId)) {
                         Seeds.sharedInstance().showInAppMessage(messageId);
 
-
                     } else {
                         Seeds.sharedInstance().requestInAppMessage(messageId);
 //                        Toast.makeText(AndroidLauncher.this, "InAppMessage loading...", Toast.LENGTH_LONG)
@@ -129,7 +128,7 @@ public class MainActivity extends Activity implements InAppMessageListener {
 
     @Override
     public void inAppMessageLoadSucceeded(String messageId, InAppMessage inAppMessage) {
-        Toast.makeText(this, "inAppMessageLoadSucceeded(messageId = " + messageId + ")", Toast.LENGTH_LONG).show();
+        Toast.makeText(getBaseContext(), "inAppMessageLoadSucceeded(messageId = " + messageId + ")", Toast.LENGTH_LONG).show();
     }
 
     @Override
