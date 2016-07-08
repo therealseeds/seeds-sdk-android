@@ -40,6 +40,7 @@ import android.location.Location;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 
 import com.android.vending.billing.IInAppBillingService;
 import com.google.gson.Gson;
@@ -522,9 +523,13 @@ public class InAppMessageManager {
 	 * This method handles sending notifications to the listeners
 	 */
 	private void sendNotification(Runnable runnable) {
+		// added for testing purposes
+		if (mContext.getPackageName().equals("com.playseeds.android.sdk")) {
+			new Thread(runnable).start();
+		}
+
 		Handler mainHandler = new Handler(mContext.getMainLooper());
 		mainHandler.post(runnable);
-		//new Thread(runnable).start();
 	}
 
 	public void setListener(InAppMessageListener listener) {

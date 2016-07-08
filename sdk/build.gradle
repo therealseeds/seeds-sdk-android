@@ -54,6 +54,7 @@ dependencies {
     androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.0'
     testCompile 'junit:junit:4.12'
     testCompile "org.robolectric:robolectric:3.0"
+    testCompile "org.robolectric:shadows-multidex:3.0"
 }
 
 publish {
