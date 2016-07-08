@@ -63,7 +63,7 @@ public class SeedsTest extends AndroidTestCase {
     }
 
     public void testTrackPurchase() throws Exception {
-        seedsSpy.init(context, mock(InAppMessageListener.class), "https://devdash.com", "fake key", "Nexus");
+        seedsSpy.init(context, null, mock(InAppMessageListener.class), "https://devdash.com", "fake key", "Nexus");
         doCallRealMethod().when(seedsSpy).trackPurchase("fake key", 1.00);
         seedsSpy.trackPurchase("fake key", 1.00);
 
