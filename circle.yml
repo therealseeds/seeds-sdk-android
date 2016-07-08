@@ -13,7 +13,7 @@ machine:
 
 dependencies:
     override:
-        - echo y | android update sdk --no-ui --all --filter build-tools-23.0.3,extra-google-m2repository,extra-google-google_play_services
+        - echo y | android update sdk --no-ui --all --filter extra-google-google_play_services
         - ANDROID_HOME=/usr/local/android-sdk-linux ./gradlew dependencies
 
 test:
