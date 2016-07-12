@@ -36,7 +36,7 @@ public class GeneralInAppMessageProvider extends InAppMessageProvider<InAppMessa
 	public GeneralInAppMessageProvider() {
 	}
 
-	public InAppMessageResponse parseCountlyJSON(final InputStream inputStream,  Map<String, List<String>> headers) throws RequestException {
+	public InAppMessageResponse parseCountlyJSON(final InputStream inputStream, Map<String, List<String>> headers) throws RequestException {
 
 		Log.i("Starting parseCountlyJSON");
 
