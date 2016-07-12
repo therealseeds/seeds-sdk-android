@@ -52,8 +52,6 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 public class Util {
 	private static String androidAdId;
 	private static boolean adDoNotTrack = false;
-
-
 	private static final float MINIMAL_ACCURACY = 1000;
 	private static final long MINIMAL_TIME_FROM_FIX = 1000 * 60 * 20;
 
@@ -196,7 +194,7 @@ public class Util {
 		return null;
 	}
 
-	public static String getDefaultUserAgentString(Context context) {
+	public static String getDefaultUserAgentString() {
 		String userAgent = System.getProperty("http.agent");
 		return userAgent;
 	}
@@ -232,7 +230,6 @@ public class Util {
 	}
 
 	public static void prepareAndroidAdId(final Context context) {
-
 		if (androidAdId == null && GooglePlayServicesUtil.isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS) {
 			Log.d("GooglePlayServices connected");
 			AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>() {
@@ -272,10 +269,6 @@ public class Util {
 		return androidAdId;
 	}
 
-	public static boolean hasAdDoNotTrack() {
-		return adDoNotTrack;
-	}
-
 	public static Bitmap loadBitmap (String url) {
 		Bitmap bitmap = null;
 		try {
@@ -288,5 +281,4 @@ public class Util {
 		
 		return bitmap;
 	}
-
 }

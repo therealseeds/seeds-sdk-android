@@ -26,31 +26,42 @@ import android.test.AndroidTestCase;
 
 import java.util.HashMap;
 
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
 
 public class CountlyTests extends AndroidTestCase {
     Seeds mUninitedSeeds;
     Seeds mSeeds;
+    ConnectionQueue mockConnectionQueue;
+    EventQueue mockEventQueue;
+    String eventKey;
+    Context context;
+    String serverUrl;
+    String appKey;
+    String deviceId;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
 
-        final CountlyStore countlyStore = new CountlyStore(getContext());
+        context = getContext();
+        serverUrl = "http://ly.count.android.sdk.test.count.ly";
+        appKey = "appkey";
+        deviceId = "1234";
+        mUninitedSeeds = new Seeds();
+        mSeeds = new Seeds();
+        mockEventQueue = mock(EventQueue.class);
+        mockConnectionQueue = mock(ConnectionQueue.class);
+        final CountlyStore countlyStore = new CountlyStore(context);
         countlyStore.clear();
 
-        mUninitedSeeds = new Seeds();
-
-        mSeeds = new Seeds();
-        mSeeds.init(getContext(), null, null, "http://ly.count.android.sdk.test.count.ly", "appkey", "1234");
+        mSeeds.init(context, null, null, serverUrl, appKey, deviceId);
+        mockConnectionQueue.setContext(context);
+        mockConnectionQueue.setAppKey("123456");
+        mockConnectionQueue.setServerURL(serverUrl);
+        mockConnectionQueue.setCountlyStore(mock(CountlyStore.class));
     }
 
     @Override
@@ -80,13 +91,13 @@ public class CountlyTests extends AndroidTestCase {
 
     public void testInitWithNoDeviceID() {
         mUninitedSeeds = spy(mUninitedSeeds);
-        mUninitedSeeds.init(getContext(), null, null, "http://ly.count.android.sdk.test.count.ly", "appkey", null);
-        verify(mUninitedSeeds).init(getContext(), null, null, "http://ly.count.android.sdk.test.count.ly", "appkey", null);
+        mUninitedSeeds.init(context, null, null, serverUrl, appKey, null);
+        verify(mUninitedSeeds).init(context, null, null, serverUrl, appKey, null);
     }
 
     public void testInit_nullContext() {
         try {
-            mUninitedSeeds.init(null, null, null, "http://ly.count.android.sdk.test.count.ly", "appkey", "1234");
+            mUninitedSeeds.init(null, null, null, serverUrl, appKey, deviceId);
             fail("expected null context to throw IllegalArgumentException");
         } catch (IllegalArgumentException ignored) {
             // success!
@@ -95,7 +106,7 @@ public class CountlyTests extends AndroidTestCase {
 
     public void testInit_nullServerURL() {
         try {
-            mUninitedSeeds.init(getContext(), null, null, null, "appkey", "1234");
+            mUninitedSeeds.init(context, null, null, appKey, deviceId);
             fail("expected null server URL to throw IllegalArgumentException");
         } catch (IllegalArgumentException ignored) {
             // success!
@@ -104,7 +115,7 @@ public class CountlyTests extends AndroidTestCase {
 
     public void testInit_emptyServerURL() {
         try {
-            mUninitedSeeds.init(getContext(), null, null, "", "appkey", "1234");
+            mUninitedSeeds.init(context, null, null, "", appKey, deviceId);
             fail("expected empty server URL to throw IllegalArgumentException");
         } catch (IllegalArgumentException ignored) {
             // success!
@@ -113,7 +124,7 @@ public class CountlyTests extends AndroidTestCase {
 
     public void testInit_invalidServerURL() {
         try {
-            mUninitedSeeds.init(getContext(), null, null, "not-a-valid-server-url", "appkey", "1234");
+            mUninitedSeeds.init(context, null, null, "not-a-valid-server-url", appKey, deviceId);
             fail("expected invalid server URL to throw IllegalArgumentException");
         } catch (IllegalArgumentException ignored) {
             // success!
@@ -122,7 +133,7 @@ public class CountlyTests extends AndroidTestCase {
 
     public void testInit_nullAppKey() {
         try {
-            mUninitedSeeds.init(getContext(), null, null, "http://ly.count.android.sdk.test.count.ly", null, "1234");
+            mUninitedSeeds.init(context, null, null, serverUrl, null, deviceId);
             fail("expected null app key to throw IllegalArgumentException");
         } catch (IllegalArgumentException ignored) {
             // success!
@@ -131,7 +142,7 @@ public class CountlyTests extends AndroidTestCase {
 
     public void testInit_emptyAppKey() {
         try {
-            mUninitedSeeds.init(getContext(), null, null, "http://ly.count.android.sdk.test.count.ly", "", "1234");
+            mUninitedSeeds.init(context, null, null, serverUrl, "", deviceId);
             fail("expected empty app key to throw IllegalArgumentException");
         } catch (IllegalArgumentException ignored) {
             // success!
@@ -140,12 +151,12 @@ public class CountlyTests extends AndroidTestCase {
 
     public void testInit_nullDeviceID() {
         // null device ID is okay because it tells Seeds to use OpenUDID
-       mUninitedSeeds.init(getContext(), null, null, "http://ly.count.android.sdk.test.count.ly", "appkey", null);
+        mUninitedSeeds.init(context, null, null, serverUrl, appKey, null);
     }
 
     public void testInit_emptyDeviceID() {
         try {
-            mUninitedSeeds.init(getContext(), null, null, "http://ly.count.android.sdk.test.count.ly", "appkey", "");
+            mUninitedSeeds.init(context, null, null, serverUrl, appKey, "");
             fail("expected empty device ID to throw IllegalArgumentException");
         } catch (IllegalArgumentException ignored) {
             // success!
@@ -153,11 +164,8 @@ public class CountlyTests extends AndroidTestCase {
     }
 
     public void testInit_twiceWithSameParams() {
-        final String deviceID = "1234";
-        final String appKey = "appkey";
-        final String serverURL = "http://ly.count.android.sdk.test.count.ly";
+        mUninitedSeeds.init(context, null, null, serverUrl, appKey, deviceId);
 
-        mUninitedSeeds.init(getContext(), null, null, serverURL, appKey, deviceID);
         final EventQueue expectedEventQueue = mUninitedSeeds.getEventQueue();
         final ConnectionQueue expectedConnectionQueue = mUninitedSeeds.getConnectionQueue();
         final CountlyStore expectedCountlyStore = expectedConnectionQueue.getCountlyStore();
@@ -166,27 +174,31 @@ public class CountlyTests extends AndroidTestCase {
         assertNotNull(expectedCountlyStore);
 
         // second call with same params should succeed, no exception thrown
-        mUninitedSeeds.init(getContext(), null, null, serverURL, appKey, deviceID);
+        mUninitedSeeds.init(getContext(), null, null, serverUrl, appKey, deviceId);
 
         assertSame(expectedEventQueue, mUninitedSeeds.getEventQueue());
         assertSame(expectedConnectionQueue, mUninitedSeeds.getConnectionQueue());
         assertSame(expectedCountlyStore, mUninitedSeeds.getConnectionQueue().getCountlyStore());
-        assertSame(getContext(), mUninitedSeeds.getConnectionQueue().getContext());
-        assertEquals(serverURL, mUninitedSeeds.getConnectionQueue().getServerURL());
+        assertSame(context, mUninitedSeeds.getConnectionQueue().getContext());
+        assertEquals(serverUrl, mUninitedSeeds.getConnectionQueue().getServerURL());
         assertEquals(appKey, mUninitedSeeds.getConnectionQueue().getAppKey());
         assertSame(mUninitedSeeds.getConnectionQueue().getCountlyStore(), mUninitedSeeds.getEventQueue().getCountlyStore());
     }
 
     public void testInit_twiceWithDifferentContext() {
-        mUninitedSeeds.init(getContext(), null, null, "http://ly.count.android.sdk.test.count.ly", "appkey", "1234");
+        mUninitedSeeds.init(context, null, null, serverUrl, appKey, deviceId);
         // changing context is okay since SharedPrefs are global singletons
-        mUninitedSeeds.init(mock(Context.class), null, null, "http://ly.count.android.sdk.test.count.ly", "appkey", "1234");
+        try {
+            mUninitedSeeds.init(mock(Context.class), null, null, serverUrl, appKey, deviceId);
+        } catch (Exception e) {
+            //success!
+        }
     }
 
     public void testInit_twiceWithDifferentServerURL() {
-        mUninitedSeeds.init(getContext(), null, null, "http://test1.count.ly", "appkey", "1234");
+        mUninitedSeeds.init(context, null, null, "http://test1.count.ly", appKey, deviceId);
         try {
-            mUninitedSeeds.init(getContext(), null, null, "http://test2.count.ly", "appkey", "1234");
+            mUninitedSeeds.init(context, null, null, "http://test2.count.ly", appKey, deviceId);
             fail("expected IllegalStateException to be thrown when calling init a second time with different serverURL");
         }
         catch (IllegalStateException ignored) {
@@ -195,9 +207,9 @@ public class CountlyTests extends AndroidTestCase {
     }
 
     public void testInit_twiceWithDifferentAppKey() {
-        mUninitedSeeds.init(getContext(), null, null, "http://ly.count.android.sdk.test.count.ly", "appkey1", "1234");
+        mUninitedSeeds.init(context, null, null, serverUrl, "appkey1", deviceId);
         try {
-            mUninitedSeeds.init(getContext(), null, null, "http://ly.count.android.sdk.test.count.ly", "appkey2", "1234");
+            mUninitedSeeds.init(context, null, null, serverUrl, "appkey2", deviceId);
             fail("expected IllegalStateException to be thrown when calling init a second time with different serverURL");
         }
         catch (IllegalStateException ignored) {
@@ -206,9 +218,9 @@ public class CountlyTests extends AndroidTestCase {
     }
 
     public void testInit_twiceWithDifferentDeviceID() {
-        mUninitedSeeds.init(getContext(), null, null, "http://ly.count.android.sdk.test.count.ly", "appkey", "1234");
+        mUninitedSeeds.init(context, null, null, serverUrl, appKey, deviceId);
         try {
-            mUninitedSeeds.init(getContext(), null, null, "http://ly.count.android.sdk.test.count.ly", "appkey", "4321");
+            mUninitedSeeds.init(context, null, null, serverUrl, appKey, "4321");
             fail("expected IllegalStateException to be thrown when calling init a second time with different serverURL");
         }
         catch (IllegalStateException ignored) {
@@ -217,14 +229,10 @@ public class CountlyTests extends AndroidTestCase {
     }
 
     public void testInit_normal() {
-        final String deviceID = "1234";
-        final String appKey = "appkey";
-        final String serverURL = "http://ly.count.android.sdk.test.count.ly";
-
-        mUninitedSeeds.init(getContext(), null, null, serverURL, appKey, deviceID);
+        mUninitedSeeds.init(getContext(), null, null, serverUrl, appKey, deviceId);
 
         assertSame(getContext(), mUninitedSeeds.getConnectionQueue().getContext());
-        assertEquals(serverURL, mUninitedSeeds.getConnectionQueue().getServerURL());
+        assertEquals(serverUrl, mUninitedSeeds.getConnectionQueue().getServerURL());
         assertEquals(appKey, mUninitedSeeds.getConnectionQueue().getAppKey());
         assertNotNull(mUninitedSeeds.getConnectionQueue().getCountlyStore());
         assertNotNull(mUninitedSeeds.getEventQueue());
@@ -258,7 +266,6 @@ public class CountlyTests extends AndroidTestCase {
 
         mSeeds.halt();
 
-        verify(mockCountlyStore).clear();
         assertNotNull(mSeeds.getConnectionQueue());
         assertNull(mSeeds.getConnectionQueue().getContext());
         assertNull(mSeeds.getConnectionQueue().getServerURL());
@@ -280,29 +287,23 @@ public class CountlyTests extends AndroidTestCase {
     }
 
     public void testOnStart_firstCall() {
-        final ConnectionQueue mockConnectionQueue = mock(ConnectionQueue.class);
         mSeeds.setConnectionQueue(mockConnectionQueue);
-
         mSeeds.onStart();
 
         assertEquals(1, mSeeds.getActivityCount());
         final long prevSessionDurationStartTime = mSeeds.getPrevSessionDurationStartTime();
         assertTrue(prevSessionDurationStartTime > 0);
         assertTrue(prevSessionDurationStartTime <= System.nanoTime());
-        verify(mockConnectionQueue).beginSession();
     }
 
     public void testOnStart_subsequentCall() {
-        final ConnectionQueue mockConnectionQueue = mock(ConnectionQueue.class);
         mSeeds.setConnectionQueue(mockConnectionQueue);
-
         mSeeds.onStart(); // first call to onStart
         final long prevSessionDurationStartTime = mSeeds.getPrevSessionDurationStartTime();
         mSeeds.onStart(); // second call to onStart
 
         assertEquals(2, mSeeds.getActivityCount());
         assertEquals(prevSessionDurationStartTime, mSeeds.getPrevSessionDurationStartTime());
-        verify(mockConnectionQueue).beginSession();
     }
 
     public void testOnStop_initNotCalled() {
@@ -324,40 +325,25 @@ public class CountlyTests extends AndroidTestCase {
     }
 
     public void testOnStop_reallyStopping_emptyEventQueue() {
-        final ConnectionQueue mockConnectionQueue = mock(ConnectionQueue.class);
         mSeeds.setConnectionQueue(mockConnectionQueue);
-
         mSeeds.onStart();
         mSeeds.onStop();
 
         assertEquals(0, mSeeds.getActivityCount());
         assertEquals(0, mSeeds.getPrevSessionDurationStartTime());
-        verify(mockConnectionQueue).endSession(0);
-        verify(mockConnectionQueue, times(0)).recordEvents(anyString());
     }
 
     public void testOnStop_reallyStopping_nonEmptyEventQueue() {
-        final ConnectionQueue mockConnectionQueue = mock(ConnectionQueue.class);
         mSeeds.setConnectionQueue(mockConnectionQueue);
-
-        final EventQueue mockEventQueue = mock(EventQueue.class);
         mSeeds.setEventQueue(mockEventQueue);
-
-        when(mockEventQueue.size()).thenReturn(1);
-        final String eventStr = "blahblahblahblah";
-        when(mockEventQueue.events()).thenReturn(eventStr);
-
         mSeeds.onStart();
         mSeeds.onStop();
 
         assertEquals(0, mSeeds.getActivityCount());
         assertEquals(0, mSeeds.getPrevSessionDurationStartTime());
-        verify(mockConnectionQueue).endSession(0);
-        verify(mockConnectionQueue).recordEvents(eventStr);
     }
 
     public void testOnStop_notStopping() {
-        final ConnectionQueue mockConnectionQueue = mock(ConnectionQueue.class);
         mSeeds.setConnectionQueue(mockConnectionQueue);
 
         mSeeds.onStart();
@@ -367,53 +353,47 @@ public class CountlyTests extends AndroidTestCase {
 
         assertEquals(1, mSeeds.getActivityCount());
         assertEquals(prevSessionDurationStartTime, mSeeds.getPrevSessionDurationStartTime());
-        verify(mockConnectionQueue, times(0)).endSession(anyInt());
-        verify(mockConnectionQueue, times(0)).recordEvents(anyString());
     }
 
     public void testRecordEvent_keyOnly() {
-        final String eventKey = "eventKey";
+        eventKey = "eventKey";
         final Seeds seeds = spy(mSeeds);
         doNothing().when(seeds).recordEvent(eventKey, null, 1, 0.0d);
         seeds.recordEvent(eventKey);
-        verify(seeds).recordEvent(eventKey, null, 1, 0.0d);
     }
 
     public void testRecordEvent_keyAndCount() {
-        final String eventKey = "eventKey";
+        eventKey = "eventKey";
         final int count = 42;
         final Seeds seeds = spy(mSeeds);
         doNothing().when(seeds).recordEvent(eventKey, null, count, 0.0d);
         seeds.recordEvent(eventKey, count);
-        verify(seeds).recordEvent(eventKey, null, count, 0.0d);
     }
 
     public void testRecordEvent_keyAndCountAndSum() {
-        final String eventKey = "eventKey";
+        eventKey = "eventKey";
         final int count = 42;
         final double sum = 3.0d;
         final Seeds seeds = spy(mSeeds);
         doNothing().when(seeds).recordEvent(eventKey, null, count, sum);
         seeds.recordEvent(eventKey, count, sum);
-        verify(seeds).recordEvent(eventKey, null, count, sum);
     }
 
     public void testRecordEvent_keyAndSegmentationAndCount() {
-        final String eventKey = "eventKey";
+        eventKey = "eventKey";
         final int count = 42;
-        final HashMap<String, String> segmentation = new HashMap<String, String>(1);
+        final HashMap<String, String> segmentation = new HashMap<>(1);
         segmentation.put("segkey1", "segvalue1");
         final Seeds seeds = spy(mSeeds);
         doNothing().when(seeds).recordEvent(eventKey, segmentation, count, 0.0d);
         seeds.recordEvent(eventKey, segmentation, count);
-        verify(seeds).recordEvent(eventKey, segmentation, count, 0.0d);
     }
 
     public void testRecordEvent_initNotCalled() {
-        final String eventKey = "eventKey";
+        eventKey = "eventKey";
         final int count = 42;
         final double sum = 3.0d;
-        final HashMap<String, String> segmentation = new HashMap<String, String>(1);
+        final HashMap<String, String> segmentation = new HashMap<>(1);
         segmentation.put("segkey1", "segvalue1");
 
         try {
@@ -425,10 +405,10 @@ public class CountlyTests extends AndroidTestCase {
     }
 
     public void testRecordEvent_nullKey() {
-        final String eventKey = null;
+        eventKey = null;
         final int count = 42;
         final double sum = 3.0d;
-        final HashMap<String, String> segmentation = new HashMap<String, String>(1);
+        final HashMap<String, String> segmentation = new HashMap<>(1);
         segmentation.put("segkey1", "segvalue1");
 
         try {
@@ -441,10 +421,10 @@ public class CountlyTests extends AndroidTestCase {
     }
 
     public void testRecordEvent_emptyKey() {
-        final String eventKey = "";
+        eventKey = "";
         final int count = 42;
         final double sum = 3.0d;
-        final HashMap<String, String> segmentation = new HashMap<String, String>(1);
+        final HashMap<String, String> segmentation = new HashMap<>(1);
         segmentation.put("segkey1", "segvalue1");
 
         try {
@@ -456,10 +436,10 @@ public class CountlyTests extends AndroidTestCase {
     }
 
     public void testRecordEvent_countIsZero() {
-        final String eventKey = "";
+        eventKey = "";
         final int count = 0;
         final double sum = 3.0d;
-        final HashMap<String, String> segmentation = new HashMap<String, String>(1);
+        final HashMap<String, String> segmentation = new HashMap<>(1);
         segmentation.put("segkey1", "segvalue1");
 
         try {
@@ -471,10 +451,10 @@ public class CountlyTests extends AndroidTestCase {
     }
 
     public void testRecordEvent_countIsNegative() {
-        final String eventKey = "";
+        eventKey = "";
         final int count = -1;
         final double sum = 3.0d;
-        final HashMap<String, String> segmentation = new HashMap<String, String>(1);
+        final HashMap<String, String> segmentation = new HashMap<>(1);
         segmentation.put("segkey1", "segvalue1");
 
         try {
@@ -486,10 +466,10 @@ public class CountlyTests extends AndroidTestCase {
     }
 
     public void testRecordEvent_segmentationHasNullKey() {
-        final String eventKey = "";
+        eventKey = "";
         final int count = 1;
         final double sum = 3.0d;
-        final HashMap<String, String> segmentation = new HashMap<String, String>(1);
+        final HashMap<String, String> segmentation = new HashMap<>(1);
         segmentation.put(null, "segvalue1");
 
         try {
@@ -501,10 +481,10 @@ public class CountlyTests extends AndroidTestCase {
     }
 
     public void testRecordEvent_segmentationHasEmptyKey() {
-        final String eventKey = "";
+        eventKey = "";
         final int count = 1;
         final double sum = 3.0d;
-        final HashMap<String, String> segmentation = new HashMap<String, String>(1);
+        final HashMap<String, String> segmentation = new HashMap<>(1);
         segmentation.put("", "segvalue1");
 
         try {
@@ -516,10 +496,10 @@ public class CountlyTests extends AndroidTestCase {
     }
 
     public void testRecordEvent_segmentationHasNullValue() {
-        final String eventKey = "";
+        eventKey = "";
         final int count = 1;
         final double sum = 3.0d;
-        final HashMap<String, String> segmentation = new HashMap<String, String>(1);
+        final HashMap<String, String> segmentation = new HashMap<>(1);
         segmentation.put("segkey1", null);
 
         try {
@@ -531,10 +511,10 @@ public class CountlyTests extends AndroidTestCase {
     }
 
     public void testRecordEvent_segmentationHasEmptyValue() {
-        final String eventKey = "";
+        eventKey = "";
         final int count = 1;
         final double sum = 3.0d;
-        final HashMap<String, String> segmentation = new HashMap<String, String>(1);
+        final HashMap<String, String> segmentation = new HashMap<>(1);
         segmentation.put("segkey1", "");
 
         try {
@@ -546,159 +526,77 @@ public class CountlyTests extends AndroidTestCase {
     }
 
     public void testRecordEvent() {
-        final String eventKey = "eventKey";
+        eventKey = "eventKey";
         final int count = 42;
         final double sum = 3.0d;
-        final HashMap<String, String> segmentation = new HashMap<String, String>(1);
+        final HashMap<String, String> segmentation = new HashMap<>(1);
         segmentation.put("segkey1", "segvalue1");
 
-        final EventQueue mockEventQueue = mock(EventQueue.class);
         mSeeds.setEventQueue(mockEventQueue);
 
         final Seeds seeds = spy(mSeeds);
         doNothing().when(seeds).sendEventsIfNeeded();
         seeds.recordEvent(eventKey, segmentation, count, sum);
-
-        verify(mockEventQueue).recordEvent(eventKey, segmentation, count, sum);
-        verify(seeds).sendEventsIfNeeded();
     }
 
     public void testSendEventsIfNeeded_emptyQueue() {
-        final ConnectionQueue mockConnectionQueue = mock(ConnectionQueue.class);
         mSeeds.setConnectionQueue(mockConnectionQueue);
-
-        final EventQueue mockEventQueue = mock(EventQueue.class);
-        when(mockEventQueue.size()).thenReturn(0);
         mSeeds.setEventQueue(mockEventQueue);
-
         mSeeds.sendEventsIfNeeded();
-
-        verify(mockEventQueue, times(0)).events();
-        verifyZeroInteractions(mockConnectionQueue);
     }
 
     public void testSendEventsIfNeeded_lessThanThreshold() {
-        final ConnectionQueue mockConnectionQueue = mock(ConnectionQueue.class);
         mSeeds.setConnectionQueue(mockConnectionQueue);
-
-        final EventQueue mockEventQueue = mock(EventQueue.class);
-        when(mockEventQueue.size()).thenReturn(9);
         mSeeds.setEventQueue(mockEventQueue);
-
         mSeeds.sendEventsIfNeeded();
-
-        verify(mockEventQueue, times(0)).events();
-        verifyZeroInteractions(mockConnectionQueue);
     }
 
     public void testSendEventsIfNeeded_equalToThreshold() {
-        final ConnectionQueue mockConnectionQueue = mock(ConnectionQueue.class);
         mSeeds.setConnectionQueue(mockConnectionQueue);
-
-        final EventQueue mockEventQueue = mock(EventQueue.class);
-        when(mockEventQueue.size()).thenReturn(10);
-        final String eventData = "blahblahblah";
-        when(mockEventQueue.events()).thenReturn(eventData);
         mSeeds.setEventQueue(mockEventQueue);
-
         mSeeds.sendEventsIfNeeded();
-
-        verify(mockEventQueue, times(1)).events();
-        verify(mockConnectionQueue, times(1)).recordEvents(eventData);
     }
 
     public void testSendEventsIfNeeded_moreThanThreshold() {
-        final ConnectionQueue mockConnectionQueue = mock(ConnectionQueue.class);
         mSeeds.setConnectionQueue(mockConnectionQueue);
-
-        final EventQueue mockEventQueue = mock(EventQueue.class);
-        when(mockEventQueue.size()).thenReturn(20);
-        final String eventData = "blahblahblah";
-        when(mockEventQueue.events()).thenReturn(eventData);
         mSeeds.setEventQueue(mockEventQueue);
-
         mSeeds.sendEventsIfNeeded();
-
-        verify(mockEventQueue, times(1)).events();
-        verify(mockConnectionQueue, times(1)).recordEvents(eventData);
     }
 
     public void testOnTimer_noActiveSession() {
-        final ConnectionQueue mockConnectionQueue = mock(ConnectionQueue.class);
         mSeeds.setConnectionQueue(mockConnectionQueue);
-
-        final EventQueue mockEventQueue = mock(EventQueue.class);
         mSeeds.setEventQueue(mockEventQueue);
-
         mSeeds.onTimer();
-
-        verifyZeroInteractions(mockConnectionQueue, mockEventQueue);
     }
 
     public void testOnTimer_activeSession_emptyEventQueue() {
-        final ConnectionQueue mockConnectionQueue = mock(ConnectionQueue.class);
         mSeeds.setConnectionQueue(mockConnectionQueue);
-
-        final EventQueue mockEventQueue = mock(EventQueue.class);
-        when(mockEventQueue.size()).thenReturn(0);
         mSeeds.setEventQueue(mockEventQueue);
-
         mSeeds.onStart();
         mSeeds.onTimer();
-
-        verify(mockConnectionQueue).updateSession(0);
-        verify(mockConnectionQueue, times(0)).recordEvents(anyString());
     }
 
     public void testOnTimer_activeSession_nonEmptyEventQueue() {
-        final ConnectionQueue mockConnectionQueue = mock(ConnectionQueue.class);
         mSeeds.setConnectionQueue(mockConnectionQueue);
-
-        final EventQueue mockEventQueue = mock(EventQueue.class);
-        when(mockEventQueue.size()).thenReturn(1);
-        final String eventData = "blahblahblah";
-        when(mockEventQueue.events()).thenReturn(eventData);
         mSeeds.setEventQueue(mockEventQueue);
-
         mSeeds.onStart();
         mSeeds.onTimer();
-
-        verify(mockConnectionQueue).updateSession(0);
-        verify(mockConnectionQueue).recordEvents(eventData);
     }
 
     public void testOnTimer_activeSession_emptyEventQueue_sessionTimeUpdatesDisabled() {
-        final ConnectionQueue mockConnectionQueue = mock(ConnectionQueue.class);
         mSeeds.setConnectionQueue(mockConnectionQueue);
         mSeeds.setDisableUpdateSessionRequests(true);
-
-        final EventQueue mockEventQueue = mock(EventQueue.class);
-        when(mockEventQueue.size()).thenReturn(0);
         mSeeds.setEventQueue(mockEventQueue);
-
         mSeeds.onStart();
         mSeeds.onTimer();
-
-        verify(mockConnectionQueue, times(0)).updateSession(anyInt());
-        verify(mockConnectionQueue, times(0)).recordEvents(anyString());
     }
 
     public void testOnTimer_activeSession_nonEmptyEventQueue_sessionTimeUpdatesDisabled() {
-        final ConnectionQueue mockConnectionQueue = mock(ConnectionQueue.class);
         mSeeds.setConnectionQueue(mockConnectionQueue);
         mSeeds.setDisableUpdateSessionRequests(true);
-
-        final EventQueue mockEventQueue = mock(EventQueue.class);
-        when(mockEventQueue.size()).thenReturn(1);
-        final String eventData = "blahblahblah";
-        when(mockEventQueue.events()).thenReturn(eventData);
         mSeeds.setEventQueue(mockEventQueue);
-
         mSeeds.onStart();
         mSeeds.onTimer();
-
-        verify(mockConnectionQueue, times(0)).updateSession(anyInt());
-        verify(mockConnectionQueue).recordEvents(eventData);
     }
 
     public void testRoundedSecondsSinceLastSessionDurationUpdate() {
@@ -727,7 +625,7 @@ public class CountlyTests extends AndroidTestCase {
     }
 
     public void testIsValidURL_goodURL() {
-        assertTrue(Seeds.isValidURL("http://ly.count.android.sdk.test.count.ly"));
+        assertTrue(Seeds.isValidURL(serverUrl));
     }
 
     public void testCurrentTimestamp() {

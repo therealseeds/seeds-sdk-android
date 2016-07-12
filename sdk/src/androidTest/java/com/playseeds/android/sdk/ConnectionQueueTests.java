@@ -344,7 +344,7 @@ public class ConnectionQueueTests extends AndroidTestCase {
         final String urlStr = "http://server?" + queryStr;
         final Uri uri = Uri.parse(urlStr);
         final Set<String> queryParameterNames = uri.getQueryParameterNames();
-        final Map<String, String> queryParams = new HashMap<String, String>(queryParameterNames.size());
+        final Map<String, String> queryParams = new HashMap<>(queryParameterNames.size());
         for (String paramName : queryParameterNames) {
             queryParams.put(paramName, uri.getQueryParameter(paramName));
         }

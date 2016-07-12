@@ -8,6 +8,7 @@ import org.json.JSONObject;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Map;
 
 import com.playseeds.android.sdk.UserData;
 
@@ -33,7 +34,7 @@ public class UserDataTests extends AndroidTestCase {
         assertEquals("+1234567890", UserData.phone);
         assertEquals("M", UserData.gender);
         assertEquals("http://domain.com/ly.count.android.sdk.test.png", UserData.picture);
-        assertEquals("2000", UserData.byear);
+        assertEquals(2000, UserData.byear);
 	}
 	
 	public void testJSON() throws JSONException{
@@ -56,7 +57,7 @@ public class UserDataTests extends AndroidTestCase {
         assertEquals("+1234567890", json.getString("phone"));
         assertEquals("M", json.getString("gender"));
         assertEquals("http://domain.com/ly.count.android.sdk.test.png", json.getString("picture"));
-        assertEquals("2000", json.getInt("byear"));
+        assertEquals(2000, json.getInt("byear"));
 	}
 
 	
@@ -65,4 +66,28 @@ public class UserDataTests extends AndroidTestCase {
 		String picturePath = UserData.getPicturePathFromQuery(new URL(path));
 		assertEquals("/mnt/sdcard/pic.jpg", picturePath);
 	}
+
+    public void testSetCustomData() throws Exception {
+        Map<String, String> data = new HashMap<>();
+        data.put("key", "data");
+        UserData.setCustomData(data);
+
+        assertNotNull(UserData.custom);
+        assertFalse(UserData.isSynced);
+    }
+
+    public void testGetDataForRequest() throws Exception {
+        String request = UserData.getDataForRequest();
+
+        assertTrue(UserData.isSynced);
+        assertSame("", request);
+    }
+
+    public void testGetDataForRequestWhenNotSynced() throws Exception {
+        UserData.setCustomData(new HashMap<String, String>());
+        String request = UserData.getDataForRequest();
+
+        assertTrue(UserData.isSynced);
+        assertNotNull(request);
+    }
 }

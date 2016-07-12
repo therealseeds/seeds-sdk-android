@@ -8,7 +8,8 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
 
-    <application>
+    <application
+        android:name="android.support.multidex.MultiDexApplication">
         <!-- MobFox activities declaration -->
         <activity android:name="com.playseeds.android.sdk.inappmessaging.RichMediaActivity"
             android:theme="@android:style/Theme.Translucent"
@@ -18,8 +19,9 @@
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
 
         <!-- Required to use Google Play Services, but is already provided by GPS base AAR -->
-        <!--<meta-data android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version"/>-->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
 
         <!--<uses-library android:name="android.test.runner"/>-->
     </application>

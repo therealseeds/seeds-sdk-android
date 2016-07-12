@@ -1,38 +1,27 @@
 package com.playseeds.android.demo.inappmessaging;
 
 import android.app.Activity;
+
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.net.Uri;
-import android.os.Handler;
+
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
+
 import android.widget.Toast;
 
 import com.android.vending.billing.IInAppBillingService;
 import com.playseeds.android.sdk.Seeds;
-import com.playseeds.android.sdk.DeviceId;
 
 import com.playseeds.android.sdk.inappmessaging.InAppMessage;
 import com.playseeds.android.sdk.inappmessaging.InAppMessageListener;
-import com.playseeds.android.sdk.inappmessaging.InAppMessageManager;
 import com.playseeds.demo.inappmessaging.R;
 
-
-
 public class MainActivity extends Activity implements InAppMessageListener {
-
-    //private static String YOUR_SERVER = "http://dash.playseeds.com"; // don't include trailing slash
-    //private static String YOUR_APP_KEY = "test";
-    //private static String messageId0 = null;
-    //private static String messageId1 = null;
-
     private static String YOUR_SERVER = "http://staging.playseeds.com";
     private static String YOUR_APP_KEY = "71ac2900e9d31647d68d0ddc6f0aaf52611a612d";
     private static String messageId0 = "575f872a64bc1e5b0eca506f";
@@ -110,7 +99,6 @@ public class MainActivity extends Activity implements InAppMessageListener {
                     if (Seeds.sharedInstance().isInAppMessageLoaded(messageId)) {
                         Seeds.sharedInstance().showInAppMessage(messageId);
 
-
                     } else {
                         Seeds.sharedInstance().requestInAppMessage(messageId);
 //                        Toast.makeText(AndroidLauncher.this, "InAppMessage loading...", Toast.LENGTH_LONG)
@@ -135,7 +123,7 @@ public class MainActivity extends Activity implements InAppMessageListener {
 
     @Override
     public void inAppMessageLoadSucceeded(String messageId, InAppMessage inAppMessage) {
-        Toast.makeText(this, "inAppMessageLoadSucceeded(messageId = " + messageId + ")", Toast.LENGTH_LONG).show();
+        Toast.makeText(getBaseContext(), "inAppMessageLoadSucceeded(messageId = " + messageId + ")", Toast.LENGTH_LONG).show();
     }
 
     @Override

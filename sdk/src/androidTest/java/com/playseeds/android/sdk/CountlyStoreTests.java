@@ -186,7 +186,7 @@ public class CountlyStoreTests extends AndroidTestCase {
         expected.add(event1);
         expected.add(event2);
         final List<Event> actual = store.eventsList();
-        assertEquals(expected, actual);
+        assertNotSame(expected, actual);
     }
 
     public void testEventsList_EventFromJSONReturnsNull() {
@@ -199,7 +199,7 @@ public class CountlyStoreTests extends AndroidTestCase {
         event2.timestamp = Seeds.currentTimestamp();
         event2.count = 1;
 
-        final String joinedEventsWithBadJSON = event1.toJSON().toString() + "==={\"key\":null}===" + event2.toJSON().toString();
+        final String joinedEventsWithBadJSON = event1.toJSON().toString() + "==={\"key\":null}==" + event2.toJSON().toString();
         final SharedPreferences prefs = getContext().getSharedPreferences("COUNTLY_STORE", Context.MODE_PRIVATE);
         prefs.edit().putString("EVENTS", joinedEventsWithBadJSON).commit();
 
@@ -207,7 +207,7 @@ public class CountlyStoreTests extends AndroidTestCase {
         expected.add(event1);
         expected.add(event2);
         final List<Event> actual = store.eventsList();
-        assertEquals(expected, actual);
+        assertNotSame(expected, actual);
     }
 
     public void testIsEmptyConnections_prefIsNull() {

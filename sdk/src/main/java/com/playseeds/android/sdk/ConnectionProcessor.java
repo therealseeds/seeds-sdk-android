@@ -70,7 +70,7 @@ public class ConnectionProcessor implements Runnable {
         }
     }
 
-    URLConnection urlConnectionForEventData(final String eventData) throws IOException {
+    public URLConnection urlConnectionForEventData(final String eventData) throws IOException {
         String urlStr = serverURL_ + "/i?";
         if(!eventData.contains("&crash="))
             urlStr += eventData;

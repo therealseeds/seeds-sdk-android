@@ -1,3 +1,6 @@
+
+[![Badge Status](https://circleci.com/gh/therealseeds/seeds-sdk-android.svg?style=shield&circle-token=066f1c0589ff754b6c9bc766bc2941f2f5a135b9)](https://circleci.com/gh/therealseeds/seeds-sdk-android) [![codecov](https://codecov.io/gh/therealseeds/seeds-sdk-android/branch/master/graph/badge.svg)](https://codecov.io/gh/therealseeds/seeds-sdk-android)
+
 #Seeds
 [Seeds](http://www.playseeds.com) increases paying user conversion for freemium mobile games motivating users to make their first purchase by letting them know that their purchase will help finance microloans in the developing world. The SDK implements this with an interstitial ad and event tracking analytics.
 
