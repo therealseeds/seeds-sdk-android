@@ -49,82 +49,31 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
-
-
-
-
-
-
 import com.playseeds.android.sdk.inappmessaging.InAppMessageView.BannerAdViewListener;
 
 public class RichMediaActivity extends Activity {
-
-	class CanSkipTask extends TimerTask {
-
-		private final RichMediaActivity mActivity;
-
-		public CanSkipTask(final RichMediaActivity activity) {
-			this.mActivity = activity;
-		}
-
-		@Override
-		public void run() {
-
-			Log.v("###########TRACKING CAN CLOSE INTERSTITIAL");
-			this.mActivity.mCanClose = true;
-			if (this.mActivity.mSkipButton != null)
-				this.mActivity.runOnUiThread(new Runnable() {
-
-					@Override
-					public void run() {
-						CanSkipTask.this.mActivity.mSkipButton.setVisibility(View.VISIBLE);
-					}
-				});
-		}
-	}
-
-
-	public static final int TYPE_UNKNOWN = -1;
-
-	public static final int TYPE_BROWSER = 0;
-
-	public static final int TYPE_INTERSTITIAL = 2;
-
 	private ResourceManager mResourceManager;
 	private FrameLayout mRootLayout;
-
 	private ImageView mSkipButton;
 	private InAppMessageResponse mAd;
-
-
-	private Uri uri;
-
-	private int mWindowWidth;
-	private int mWindowHeight;
-
 	private boolean mCanClose;
-	protected boolean mInterstitialAutocloseReset;
 	private int mType;
 	private boolean wasClicked;
-
 	private boolean mResult;
+
+	int skipButtonSizeLand = 40;
+	int skipButtonSizePort = 40;
+	public static final int TYPE_UNKNOWN = -1;
+	public static final int TYPE_BROWSER = 0;
+	public static final int TYPE_INTERSTITIAL = 2;
 
 	DisplayMetrics metrics;
 
-	int paddingArg = 5;
-
-	int marginArg = 8;
-
-	int skipButtonSizeLand = 40;
-
-	int skipButtonSizePort = 40;
-
 	static class ResourceHandler extends Handler {
-
 		WeakReference<RichMediaActivity> richMediaActivity;
 
 		public ResourceHandler(RichMediaActivity activity) {
-			richMediaActivity = new WeakReference<RichMediaActivity>(activity);
+			richMediaActivity = new WeakReference<>(activity);
 		}
 
 		@Override
@@ -134,58 +83,42 @@ public class RichMediaActivity extends Activity {
 				wRichMediaActivity.handleMessage(msg);
 			}
 		}
-	};
+	}
 
 	public void handleMessage(final Message msg) {
 		switch (msg.what) {
-		case ResourceManager.RESOURCE_LOADED_MSG:
-			switch (msg.arg1) {
-			case ResourceManager.DEFAULT_SKIP_IMAGE_RESOURCE_ID:
-				if (RichMediaActivity.this.mSkipButton != null) {
-					RichMediaActivity.this.mSkipButton.setImageDrawable(mResourceManager.getResource(this, ResourceManager.DEFAULT_SKIP_IMAGE_RESOURCE_ID));
+			case ResourceManager.RESOURCE_LOADED_MSG:
+				switch (msg.arg1) {
+					case ResourceManager.DEFAULT_SKIP_IMAGE_RESOURCE_ID:
+						if (RichMediaActivity.this.mSkipButton != null) {
+							RichMediaActivity.this.mSkipButton.setImageDrawable(mResourceManager.getResource(this, ResourceManager.DEFAULT_SKIP_IMAGE_RESOURCE_ID));
+						}
+					break;
 				}
-				break;
-			}
 			break;
-
 		}
 	}
 
-
 	OnClickListener mOnInterstitialSkipListener = new OnClickListener() {
-
 		@Override
 		public void onClick(final View v) {
-
 			Log.v("###########TRACKING SKIP INTERSTITIAL");
-
 			RichMediaActivity.this.close();
 		}
 	};
 
 
-	private ResourceHandler mHandler;
-
 	@Override
 	public void finish() {
+		super.finish();
 
 		if (this.mAd != null) {
 			Log.d("Finish Activity type:" + this.mType + " ad Type:" + this.mAd.getType());
 			InAppMessageManager.closeRunningInAppMessage(this.mAd, this.mResult);
 		}
-		super.finish();
-	}
-
-	public int getDipSize(final int argSize) {
-		return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, argSize, this.getResources().getDisplayMetrics());
-	}
-
-	public FrameLayout getRootLayout() {
-		return this.mRootLayout;
 	}
 
 	public void goBack() {
-
 		switch (this.mType) {
 			case TYPE_INTERSTITIAL:
 				this.mResult = true;
@@ -196,10 +129,7 @@ public class RichMediaActivity extends Activity {
 				this.finish();
 				break;
 		}
-
 	}
-
-
 
 	private void initInterstitialFromBannerView() {
 		final FrameLayout layout = new FrameLayout(this);
@@ -302,51 +232,34 @@ public class RichMediaActivity extends Activity {
 		this.mRootLayout.setBackgroundColor(Color.argb(128, 0, 0, 0));
 	}
 
-
-	public void navigate(final String clickUrl) {
-		notifyAdClicked();
-		switch (this.mType) {
-/*		case TYPE_BROWSER:
-			this.mWebBrowserView.loadUrl(clickUrl);
-			break;*/
-		default:
-			final Intent intent = new Intent(this, RichMediaActivity.class);
-			intent.setData(Uri.parse(clickUrl));
-			this.startActivity(intent);
-		}
-	}
-
 	@Override
 	public void onConfigurationChanged(final Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
-
 		Log.d("RichMediaActivity onConfigurationChanged");
 	}
 
 	@SuppressWarnings("deprecation")
 	@Override
 	public void onCreate(final Bundle icicle) {
-
-		Log.d("RichMediaActivity onCreate");
 		super.onCreate(icicle);
 
 		try {
+			final Window win = this.getWindow();
+			final WindowManager wm = (WindowManager) this.getSystemService(Context.WINDOW_SERVICE);
+			final Display display = this.getWindowManager().getDefaultDisplay();
+			int mWindowWidth = display.getWidth();
+			int mWindowHeight = display.getHeight();
+			this.metrics = new DisplayMetrics();
 
 			this.mResult = false;
 			this.setResult(Activity.RESULT_CANCELED);
-			final Window win = this.getWindow();
-			win.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+			win.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			win.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-			final Display display = this.getWindowManager().getDefaultDisplay();
-			this.metrics = new DisplayMetrics();
-			final WindowManager wm = (WindowManager) this.getSystemService(Context.WINDOW_SERVICE);
 			wm.getDefaultDisplay().getMetrics(this.metrics);
-			this.mWindowWidth = display.getWidth();
-			this.mWindowHeight = display.getHeight();
 			win.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
 
-			Log.d("RichMediaActivity Window Size:(" + this.mWindowWidth + "," + this.mWindowHeight + ")");
+			Log.d("RichMediaActivity Window Size:(" + mWindowWidth + "," + mWindowHeight + ")");
 /*
 			this.setVolumeControlStream(AudioManager.STREAM_MUSIC);
 */
@@ -354,57 +267,52 @@ public class RichMediaActivity extends Activity {
 			final Intent intent = this.getIntent();
 			final Bundle extras = intent.getExtras();
 			if (extras == null || extras.getSerializable(Const.AD_EXTRA) == null) {
-				this.uri = intent.getData();
+				Uri uri = intent.getData();
 				Log.d("uri " + uri);
-				if (this.uri == null) {
 
-					Log.d("url is null so do not load anything");
+				if (uri == null) {
 					this.finish();
 					return;
 				}
+
 				this.mType = RichMediaActivity.TYPE_BROWSER;
-			} else
+			} else {
 				this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+			}
 
-			mHandler = new ResourceHandler(this);
-
-			this.mResourceManager = new ResourceManager(this, this.mHandler);
+			ResourceHandler mHandler = new ResourceHandler(this);
+			this.mResourceManager = new ResourceManager();
 			this.initRootLayout();
 
-/*			if (this.mType == RichMediaActivity.TYPE_BROWSER) {
-				this.initWebBrowserView(true);
-				this.mWebBrowserView.loadUrl(this.uri.toString());
-			} else {*/
 				this.mAd = (InAppMessageResponse) extras.getSerializable(Const.AD_EXTRA);
 
 				this.mCanClose = false;
 				this.mType = extras.getInt(Const.AD_TYPE_EXTRA, -1);
-				if (this.mType == -1)
+				if (this.mType == -1) {
 					switch (this.mAd.getType()) {
-
-					case Const.TEXT:
-					case Const.IMAGE:
-						if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.GINGERBREAD) {
-							setOrientationOldApi();
-						} else {
-							setOrientation();
-						}
-						this.mType = TYPE_INTERSTITIAL;
-						break;
+						case Const.TEXT:
+						case Const.IMAGE:
+							if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.GINGERBREAD) {
+								setOrientationOldApi();
+							} else {
+								setOrientation();
+							}
+							this.mType = TYPE_INTERSTITIAL;
+							break;
 					}
-				switch (this.mType) {
-
+				}
+			switch (this.mType) {
 				case TYPE_INTERSTITIAL:
 					Log.v("Type interstitial like banner");
 					this.initInterstitialFromBannerView();
 					break;
-				}
-
+			}
 
 			this.setContentView(this.mRootLayout);
 			Log.d("RichMediaActivity onCreate done");
 
-		} catch (Exception e) { // in unlikely case something goes terribly wrong
+		} catch (Exception e) {
+			// in unlikely case something goes terribly wrong
 			finish();
 		}
 	}
@@ -428,17 +336,12 @@ public class RichMediaActivity extends Activity {
 
 	@Override
 	protected void onDestroy() {
-
-		if (mResourceManager != null)
-			mResourceManager.releaseInstance();
-
-		Log.d("RichMediaActivity onDestroy");
 		super.onDestroy();
 
-		Log.d("RichMediaActivity onDestroy done");
+		if (mResourceManager != null) {
+			mResourceManager.releaseInstance();
+		}
 	}
-
-
 
 	@Override
 	public boolean onKeyDown(final int keyCode, final KeyEvent event) {
@@ -451,27 +354,24 @@ public class RichMediaActivity extends Activity {
 
 	@Override
 	protected void onPause() {
-
-		Log.d("RichMediaActivity onPause");
 		super.onPause();
-
-		Log.d("RichMediaActivity onPause done");
+		Log.d("RichMediaActivity onPause");
 	}
 
 	@Override
 	protected void onResume() {
-		if (wasClicked) { // close after coming back from click.
+		super.onResume();
+
+		if (wasClicked) {
+			// close after coming back from click.
 			close();
 		}
 
 		Log.d("RichMediaActivity onResume");
-		super.onResume();
 		switch (this.mType) {
-		case TYPE_BROWSER:
+			case TYPE_BROWSER:
 			break;
 		}
-
-		Log.d("RichMediaActivity onResume done");
 	}
 
 	public void close() {
@@ -480,4 +380,7 @@ public class RichMediaActivity extends Activity {
 		finish();
 	}
 
+	protected void setTypeInterstitial(int type) {
+		mType = type;
+	}
 }

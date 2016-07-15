@@ -18,8 +18,6 @@ package com.playseeds.android.sdk.inappmessaging;
 
 public class RequestException extends Exception {
 
-	private static final long serialVersionUID = 1L;
-
 	public RequestException() {
 		super();
 	}
@@ -36,5 +34,4 @@ public class RequestException extends Exception {
 	public RequestException(final Throwable throwable) {
 		super(throwable);
 	}
-
 }

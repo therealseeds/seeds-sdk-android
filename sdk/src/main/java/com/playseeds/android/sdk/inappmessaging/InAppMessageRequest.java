@@ -22,14 +22,10 @@ import java.util.List;
 
 import android.net.Uri;
 import android.os.Build;
-import android.text.TextUtils;
 
 import com.playseeds.android.sdk.DeviceId;
 
 public class InAppMessageRequest {
-	private static final String REQUEST_TYPE_ANDROID = "android_app";
-	private static final int DEVICE_ID_MS_DELAY = 500;  // sleep in ms if device_id not loaded yet
-	
 	private String userAgent;
 	private String userAgent2;
 	private String headers;
@@ -49,29 +45,22 @@ public class InAppMessageRequest {
 	private Gender gender;
 	private int userAge;
 	private List<String> keywords;
-
 	private String ipAddress;
-	private String androidAdId = "";
-	private boolean adDoNotTrack = false;
 	private String connectionType;
 	private long timestamp;
-
 	private String orientation;
-
-	public String getDeviceId() {
-		return deviceId;
-	}
+	private String androidAdId = "";
+	private boolean adDoNotTrack = false;
+	private static final String REQUEST_TYPE_ANDROID = "android_app";
+	// sleep in ms if device_id not loaded yet
+	private static final int DEVICE_ID_MS_DELAY = 500;
 
 	public void setDeviceId(String deviceId) {
 		this.deviceId = deviceId;
 	}
 
-	public DeviceId.Type getIdMode() {
-		return idMode;
-	}
-
-	public void setIdMode(DeviceId.Type idMode) {
-		this.idMode = idMode;
+	public void setGender(Gender gender) {
+		this.gender = gender;
 	}
 
 	public String getMessageId() {
@@ -80,6 +69,158 @@ public class InAppMessageRequest {
 
 	public void setMessageId(String messageId) {
 		this.messageId = messageId;
+	}
+
+	public void setUserAge(int userAge) {
+		this.userAge = userAge;
+	}
+
+	public void setKeywords(List<String> keywords) {
+		this.keywords = keywords;
+	}
+
+	public void setIdMode(DeviceId.Type idMode) {
+		this.idMode = idMode;
+	}
+
+	public void setConnectionType(final String connectionType) {
+		this.connectionType = connectionType;
+	}
+
+	public void setAdDoNotTrack(boolean adDoNotTrack) {
+		this.adDoNotTrack = adDoNotTrack;
+	}
+
+	public void setOrientation(String orientation) {
+		this.orientation = orientation;
+	}
+
+	public void setHeaders(final String headers) {
+		this.headers = headers;
+	}
+
+	public void setIpAddress(final String ipAddress) {
+		this.ipAddress = ipAddress;
+	}
+
+	public void setLatitude(final double latitude) {
+		this.latitude = latitude;
+	}
+
+	public void setListAds(final String listAds) {
+		this.listAds = listAds;
+	}
+
+	public void setLongitude(final double longitude) {
+		this.longitude = longitude;
+	}
+
+	public void setProtocolVersion(final String protocolVersion) {
+		this.protocolVersion = protocolVersion;
+	}
+
+	public void setAppKey(final String appKey) {
+		this.appKey = appKey;
+	}
+
+	public void setTimestamp(final long timestamp) {
+		this.timestamp = timestamp;
+	}
+
+	public void setUserAgent(final String userAgent) {
+		this.userAgent = userAgent;
+	}
+
+	public void setUserAgent2(final String userAgent) {
+		this.userAgent2 = userAgent;
+	}
+
+	public void setRequestURL(String requestURL) {
+		this.requestURL = requestURL;
+	}
+
+	public void setAdspaceStrict(boolean adspaceStrict) {
+		this.adspaceStrict = adspaceStrict;
+	}
+
+	public void setAdspaceWidth(int adspaceWidth) {
+		this.adspaceWidth = adspaceWidth;
+	}
+
+	public void setAdspaceHeight(int adspaceHeight) {
+		this.adspaceHeight = adspaceHeight;
+	}
+
+	public void setAndroidAdId(String androidAdId) {
+		this.androidAdId = androidAdId;
+	}
+
+	public String countlyUriToString() {
+		return this.toCountlyUri().toString();
+	}
+
+	//TODO: make sure "deviceCategory" gets to server code
+	public Uri toCountlyUri() {
+		String countlyURL = requestURL;
+		String path = "/o/messages";
+		final Uri.Builder b = Uri.parse((countlyURL + path)).buildUpon();
+
+		b.appendQueryParameter("app_key", appKey);
+		b.appendQueryParameter("orientation", orientation);
+
+		if (deviceId == null || deviceId.isEmpty()) {
+			deviceId = Util.getAndroidAdId();
+			if (deviceId == null || deviceId.isEmpty()) {
+				try {
+					Thread.sleep(DEVICE_ID_MS_DELAY);
+				} catch (InterruptedException e) {
+					Log.e("Sleep interrupted: " + e);
+				}
+				deviceId = Util.getAndroidAdId();
+			}
+		}
+
+		if (deviceId == null || deviceId.isEmpty()) {
+			Log.e("Device Id could not be set");
+		}
+		b.appendQueryParameter("device_id", deviceId);
+		//b.appendQueryParameter("device_id_type", idMode.toString()); //currently unused
+		if (messageId != null)
+			b.appendQueryParameter("message_id", messageId);
+
+		return b.build();
+	}
+
+	public String getRequestURL() {
+		return requestURL;
+	}
+
+	public boolean isAdspaceStrict() {
+		return adspaceStrict;
+	}
+
+	public int getAdspaceWidth() {
+		return adspaceWidth;
+	}
+
+	public int getAdspaceHeight() {
+		return adspaceHeight;
+	}
+
+	public String getAndroidAdId() {
+		return androidAdId;
+	}
+
+	public Boolean hasAdDoNotTrack() {
+		return adDoNotTrack;
+	}
+
+	public String getOrientation() {
+		return orientation;
+	}
+
+	public DeviceId.Type getIdMode() {
+		return idMode;
 	}
 
 	public String getAndroidVersion() {
@@ -93,6 +234,11 @@ public class InAppMessageRequest {
 	public String getDeviceMode() {
 		return Build.MODEL;
 	}
+
+	public String getDeviceId() {
+		return deviceId;
+	}
+
 
 	public String getHeaders() {
 		if (this.headers == null)
@@ -154,159 +300,15 @@ public class InAppMessageRequest {
 		return this.userAgent2;
 	}
 
-	public void setConnectionType(final String connectionType) {
-		this.connectionType = connectionType;
+	public Gender getGender() {
+		return this.gender;
 	}
 
-	public void setHeaders(final String headers) {
-		this.headers = headers;
+	public int getUserAge() {
+		return this.userAge;
 	}
 
-	public void setIpAddress(final String ipAddress) {
-		this.ipAddress = ipAddress;
+	public List<String> getKeywords() {
+		return this.keywords;
 	}
-
-	public void setLatitude(final double latitude) {
-		this.latitude = latitude;
-	}
-
-	public void setListAds(final String listAds) {
-		this.listAds = listAds;
-	}
-
-	public void setLongitude(final double longitude) {
-		this.longitude = longitude;
-	}
-
-	public void setProtocolVersion(final String protocolVersion) {
-		this.protocolVersion = protocolVersion;
-	}
-
-	public void setAppKey(final String appKey) {
-		this.appKey = appKey;
-	}
-
-	public void setTimestamp(final long timestamp) {
-		this.timestamp = timestamp;
-	}
-
-	public void setUserAgent(final String userAgent) {
-		this.userAgent = userAgent;
-	}
-
-	public void setUserAgent2(final String userAgent) {
-		this.userAgent2 = userAgent;
-	}
-
-//	@Override
-//	public String toString() {
-//
-//		return this.toUri().toString();
-//	}
-
-	public String countlyUriToString() {
-		return this.toCountlyUri().toString();
-	}
-
-
-	//TODO: make sure "deviceCategory" gets to server code
-	public Uri toCountlyUri() {
-		String countlyURL = requestURL;
-		String path = "/o/messages";
-		final Uri.Builder b = Uri.parse((countlyURL + path)).buildUpon();
-
-		b.appendQueryParameter("app_key", appKey);
-		b.appendQueryParameter("orientation", orientation);
-
-		if (deviceId == null || deviceId.isEmpty()) {
-			deviceId = Util.getAndroidAdId();
-			if (deviceId == null || deviceId.isEmpty()) {
-				try {
-					Thread.sleep(DEVICE_ID_MS_DELAY);
-				} catch (InterruptedException e) {
-					Log.e("Sleep interrupted: " + e);
-				}
-				deviceId = Util.getAndroidAdId();
-			}
-		}
-
-		if (deviceId == null || deviceId.isEmpty()) {
-			Log.e("Device Id could not be set");
-		}
-		b.appendQueryParameter("device_id", deviceId);
-		//b.appendQueryParameter("device_id_type", idMode.toString()); //currently unused
-		if (messageId != null)
-			b.appendQueryParameter("message_id", messageId);
-
-		return b.build();
-	}
-
-	public String getRequestURL() {
-		return requestURL;
-	}
-
-	public void setRequestURL(String requestURL) {
-		this.requestURL = requestURL;
-	}
-
-	public boolean isAdspaceStrict() {
-		return adspaceStrict;
-	}
-
-	public void setAdspaceStrict(boolean adspaceStrict) {
-		this.adspaceStrict = adspaceStrict;
-	}
-
-	public int getAdspaceWidth() {
-		return adspaceWidth;
-	}
-
-	public void setAdspaceWidth(int adspaceWidth) {
-		this.adspaceWidth = adspaceWidth;
-	}
-
-	public int getAdspaceHeight() {
-		return adspaceHeight;
-	}
-
-	public void setAdspaceHeight(int adspaceHeight) {
-		this.adspaceHeight = adspaceHeight;
-	}
-
-	public String getAndroidAdId() {
-		return androidAdId;
-	}
-
-	public void setAndroidAdId(String androidAdId) {
-		this.androidAdId = androidAdId;
-	}
-
-	public Boolean hasAdDoNotTrack() {
-		return adDoNotTrack;
-	}
-
-	public void setAdDoNotTrack(boolean adDoNotTrack) {
-		this.adDoNotTrack = adDoNotTrack;
-	}
-
-	public String getOrientation() {
-		return orientation;
-	}
-
-	public void setOrientation(String orientation) {
-		this.orientation = orientation;
-	}
-
-	public void setGender(Gender gender) {
-		this.gender = gender;
-	}
-	
-	public void setUserAge(int userAge) {
-		this.userAge = userAge;
-	}
-
-	public void setKeywords(List<String> keywords) {
-		this.keywords = keywords;
-	}
-
 }

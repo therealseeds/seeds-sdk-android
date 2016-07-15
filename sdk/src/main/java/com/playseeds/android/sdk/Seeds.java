@@ -1,16 +1,13 @@
 /*
 Copyright (c) 2012, 2013, 2014 Countly
-
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
-
 The above copyright notice and this permission notice shall be included in
 all copies or substantial portions of the Software.
-
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -42,22 +39,40 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-
 /**
  * This class is the public API for the Seeds Android SDK.
  * Get more details <a href="https://github.com/the-real-sseds/seeds-sdk-android">here</a>.
  */
 public class Seeds {
+    private ConnectionQueue connectionQueue_;
+    @SuppressWarnings("FieldCanBeLocal")
+    private ScheduledExecutorService timerService_;
+    private EventQueue eventQueue_;
+    private long prevSessionDurationStartTime_;
+    private int activityCount_;
+    private boolean disableUpdateSessionRequests_;
+    private boolean enableLogging_;
+    private Seeds.CountlyMessagingMode messagingMode_;
+    private Context context_;
+    protected static List<String> publicKeyPinCertificates;
+    private IInAppBillingService billingService;
+
+    // Seeds message identification stuff
+    private String messageVariantName;
+
+    private boolean adClicked = false;
 
     /**
      * Current version of the Count.ly Android SDK as a displayable string.
      */
     public static final String COUNTLY_SDK_VERSION_STRING = "15.06";
+
     /**
      * Default string used in the begin session metrics if the
      * app version cannot be found.
      */
     public static final String DEFAULT_APP_VERSION = "1.0";
+
     /**
      * Tag used in all logging in the Count.ly SDK.
      */
@@ -68,58 +83,11 @@ public class Seeds {
      * an attempt is made to submit them to a Count.ly server.
      */
     private static final int EVENT_QUEUE_SIZE_THRESHOLD = 10;
+
     /**
      * How often onTimer() is called.
      */
     private static final long TIMER_DELAY_IN_SECONDS = 60;
-
-    protected static List<String> publicKeyPinCertificates;
-
-    /**
-     * Enum used in Seeds.initMessaging() method which controls what kind of
-     * app installation it is. Later (in Seeds Dashboard or when calling Seeds API method),
-     * you'll be able to choose whether you want to send a message to ly.count.android.sdk.test devices,
-     * or to production ones.
-     */
-    public static enum CountlyMessagingMode {
-        TEST,
-        PRODUCTION,
-    }
-
-    // see http://stackoverflow.com/questions/7048198/thread-safe-singletons-in-java
-    private static class SingletonHolder {
-        static final Seeds instance = new Seeds();
-    }
-
-    private ConnectionQueue connectionQueue_;
-    @SuppressWarnings("FieldCanBeLocal")
-    private ScheduledExecutorService timerService_;
-    private EventQueue eventQueue_;
-    private DeviceId deviceId_Manager_;
-    private long prevSessionDurationStartTime_;
-    private int activityCount_;
-    private boolean disableUpdateSessionRequests_;
-    private boolean enableLogging_;
-    private Seeds.CountlyMessagingMode messagingMode_;
-    private Context context_;
-    private IInAppBillingService billingService;
-
-    public boolean isAdClicked() {
-        return adClicked;
-    }
-
-    public void setAdClicked(boolean adClicked) {
-        this.adClicked = adClicked;
-    }
-
-    private boolean adClicked = false;
-
-    /**
-     * Returns the Seeds singleton.
-     */
-    public static Seeds sharedInstance() {
-        return SingletonHolder.instance;
-    }
 
     /**
      * Constructs a Seeds object.
@@ -136,6 +104,28 @@ public class Seeds {
         }, TIMER_DELAY_IN_SECONDS, TIMER_DELAY_IN_SECONDS, TimeUnit.SECONDS);
     }
 
+    // see http://stackoverflow.com/questions/7048198/thread-safe-singletons-in-java
+    private static class SingletonHolder {
+        static final Seeds instance = new Seeds();
+    }
+
+    /**
+     * Returns the Seeds singleton.
+     */
+    public static Seeds sharedInstance() {
+        return SingletonHolder.instance;
+    }
+
+    /**
+     * Enum used in Seeds.initMessaging() method which controls what kind of
+     * app installation it is. Later (in Seeds Dashboard or when calling Seeds API method),
+     * you'll be able to choose whether you want to send a message to ly.count.android.sdk.test devices,
+     * or to production ones.
+     */
+    public enum CountlyMessagingMode {
+        TEST,
+        PRODUCTION,
+    }
 
     /**
      * Initializes the Seeds SDK. Call from your main Activity's onCreate() method.
@@ -210,8 +200,8 @@ public class Seeds {
             throw new IllegalArgumentException("valid deviceID is required because Advertising ID is not available (you need to include Google Play services 4.0+ into your project)");
         }
         if (eventQueue_ != null && (!connectionQueue_.getServerURL().equals(serverURL) ||
-                                    !connectionQueue_.getAppKey().equals(appKey) ||
-                                    !DeviceId.deviceIDEqualsNullSafe(deviceID, idMode, connectionQueue_.getDeviceId()) )) {
+                !connectionQueue_.getAppKey().equals(appKey) ||
+                !DeviceId.deviceIDEqualsNullSafe(deviceID, idMode, connectionQueue_.getDeviceId()) )) {
             throw new IllegalStateException("Seeds cannot be reinitialized with different values");
         }
 
@@ -252,7 +242,6 @@ public class Seeds {
         initInAppMessaging();
         InAppMessageManager.sharedInstance().setListener(listener);
 
-
         return this;
     }
 
@@ -276,6 +265,7 @@ public class Seeds {
     public Seeds initMessaging(Activity activity, Class<? extends Activity> activityClass, String projectID, Seeds.CountlyMessagingMode mode) {
         return initMessaging(activity, activityClass, projectID, null, mode);
     }
+
     /**
      * Initializes the Seeds MessagingSDK. Call from your main Activity's onCreate() method.
      * @param activity application activity which acts as a final destination for notifications
@@ -308,7 +298,6 @@ public class Seeds {
      * Initializes the Seeds InAppMessaging part of the MessagingSDK. Call from your main Activity's onCreate() method.
      * @return Seeds instance for easy method chaining
      */
-
     public synchronized Seeds initInAppMessaging() {
         Log.d(Seeds.TAG, "deviceId: " + connectionQueue_.getDeviceId() +
                 connectionQueue_.getDeviceId().getId() + connectionQueue_.getDeviceId().getType());
@@ -481,8 +470,6 @@ public class Seeds {
 
 
     public void trackPurchase(String key, final double price) {
-
-
         if (isAdClicked()) {
             recordSeedsIAPEvent(key, price);
             setAdClicked(false);
@@ -838,21 +825,41 @@ public class Seeds {
     }
 
     // for unit testing
-    ConnectionQueue getConnectionQueue() { return connectionQueue_; }
-    void setConnectionQueue(final ConnectionQueue connectionQueue) { connectionQueue_ = connectionQueue; }
-    ExecutorService getTimerService() { return timerService_; }
-    EventQueue getEventQueue() { return eventQueue_; }
-    void setEventQueue(final EventQueue eventQueue) { eventQueue_ = eventQueue; }
-    long getPrevSessionDurationStartTime() { return prevSessionDurationStartTime_; }
-    void setPrevSessionDurationStartTime(final long prevSessionDurationStartTime) { prevSessionDurationStartTime_ = prevSessionDurationStartTime; }
-    int getActivityCount() { return activityCount_; }
-    boolean getDisableUpdateSessionRequests() { return disableUpdateSessionRequests_; }
+    ConnectionQueue getConnectionQueue() {
+        return connectionQueue_;
+    }
 
+    void setConnectionQueue(final ConnectionQueue connectionQueue) {
+        connectionQueue_ = connectionQueue;
+    }
 
-    // Seeds message identification stuff
+    ExecutorService getTimerService() {
+        return timerService_;
+    }
 
-    private String messageVariantName;
+    EventQueue getEventQueue() {
+        return eventQueue_;
+    }
 
+    void setEventQueue(final EventQueue eventQueue) {
+        eventQueue_ = eventQueue;
+    }
+
+    long getPrevSessionDurationStartTime() {
+        return prevSessionDurationStartTime_;
+    }
+
+    void setPrevSessionDurationStartTime(final long prevSessionDurationStartTime) {
+        prevSessionDurationStartTime_ = prevSessionDurationStartTime;
+    }
+
+    int getActivityCount() {
+        return activityCount_;
+    }
+
+    boolean getDisableUpdateSessionRequests() {
+        return disableUpdateSessionRequests_;
+    }
 
     public void setMessageVariantName(String messageVariantName) {
         this.messageVariantName = messageVariantName;
@@ -876,6 +883,22 @@ public class Seeds {
 
     public boolean isInAppMessageLoaded(String messageId) {
         return InAppMessageManager.sharedInstance().isInAppMessageLoaded(messageId);
+    }
+
+    public boolean isAdClicked() {
+        return adClicked;
+    }
+
+    public void setAdClicked(boolean adClicked) {
+        this.adClicked = adClicked;
+    }
+
+    /**
+     * This method is added solely for the purposes of testing
+     * Check: SeedsTests.java
+     */
+    protected void clear() {
+        sharedInstance().eventQueue_ = null;
     }
 
     public void showInAppMessage() {
