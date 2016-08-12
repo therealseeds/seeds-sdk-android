@@ -34,7 +34,7 @@ test:
         - cp -r sdk/build/outputs/androidTest-results $CIRCLE_TEST_REPORTS
         - cp -r sdk/build/reports/coverage $CIRCLE_TEST_REPORTS
         # I added this here for testing. Normally this command should only run in a stable branch (i.e master branch)
-        - curl -T $CIRCLE_ARTIFACTS/output/aar/sdk-release.aar -uBINTRAY_USER:BINTRAY_API_KEY https://api.bintray.com/content/BINTRAY_USER/playseeds/seeds-android-sdk/0.3.5/seeds-android-sdk.aar
+        - curl -T sdk/build/output/aar/sdk-release.aar -uBINTRAY_USER:BINTRAY_API_KEY https://api.bintray.com/content/BINTRAY_USER/playseeds/seeds-android-sdk/0.3.5/seeds-android-sdk.aar
 
 
 deployment:
@@ -42,8 +42,8 @@ deployment:
     branch: master
     commands:
     # format
-    # - curl -T $CIRCLE_ARTIFACTS/output/aar/sdk-release.aar -u<user-name>:<api_key> https://api.bintray.com/content/<user-name>/<repo-name-on-bintray>/<packgage-name-on-bintray>/<version-name-on-bintray>/<target-file-name>
-    - curl -T $CIRCLE_ARTIFACTS/output/aar/sdk-release.aar -uBINTRAY_USER:BINTRAY_API_KEY https://api.bintray.com/content/BINTRAY_USER/playseeds/seeds-android-sdk/0.3.5/seeds-android-sdk.aar
+    # - curl -T sdk/build/output/aar/sdk-release.aar -u<user-name>:<api_key> https://api.bintray.com/content/<user-name>/<repo-name-on-bintray>/<packgage-name-on-bintray>/<version-name-on-bintray>/<target-file-name>
+    - curl -T sdk/build/output/aar/sdk-release.aar -uBINTRAY_USER:BINTRAY_API_KEY https://api.bintray.com/content/BINTRAY_USER/playseeds/seeds-android-sdk/0.3.5/seeds-android-sdk.aar
 
 experimental:
   notify:
