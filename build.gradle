@@ -9,50 +9,9 @@ buildscript {
     }
 }
 
-apply plugin: 'com.jfrog.bintray'
-apply plugin: 'maven-publish'
-apply plugin: 'java'
-sourceCompatibility = JavaVersion.VERSION_1_6
-
 allprojects {
     repositories {
         jcenter()
         mavenLocal()
     }
-}
-
-publishing {
-    publications {
-        MyPublication(MavenPublication) {
-            groupId 'com.playseeds'
-            artifactId 'android-sdk'
-            version '0.3.5'
-            artifact(sourceJar)
-            artifact("sdk/build/outputs/aar/sdk-release.aar")
-        }
-    }
-
-    repositories {
-        maven {
-            url "$buildDir/https://github.com/therealseeds/seeds-sdk-android"
-        }
-    }
-}
-
-bintray {
-    user = "andela-oofoamalu"
-    key = "6abebd8fece953ae2084494a873e0679accdc655"
-
-    pkg {
-        repo = 'generic'
-        name = 'seeds-android-sdk'
-        userOrg = 'seedsinc'
-        licenses = ['Apache-2.0']
-        vcsUrl = 'https://github.com/therealseeds/seeds-sdk-android'
-        publications = ['MyPublication']
-    }
-}
-
-task sourceJar(type: Jar) {
-    classifier "source"
 }
