@@ -33,6 +33,7 @@ test:
         - cp -r sdk/build/outputs $CIRCLE_ARTIFACTS
         - cp -r sdk/build/outputs/androidTest-results $CIRCLE_TEST_REPORTS
         - cp -r sdk/build/reports/coverage $CIRCLE_TEST_REPORTS
+        - ./gradlew -Puser=BINTRAY_USER -Pkey=BINTRAY_KEY bintrayUpload --info --stacktrace
 
 experimental:
   notify:

@@ -65,4 +65,3 @@ publish {
     description = 'Android SDK for Seeds mobile analytics'
     website = 'https://github.com/therealseeds/seeds-sdk-android'
 }
-
