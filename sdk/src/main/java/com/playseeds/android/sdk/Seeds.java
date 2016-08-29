@@ -20,10 +20,16 @@ package com.playseeds.android.sdk;
 
 import android.app.Activity;
 import android.content.Context;
+import android.net.Uri;
 import android.util.Log;
 
 import com.android.vending.billing.IInAppBillingService;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.TextHttpResponseHandler;
 import com.playseeds.android.sdk.inappmessaging.InAppMessageListener;
 import com.playseeds.android.sdk.inappmessaging.InAppMessageManager;
 
@@ -38,6 +44,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import cz.msebera.android.httpclient.Header;
 
 /**
  * This class is the public API for the Seeds Android SDK.
@@ -56,6 +64,7 @@ public class Seeds {
     private Context context_;
     protected static List<String> publicKeyPinCertificates;
     private IInAppBillingService billingService;
+    private AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
 
     // Seeds message identification stuff
     private String messageVariantName;
@@ -907,5 +916,63 @@ public class Seeds {
 
     public void showInAppMessage(String messageId) {
         InAppMessageManager.sharedInstance().showInAppMessage(messageId);
+    }
+
+    public void requestInAppPurchaseCount(IInAppPurchaseStatsListener listener) {
+        requestInAppPurchaseCount(null, listener);
+    }
+
+    public void requestInAppPurchaseCount(final String key, final IInAppPurchaseStatsListener listener) {
+        String endpoint = connectionQueue_.getServerURL() + "/o/app-user/query-iap-purchase-count";
+        Uri.Builder uri = Uri.parse(endpoint).buildUpon();
+        uri.appendQueryParameter("app_key", connectionQueue_.getAppKey());
+        uri.appendQueryParameter("device_id", connectionQueue_.getDeviceId().getId());
+
+        if (key != null)
+            uri.appendQueryParameter("iap_key", key);
+        else
+            uri.appendPath("total");
+
+        asyncHttpClient.get(uri.build().toString(), new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                JsonObject jsonResponse = new JsonParser().parse(responseString).getAsJsonObject();
+                if (listener != null)
+                    listener.onInAppPurchaseStats(key, jsonResponse.get("result").getAsInt());
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                Log.e(TAG, "requestInAppPurchaseCount failed: " + responseString);
+            }
+        });
+    }
+
+    public void requestInAppMessageStats(IInAppMessageStatsListener listener) {
+        requestInAppMessageStats(null, listener);
+    }
+
+    public void requestInAppMessageStats(final String key, final IInAppMessageStatsListener listener) {
+        String endpoint = connectionQueue_.getServerURL() + "/o/app-user/query-interstitial-shown-count";
+        Uri.Builder uri = Uri.parse(endpoint).buildUpon();
+        uri.appendQueryParameter("app_key", connectionQueue_.getAppKey());
+        uri.appendQueryParameter("device_id", connectionQueue_.getDeviceId().getId());
+
+        if (key != null)
+            uri.appendQueryParameter("interstitial_id", key);
+
+        asyncHttpClient.get(uri.build().toString(), new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                JsonObject jsonResponse = new JsonParser().parse(responseString).getAsJsonObject();
+                if (listener != null)
+                    listener.onInAppMessageStats(key, jsonResponse.get("result").getAsInt());
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                Log.e(TAG, "requestInAppPurchaseCount failed: " + responseString);
+            }
+        });
     }
 }
