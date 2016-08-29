@@ -68,6 +68,7 @@ public class Seeds {
 
     // Seeds message identification stuff
     private String messageVariantName;
+    private String messageContext;
 
     private boolean adClicked = false;
 
@@ -494,6 +495,7 @@ public class Seeds {
         if (seedsEvent) {
             segmentation.put("IAP type", "Seeds");
             segmentation.put("message", getMessageVariantName());
+            segmentation.put("message", getMessageContext());
         } else {
             segmentation.put("IAP type", "Non-Seeds");
         }
@@ -878,6 +880,14 @@ public class Seeds {
         return messageVariantName;
     }
 
+    public void setMessageContext(String messageContext) {
+        this.messageContext = messageContext;
+    }
+
+    public String getMessageContext() {
+        return messageContext;
+    }
+
     public void requestInAppMessage() {
         InAppMessageManager.sharedInstance().requestInAppMessage(null);
     }
@@ -911,11 +921,19 @@ public class Seeds {
     }
 
     public void showInAppMessage() {
-        InAppMessageManager.sharedInstance().showInAppMessage(null);
+        InAppMessageManager.sharedInstance().showInAppMessage(null, null);
     }
 
     public void showInAppMessage(String messageId) {
-        InAppMessageManager.sharedInstance().showInAppMessage(messageId);
+        InAppMessageManager.sharedInstance().showInAppMessage(messageId, null);
+    }
+
+    public void showInAppMessageWithContext(String messageContext) {
+        InAppMessageManager.sharedInstance().showInAppMessage(null, messageContext);
+    }
+
+    public void showInAppMessage(String messageId, String messageContext) {
+        InAppMessageManager.sharedInstance().showInAppMessage(messageId, messageContext);
     }
 
     public void requestInAppPurchaseCount(IInAppPurchaseStatsListener listener) {

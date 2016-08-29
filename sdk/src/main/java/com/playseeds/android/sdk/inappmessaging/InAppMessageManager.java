@@ -305,25 +305,7 @@ public class InAppMessageManager {
 		});
 	}
 
-	public void requestInAppMessageAndShow(final String messageId, long timeout) {
-		InAppMessageListener l = mListener;
-
-		mListener = null;
-		requestInAppMessage(messageId);
-		long now = System.currentTimeMillis();
-		long timeoutTime = now + timeout;
-		while ((!isInAppMessageLoaded(messageId)) && (now < timeoutTime)) {
-			try {
-				Thread.sleep(200);
-			} catch (InterruptedException e) {
-			}
-			now = System.currentTimeMillis();
-		}
-		mListener = l;
-		showInAppMessage(messageId);
-	}
-
-	public void showInAppMessage(String messageId) {
+	public void showInAppMessage(String messageId, String messageContext) {
 		if (((mResponse == null)
 				|| (mResponse.getType() == Const.NO_AD)
 				|| (mResponse.getType() == Const.AD_FAILED))
@@ -358,6 +340,8 @@ public class InAppMessageManager {
 		} catch (Exception e) {
 			Log.e("Unknown exception when showing InAppMessage", e);
 		} finally {
+			if (result)
+				Seeds.sharedInstance().setMessageContext(messageContext);
 			notifyAdShown(ad, result);
 		}
 	}
@@ -579,6 +563,7 @@ public class InAppMessageManager {
 	public void setSegmentation() {
 		segmentation = new HashMap<>();
 		segmentation.put("message", Seeds.sharedInstance().getMessageVariantName());
+		segmentation.put("message", Seeds.sharedInstance().getMessageContext());
 	}
 
 	public void doNotShow(boolean doNotShow) {
