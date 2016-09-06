@@ -16,6 +16,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.vending.billing.IInAppBillingService;
+import com.playseeds.android.sdk.IInAppMessageStatsListener;
+import com.playseeds.android.sdk.IInAppPurchaseStatsListener;
 import com.playseeds.android.sdk.Seeds;
 import com.playseeds.android.sdk.DeviceId;
 
@@ -90,6 +92,18 @@ public class MainActivity extends Activity implements InAppMessageListener {
     public void purchaseEventButtonClicked(View view) {
         Log.d("Main", "purchase button clicked");
         Seeds.sharedInstance().recordIAPEvent("item1", 0.99);
+        Seeds.sharedInstance().requestInAppPurchaseCount(new IInAppPurchaseStatsListener() {
+            @Override
+            public void onInAppPurchaseStats(String key, int purchasesCount) {
+                int i = 5;
+            }
+        });
+        Seeds.sharedInstance().requestInAppMessageStats(new IInAppMessageStatsListener() {
+            @Override
+            public void onInAppMessageStats(String key, int shownCount) {
+                int i = 5;
+            }
+        });
     }
 
     public void seedsPurchaseEventButtonClicked(View view) {

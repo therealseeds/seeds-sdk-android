@@ -563,7 +563,7 @@ public class InAppMessageManager {
 	public void setSegmentation() {
 		segmentation = new HashMap<>();
 		segmentation.put("message", Seeds.sharedInstance().getMessageVariantName());
-		segmentation.put("message", Seeds.sharedInstance().getMessageContext());
+		segmentation.put("context", Seeds.sharedInstance().getMessageContext());
 	}
 
 	public void doNotShow(boolean doNotShow) {

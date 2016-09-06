@@ -495,7 +495,7 @@ public class Seeds {
         if (seedsEvent) {
             segmentation.put("IAP type", "Seeds");
             segmentation.put("message", getMessageVariantName());
-            segmentation.put("message", getMessageContext());
+            segmentation.put("context", getMessageContext());
         } else {
             segmentation.put("IAP type", "Non-Seeds");
         }
@@ -954,14 +954,14 @@ public class Seeds {
         asyncHttpClient.get(uri.build().toString(), new TextHttpResponseHandler() {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                JsonObject jsonResponse = new JsonParser().parse(responseString).getAsJsonObject();
-                if (listener != null)
-                    listener.onInAppPurchaseStats(key, jsonResponse.get("result").getAsInt());
+                Log.e(TAG, "requestInAppPurchaseCount failed: " + responseString);
             }
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                Log.e(TAG, "requestInAppPurchaseCount failed: " + responseString);
+                JsonObject jsonResponse = new JsonParser().parse(responseString).getAsJsonObject();
+                if (listener != null)
+                    listener.onInAppPurchaseStats(key, jsonResponse.get("result").getAsInt());
             }
         });
     }
@@ -982,14 +982,14 @@ public class Seeds {
         asyncHttpClient.get(uri.build().toString(), new TextHttpResponseHandler() {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                JsonObject jsonResponse = new JsonParser().parse(responseString).getAsJsonObject();
-                if (listener != null)
-                    listener.onInAppMessageStats(key, jsonResponse.get("result").getAsInt());
+                Log.e(TAG, "requestInAppPurchaseCount failed: " + responseString);
             }
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                Log.e(TAG, "requestInAppPurchaseCount failed: " + responseString);
+                JsonObject jsonResponse = new JsonParser().parse(responseString).getAsJsonObject();
+                if (listener != null)
+                    listener.onInAppMessageStats(key, jsonResponse.get("result").getAsInt());
             }
         });
     }
