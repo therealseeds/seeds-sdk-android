@@ -20,6 +20,7 @@ package com.playseeds.android.sdk;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Build;
 import android.util.Log;
 
 import com.android.vending.billing.IInAppBillingService;
@@ -56,6 +57,7 @@ public class Seeds {
     private Context context_;
     protected static List<String> publicKeyPinCertificates;
     private IInAppBillingService billingService;
+    private MainActivityEventListener mainActivityEventListener;
 
     // Seeds message identification stuff
     private String messageVariantName;
@@ -131,8 +133,8 @@ public class Seeds {
      * Initializes the Seeds SDK. Call from your main Activity's onCreate() method.
      * Must be called before other SDK methods can be used.
      * Device ID is supplied by OpenUDID service if available, otherwise Advertising ID is used.
-     * BE CAUTIOUS!!!! If neither OpenUDID, nor Advertising ID is available, Seeds will ignore this user.
-     * @param context application context
+     * Be cautious: if neither OpenUDID nor Advertising ID is available, Seeds will ignore this user.
+     * @param activity activity, preferably the main activity
      * @param billingService billing service or null
      * @param listener callbacks listener
      * @param serverURL URL of the Seeds server to submit data to; use "https://cloud.count.ly" for Seeds Cloud
@@ -141,14 +143,14 @@ public class Seeds {
      * @throws java.lang.IllegalArgumentException if context, serverURL, appKey, or deviceID are invalid
      * @throws java.lang.IllegalStateException if the Seeds SDK has already been initialized
      */
-    public Seeds init(final Context context, IInAppBillingService billingService, final InAppMessageListener listener, final String serverURL, final String appKey) {
-        return init(context, billingService, listener, serverURL, appKey, null, OpenUDIDAdapter.isOpenUDIDAvailable() ? DeviceId.Type.OPEN_UDID : DeviceId.Type.ADVERTISING_ID);
+    public Seeds init(final Activity activity, IInAppBillingService billingService, final InAppMessageListener listener, final String serverURL, final String appKey) {
+        return init(activity, billingService, listener, serverURL, appKey, null, OpenUDIDAdapter.isOpenUDIDAvailable() ? DeviceId.Type.OPEN_UDID : DeviceId.Type.ADVERTISING_ID);
     }
 
     /**
      * Initializes the Seeds SDK. Call from your main Activity's onCreate() method.
      * Must be called before other SDK methods can be used.
-     * @param context application context
+     * @param activity activity, preferably the main activity
      * @param billingService billing service or null
      * @param listener callbacks listener
      * @param serverURL URL of the Seeds server to submit data to; use "https://cloud.count.ly" for Seeds Cloud
@@ -158,15 +160,15 @@ public class Seeds {
      * @throws IllegalArgumentException if context, serverURL, appKey, or deviceID are invalid
      * @throws IllegalStateException if init has previously been called with different values during the same application instance
      */
-    public Seeds init(final Context context, IInAppBillingService billingService, final InAppMessageListener listener, final String serverURL, final String appKey, final String deviceID) {
-        return init(context, billingService, listener, serverURL, appKey, deviceID, null);
+    public Seeds init(final Activity activity, IInAppBillingService billingService, final InAppMessageListener listener, final String serverURL, final String appKey, final String deviceID) {
+        return init(activity, billingService, listener, serverURL, appKey, deviceID, null);
     }
 
     /**
      * Initializes the Seeds SDK. Call from your main Activity's onCreate() method.
      * Must be called before other SDK methods can be used.
-     * @param context application context
-     * @param billingService billing service or null
+     * @param activity activity, preferably the main activity
+     * @param billingService billing service object or null, always null for Android API version >= 14
      * @param listener callbacks listener
      * @param serverURL URL of the Seeds server to submit data to; use "https://cloud.count.ly" for Seeds Cloud
      * @param appKey app key for the application being tracked; find in the Seeds Dashboard under Management &gt; Applications
@@ -176,8 +178,8 @@ public class Seeds {
      * @throws IllegalArgumentException if context, serverURL, appKey, or deviceID are invalid
      * @throws IllegalStateException if init has previously been called with different values during the same application instance
      */
-    public synchronized Seeds init(final Context context, IInAppBillingService billingService, final InAppMessageListener listener, final String serverURL, final String appKey, final String deviceID, DeviceId.Type idMode) {
-        if (context == null) {
+    public synchronized Seeds init(final Activity activity, IInAppBillingService billingService, final InAppMessageListener listener, final String serverURL, final String appKey, final String deviceID, DeviceId.Type idMode) {
+        if (activity == null) {
             throw new IllegalArgumentException("valid context is required");
         }
         if (!isValidURL(serverURL)) {
@@ -205,10 +207,26 @@ public class Seeds {
             throw new IllegalStateException("Seeds cannot be reinitialized with different values");
         }
 
+        final boolean apiSupportsLifecycleCallbacks =
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH;
+        final boolean listenToLifecycleEventsAutomatically =
+                billingService == null && apiSupportsLifecycleCallbacks;
+
+        if (listenToLifecycleEventsAutomatically) {
+            mainActivityEventListener =
+                    new MainActivityEventListener(activity, listener, serverURL, appKey, deviceID, idMode);
+            mainActivityEventListener.resolve();
+        } else if (apiSupportsLifecycleCallbacks) {
+            Log.w(Seeds.TAG, "You don't have to enter billingService parameter manually for " +
+                             "Android SDK version 14 or higher. Please ignore this message " +
+                             "if you have to support devices with a lower Android SDK version.");
+        }
+
+
         // In some cases CountlyMessaging does some background processing, so it needs a way
         // to start Seeds on itself
         if (MessagingAdapter.isMessagingAvailable()) {
-            MessagingAdapter.storeConfiguration(context, serverURL, appKey, deviceID, idMode);
+            MessagingAdapter.storeConfiguration(activity, serverURL, appKey, deviceID, idMode);
         }
 
         // if we get here and eventQueue_ != null, init is being called again with the same values,
@@ -221,9 +239,9 @@ public class Seeds {
                 deviceIdInstance = new DeviceId(idMode);
             }
 
-            final CountlyStore countlyStore = new CountlyStore(context);
+            final CountlyStore countlyStore = new CountlyStore(activity);
 
-            deviceIdInstance.init(context, countlyStore, true);
+            deviceIdInstance.init(activity, countlyStore, true);
 
             connectionQueue_.setServerURL(serverURL);
             connectionQueue_.setAppKey(appKey);
@@ -233,11 +251,11 @@ public class Seeds {
             eventQueue_ = new EventQueue(countlyStore);
         }
 
-        context_ = context;
+        context_ = activity;
         this.billingService = billingService;
 
         // context is allowed to be changed on the second init call
-        connectionQueue_.setContext(context);
+        connectionQueue_.setContext(activity);
 
         initInAppMessaging();
         InAppMessageManager.sharedInstance().setListener(listener);
@@ -341,6 +359,7 @@ public class Seeds {
         if (eventQueue_ == null) {
             throw new IllegalStateException("init must be called before onStart");
         }
+
 
         ++activityCount_;
         if (activityCount_ == 1) {

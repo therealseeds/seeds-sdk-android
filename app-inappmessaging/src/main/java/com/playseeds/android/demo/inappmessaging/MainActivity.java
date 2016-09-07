@@ -38,45 +38,9 @@ public class MainActivity extends Activity implements InAppMessageListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Intent serviceIntent = new Intent("com.android.vending.billing.InAppBillingService.BIND");
-        serviceIntent.setPackage("com.android.vending");
-        bindService(serviceIntent, mServiceConn, Context.BIND_AUTO_CREATE);
-
         Seeds.sharedInstance()
                 .init(this, null, this, YOUR_SERVER, YOUR_APP_KEY)
                 .setLoggingEnabled(true);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (mService != null) {
-            unbindService(mServiceConn);
-        }
-    }
-
-    @Override
-    public void onStart()
-    {
-        super.onStart();
-        Seeds.sharedInstance().onStart();
-    }
-
-    @Override
-    public void onStop()
-    {
-        Seeds.sharedInstance().onStop();
-        super.onStop();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
     }
 
     public void iamButtonClicked0(View view) {
@@ -141,20 +105,4 @@ public class MainActivity extends Activity implements InAppMessageListener {
         Toast.makeText(this, "noInAppMessageFound(messageId = " + messageId + ")", Toast.LENGTH_LONG).show();
     }
 
-    IInAppBillingService mService;
-    ServiceConnection mServiceConn = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            mService = IInAppBillingService.Stub.asInterface(service);
-
-            Seeds.sharedInstance()
-                    .init(MainActivity.this, mService, MainActivity.this, YOUR_SERVER, YOUR_APP_KEY)
-                    .setLoggingEnabled(true);
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            mService = null;
-        }
-    };
 }
