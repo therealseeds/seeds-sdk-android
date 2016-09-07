@@ -28,4 +28,6 @@ public interface InAppMessageListener {
 	void inAppMessageShown(String messageId, boolean succeeded);
 
 	void noInAppMessageFound(String messageId);
+
+    void inAppMessageClickedWithDynamicPrice(String messageId, Double price);
 }

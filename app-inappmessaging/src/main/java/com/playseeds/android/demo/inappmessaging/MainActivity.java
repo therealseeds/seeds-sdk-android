@@ -153,6 +153,13 @@ public class MainActivity extends Activity implements InAppMessageListener {
         Toast.makeText(this, "noInAppMessageFound(messageId = " + messageId + ")", Toast.LENGTH_LONG).show();
     }
 
+    @Override
+    public void inAppMessageClickedWithDynamicPrice(String messageId, Double price) {
+        // Not needed in applications where the user can't choose the price in the Seeds interstitial
+        Toast.makeText(this, "inAppMessageClickedWithDynamicPrice(messageId = " +
+                messageId + ", price = " + price + ")", Toast.LENGTH_LONG).show();
+    }
+
     IInAppBillingService mService;
     ServiceConnection mServiceConn = new ServiceConnection() {
         @Override

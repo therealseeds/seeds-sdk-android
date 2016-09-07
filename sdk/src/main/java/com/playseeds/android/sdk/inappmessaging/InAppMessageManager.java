@@ -366,13 +366,26 @@ public class InAppMessageManager {
 	}
 
 	private void notifyAdClicked(final InAppMessageResponse ad) {
+		// Here the dynamic inAppMessageClickedWithDynamicPrice
+		String linkUrl = ad.getSeedsLinkUrl();
+
 		if (mListener != null) {
-			sendNotification(new Runnable() {
-				@Override
-				public void run() {
-					mListener.inAppMessageClicked(ad.getMessageIdRequested());
-				}
-			});
+			if (linkUrl != null && linkUrl.contains("/price/")) {
+				final Double price = Double.parseDouble(linkUrl.substring(linkUrl.lastIndexOf('/') + 1));
+				sendNotification(new Runnable() {
+					@Override
+					public void run() {
+						mListener.inAppMessageClickedWithDynamicPrice(ad.getMessageIdRequested(), price);
+					}
+				});
+			} else {
+				sendNotification(new Runnable() {
+					@Override
+					public void run() {
+						mListener.inAppMessageClicked(ad.getMessageIdRequested());
+					}
+				});
+			}
 		}
 
 		setSegmentation();

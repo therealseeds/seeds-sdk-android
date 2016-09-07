@@ -62,6 +62,7 @@ public class InAppMessageResponse implements InAppMessage {
 	private ClickType clickType;
 	private String clickUrl;
 	private String urlType;
+	private String seedsLinkUrl;
 	private int refresh;
 	private boolean scale;
 	private boolean skipPreflight;
@@ -99,6 +100,10 @@ public class InAppMessageResponse implements InAppMessage {
 
 	public void setClickUrl(final String clickUrl) {
 		this.clickUrl = clickUrl;
+	}
+
+	public void setSeedsLinkUrl(final String seedsLinkUrl) {
+		this.seedsLinkUrl = seedsLinkUrl;
 	}
 
 	public void setProductId(final String productId) {
@@ -164,6 +169,10 @@ public class InAppMessageResponse implements InAppMessage {
 
 	public String getClickUrl() {
 		return this.clickUrl;
+	}
+
+	public String getSeedsLinkUrl() {
+		return this.seedsLinkUrl;
 	}
 
 	public String getImageUrl() {
