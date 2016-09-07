@@ -370,7 +370,7 @@ public class InAppMessageManager {
 			sendNotification(new Runnable() {
 				@Override
 				public void run() {
-					mListener.inAppMessageClicked(ad.getMessageIdRequested(), ad);
+					mListener.inAppMessageClicked(ad.getMessageIdRequested());
 				}
 			});
 		}
@@ -386,7 +386,7 @@ public class InAppMessageManager {
 			sendNotification(new Runnable() {
 				@Override
 				public void run() {
-					mListener.inAppMessageLoadSucceeded(ad.getMessageIdRequested(), ad);
+					mListener.inAppMessageLoadSucceeded(ad.getMessageIdRequested());
 				}
 			});
 		}
@@ -398,7 +398,7 @@ public class InAppMessageManager {
 			sendNotification(new Runnable() {
 				@Override
 				public void run() {
-					mListener.inAppMessageShown(ad.getMessageIdRequested(), ad, ok);
+					mListener.inAppMessageShown(ad.getMessageIdRequested(), ok);
 				}
 			});
 		}
@@ -419,7 +419,8 @@ public class InAppMessageManager {
 			sendNotification(new Runnable() {
 				@Override
 				public void run() {
-					mListener.inAppMessageClosed(ad.getMessageIdRequested(), ad, ok);
+					// TODO: Trigger this only when the interstitial is being dismissed
+					mListener.inAppMessageDismissed(ad.getMessageIdRequested());
 				}
 			});
 		}

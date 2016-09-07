@@ -120,8 +120,6 @@ public class MainActivity extends Activity implements InAppMessageListener {
 
                     } else {
                         Seeds.sharedInstance().requestInAppMessage(messageId);
-//                        Toast.makeText(AndroidLauncher.this, "InAppMessage loading...", Toast.LENGTH_LONG)
-//                                .show();
                     }
                 }
             });
@@ -131,22 +129,22 @@ public class MainActivity extends Activity implements InAppMessageListener {
     }
 
     @Override
-    public void inAppMessageClicked(String messageId, InAppMessage inAppMessage) {
+    public void inAppMessageClicked(String messageId) {
         Toast.makeText(this, "inAppMessageClicked(messageId = " + messageId + ")", Toast.LENGTH_LONG).show();
     }
 
     @Override
-    public void inAppMessageClosed(String messageId, InAppMessage inAppMessage, boolean completed) {
-        Toast.makeText(this, "inAppMessageClosed(completed = " + completed + ", messageId = " + messageId + ")", Toast.LENGTH_LONG).show();
+    public void inAppMessageDismissed(String messageId) {
+        Toast.makeText(this, "inAppMessageDismissed(messageId = " + messageId + ")", Toast.LENGTH_LONG).show();
     }
 
     @Override
-    public void inAppMessageLoadSucceeded(String messageId, InAppMessage inAppMessage) {
+    public void inAppMessageLoadSucceeded(String messageId) {
         Toast.makeText(getBaseContext(), "inAppMessageLoadSucceeded(messageId = " + messageId + ")", Toast.LENGTH_LONG).show();
     }
 
     @Override
-    public void inAppMessageShown(String messageId, InAppMessage inAppMessage, boolean succeeded) {
+    public void inAppMessageShown(String messageId, boolean succeeded) {
         Toast.makeText(this, "inAppMessageShown(succeeded = " + succeeded + ", messageId = " + messageId + ")", Toast.LENGTH_LONG).show();
     }
 
