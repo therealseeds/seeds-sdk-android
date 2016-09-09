@@ -116,8 +116,7 @@ public class InAppMessageView extends RelativeLayout {
 	}
 
 	private void doOpenUrl(final String url) {
-		this.response.setSeedsLinkUrl(url);
-		adListener.onClick();
+
 		if (this.response.getClickUrl() != null && this.response.getSkipOverlay() == 1) {
 			makeTrackingRequest(this.response.getClickUrl());
 		}
@@ -138,6 +137,9 @@ public class InAppMessageView extends RelativeLayout {
 				activity.close();
 			}
 		} else {
+			this.response.setSeedsLinkUrl(url);
+			adListener.onClick();
+
 			final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
 			startActivity(intent);
 		}

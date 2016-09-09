@@ -43,7 +43,7 @@ public class InAppMessageManagerTest extends AndroidTestCase {
     }
 
     public void testCloseRunningInAppMessage() throws Exception {
-        InAppMessageManager.closeRunningInAppMessage(inAppMessageResponse, false);
+        InAppMessageManager.closeRunningInAppMessage(inAppMessageResponse, false, this.wasClicked);
         synchronized (inAppMessageListener) {
             inAppMessageListener.wait(1000);
         }

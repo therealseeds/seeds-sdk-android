@@ -101,15 +101,18 @@ public class InAppMessageManager {
 		mRequests = new HashMap<>();
 	}
 
-	public static void closeRunningInAppMessage(InAppMessageResponse ad, boolean result) {
+	public static void closeRunningInAppMessage(InAppMessageResponse ad, boolean result, boolean wasClicked) {
 		InAppMessageManager inAppMessageManager = sRunningAds.remove(ad.getTimestamp());
 
 		if (inAppMessageManager == null) {
 			Log.d("Cannot find InAppMessageManager with running ad:" + ad.getTimestamp());
 			return;
 		}
-		Log.d("Notify closing event to InAppMessageManager with running ad:" + ad.getTimestamp());
-		inAppMessageManager.notifyAdClose(ad, result);
+
+		if (!wasClicked) {
+			Log.d("Notify dismissal event to InAppMessageManager with running ad:" + ad.getTimestamp());
+			inAppMessageManager.notifyAdDismiss(ad, result);
+		}
 	}
 
 	public static void notifyInAppMessageClick(InAppMessageResponse ad) {
@@ -423,7 +426,7 @@ public class InAppMessageManager {
 		Seeds.sharedInstance().setAdClicked(false);
 	}
 
-	private void notifyAdClose(final InAppMessageResponse ad, final boolean ok) {
+	private void notifyAdDismiss(final InAppMessageResponse ad, final boolean ok) {
 		if (mListener != null) {
 			Log.d("InAppMessage Close. Result:" + ok);
 			sendNotification(new Runnable() {
