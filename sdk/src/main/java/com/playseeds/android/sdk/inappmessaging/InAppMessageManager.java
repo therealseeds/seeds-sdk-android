@@ -281,24 +281,6 @@ public class InAppMessageManager {
 		});
 	}
 
-	public void requestInAppMessageAndShow(final String messageId, long timeout) {
-		InAppMessageListener l = mListener;
-
-		mListener = null;
-		requestInAppMessage(messageId);
-		long now = System.currentTimeMillis();
-		long timeoutTime = now + timeout;
-		while ((!isInAppMessageLoaded(messageId)) && (now < timeoutTime)) {
-			try {
-				Thread.sleep(200);
-			} catch (InterruptedException e) {
-			}
-			now = System.currentTimeMillis();
-		}
-		mListener = l;
-		showInAppMessage(messageId, "");
-	}
-
 	public void showInAppMessage(String messageId, String messageContext) {
 		InAppMessageResponse mResponse = mResponses.get(messageId);
 
@@ -345,7 +327,9 @@ public class InAppMessageManager {
 	public boolean isInAppMessageLoaded(String messageId) {
 		InAppMessageResponse mResponse = mResponses.get(messageId);
 
-		if (mResponse == null)
+		if (mResponse == null
+            || (mResponse.getType() == Const.NO_AD)
+            || (mResponse.getType() == Const.AD_FAILED))
 			return false;
 
 		return messageId == null || messageId.equals(mResponse.getMessageIdRequested());

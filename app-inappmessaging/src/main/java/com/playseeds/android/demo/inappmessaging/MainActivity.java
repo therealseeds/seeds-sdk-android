@@ -120,7 +120,7 @@ public class MainActivity extends Activity implements InAppMessageListener {
             runOnUiThread(new Runnable() {
                 public void run() {
                     if (Seeds.sharedInstance().isInAppMessageLoaded(messageId)) {
-                        Seeds.sharedInstance().showInAppMessage(messageId);
+                        Seeds.sharedInstance().showInAppMessage(messageId, "in-store");
 
                     } else {
                         Seeds.sharedInstance().requestInAppMessage(messageId);

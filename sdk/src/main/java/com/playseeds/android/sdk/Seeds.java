@@ -494,8 +494,10 @@ public class Seeds {
 
         if (seedsEvent) {
             segmentation.put("IAP type", "Seeds");
-            segmentation.put("message", getMessageVariantName());
-            segmentation.put("context", getMessageContext());
+
+            if (getMessageContext() != null) {
+                segmentation.put("context", getMessageContext());
+            }
         } else {
             segmentation.put("IAP type", "Non-Seeds");
         }
