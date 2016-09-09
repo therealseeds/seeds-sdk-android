@@ -19,22 +19,5 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="com.playseeds.android.demo.inappmessaging.DeepLinkActivity"
-            android:label="@string/title_activity_deep_link" >
-
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:scheme="in-app-messaging-demo"
-                    android:host="seeds" />
-            </intent-filter>
-
-        </activity>
     </application>
-
 </manifest>

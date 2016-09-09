@@ -47,6 +47,10 @@ public class MainActivity extends Activity implements InAppMessageListener {
         Seeds.sharedInstance()
                 .init(this, null, this, YOUR_SERVER, YOUR_APP_KEY)
                 .setLoggingEnabled(true);
+
+        // Currently not possible to do in parallel!
+        Seeds.sharedInstance().requestInAppMessage(messageId0);
+        Seeds.sharedInstance().requestInAppMessage(messageId1);
     }
 
     @Override
@@ -130,31 +134,41 @@ public class MainActivity extends Activity implements InAppMessageListener {
 
     @Override
     public void inAppMessageClicked(String messageId) {
+        // Called when a user clicks the buy button. Handle the purchase here!
+        // The interstitial is specified by messageId parameter
         Toast.makeText(this, "inAppMessageClicked(messageId = " + messageId + ")", Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void inAppMessageDismissed(String messageId) {
+        // Called when a user dismisses the interstitial and no purchase is being made
+        // The interstitial is specified by messageId parameter
         Toast.makeText(this, "inAppMessageDismissed(messageId = " + messageId + ")", Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void inAppMessageLoadSucceeded(String messageId) {
+        // Called when an interstitial is loaded
+        // The interstitial is specified by messageId parameter
         Toast.makeText(getBaseContext(), "inAppMessageLoadSucceeded(messageId = " + messageId + ")", Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void inAppMessageShown(String messageId, boolean succeeded) {
+        // Called when an interstitial is successfully opened
+        // The interstitial is specified by messageId parameter
         Toast.makeText(this, "inAppMessageShown(succeeded = " + succeeded + ", messageId = " + messageId + ")", Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void noInAppMessageFound(String messageId) {
+        // Called when an interstitial couldn't be found or there is an error with loading it
         Toast.makeText(this, "noInAppMessageFound(messageId = " + messageId + ")", Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void inAppMessageClickedWithDynamicPrice(String messageId, Double price) {
+        // Called when an interstitial has multiple price options, and a user chooses one of them
         // Not needed in applications where the user can't choose the price in the Seeds interstitial
         Toast.makeText(this, "inAppMessageClickedWithDynamicPrice(messageId = " +
                 messageId + ", price = " + price + ")", Toast.LENGTH_LONG).show();
