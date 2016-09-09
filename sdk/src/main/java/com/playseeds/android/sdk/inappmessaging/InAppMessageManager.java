@@ -52,7 +52,7 @@ public class InAppMessageManager {
 	private boolean mIncludeLocation;
 	private static Context mContext;
 	private static IInAppBillingService mBillingService;
-	private Thread mRequestThread;
+	private HashMap<String, Thread> mRequestThreads;
 	private InAppMessageListener mListener;
 	private HashMap<String, InAppMessageResponse> mResponses;
 	private String interstitialRequestURL;
@@ -66,7 +66,7 @@ public class InAppMessageManager {
 	private List<String> keywords;
 
 	private boolean doNotShow = false;
-	private InAppMessageRequest request = null;
+	private HashMap<String, InAppMessageRequest> mRequests = null;
 	private static HashMap<Long, InAppMessageManager> sRunningAds = new HashMap<>();
 
 	/**
@@ -97,7 +97,8 @@ public class InAppMessageManager {
 		mIdMode = idMode;
 		mContext = context;
 		mResponses = new HashMap<>();
-		sharedInstance().mRequestThread = null;
+		mRequestThreads = new HashMap<>();
+		mRequests = new HashMap<>();
 	}
 
 	public static void closeRunningInAppMessage(InAppMessageResponse ad, boolean result) {
@@ -119,20 +120,16 @@ public class InAppMessageManager {
 	}
 
 	public void requestInAppMessage(String messageId) {
-		requestInAppMessageInternal(messageId, false);
+		requestInAppMessageInternal(messageId);
 	}
 
-	private void requestInAppMessageInternal(final String messageId, boolean keepFlags) {
 
-		if (!keepFlags) {
-			alreadyRequestedInterstitial = false;
-		}
-
-		if (mRequestThread == null) {
+	private void requestInAppMessageInternal(final String messageId) {
+		if (mRequestThreads.get(messageId) == null) {
 			Log.d("Requesting InAppMessage (v" + Const.VERSION + "-" + Const.PROTOCOL_VERSION + ")");
 			mResponses.remove(messageId);
-			mRequestThread = getRequestThread(messageId);
-			mRequestThread.setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
+			mRequestThreads.put(messageId, getRequestThread(messageId));
+			mRequestThreads.get(messageId).setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
 
 				@Override
 				public void uncaughtException(Thread thread, Throwable ex) {
@@ -141,11 +138,11 @@ public class InAppMessageManager {
 					mResponse.setMessageId(messageId);
 					mResponses.put(messageId, mResponse);
 					Log.e("Handling exception in ad request thread", ex);
-					mRequestThread = null;
+					mRequestThreads.remove(messageId);
 				}
 			});
 
-			mRequestThread.start();
+			mRequestThreads.get(messageId).start();
 		} else {
 			Log.w("Request thread already running");
 		}
@@ -164,22 +161,14 @@ public class InAppMessageManager {
 				Log.d("starting request thread");
 				try {
 					GeneralInAppMessageProvider requestAd = new GeneralInAppMessageProvider();
-					if (!alreadyRequestedInterstitial) {
-						request = getInterstitialRequest(messageId);
-						alreadyRequestedInterstitial = true;
-					} else {
-						Log.d("Already requested interstitial");
-						notifyNoAdFound(messageId);
-						mRequestThread = null;
-						return;
-					}
+					mRequests.put(messageId, getInterstitialRequest(messageId));
 
 					try {
-						mResponses.put(messageId, requestAd.obtainInAppMessage(request));
+						mResponses.put(messageId, requestAd.obtainInAppMessage(mRequests.get(messageId)));
 						mResponses.get(messageId).setMessageId(messageId);
 					} catch (Exception e) {
 						File cachedInAppMessageFile = new File(mContext.getCacheDir(),
-								URLEncoder.encode(request.countlyUriToString(), "UTF-8"));
+								URLEncoder.encode(mRequests.get(messageId).countlyUriToString(), "UTF-8"));
 						if (cachedInAppMessageFile.exists()) {
 							BufferedReader cacheReader = new BufferedReader(new FileReader(cachedInAppMessageFile));
 							mResponses.put(messageId, new Gson().fromJson(cacheReader, InAppMessageResponse.class));
@@ -188,9 +177,9 @@ public class InAppMessageManager {
 					}
 					if (mResponses.get(messageId).getType() == Const.NO_AD) {
 						if (!alreadyRequestedInterstitial) {
-							request = getInterstitialRequest(messageId);
+							mRequests.put(messageId, getInterstitialRequest(messageId));
 							alreadyRequestedInterstitial = true;
-							mResponses.put(messageId, requestAd.obtainInAppMessage(request));
+							mResponses.put(messageId, requestAd.obtainInAppMessage(mRequests.get(messageId)));
 						}
 					}
 
@@ -252,7 +241,7 @@ public class InAppMessageManager {
 						BufferedWriter cacheWriter = null;
 						try {
 							File cachedInAppMessageFile = new File(mContext.getCacheDir(),
-									URLEncoder.encode(request.countlyUriToString(), "UTF-8"));
+									URLEncoder.encode(mRequests.get(messageId).countlyUriToString(), "UTF-8"));
 							cacheWriter = new BufferedWriter(new FileWriter(cachedInAppMessageFile));
 							cacheWriter.write(new Gson().toJson(mResponses.get(messageId)));
 						} catch (Exception e) {
@@ -274,8 +263,8 @@ public class InAppMessageManager {
 					Log.e("ad request failed", t);
 
 					if (!alreadyRequestedInterstitial) {
-						mRequestThread = null;
-						requestInAppMessageInternal(messageId, true);
+						mRequestThreads.remove(messageId);
+						requestInAppMessageInternal(messageId);
 					} else {
 						mResponses.put(messageId, new InAppMessageResponse());
 						mResponses.get(messageId).setType(Const.AD_FAILED);
@@ -284,7 +273,7 @@ public class InAppMessageManager {
 					}
 				}
 				Log.d("finishing ad request thread");
-				mRequestThread = null;
+				mRequestThreads.remove(messageId);
 			}
 		});
 	}
@@ -448,13 +437,16 @@ public class InAppMessageManager {
 	}
 
 	private InAppMessageRequest getInterstitialRequest(String messageId) {
-		if (this.request == null) {
-			this.request = new InAppMessageRequest();
+		if (this.mRequests.get(messageId) == null) {
+			this.mRequests.put(messageId, new InAppMessageRequest());
 
-			request.setAdDoNotTrack(adDoNotTrack);
-			request.setUserAgent(Util.getDefaultUserAgentString());
-			request.setUserAgent2(Util.buildUserAgent());
+			mRequests.get(messageId).setAdDoNotTrack(adDoNotTrack);
+			mRequests.get(messageId).setUserAgent(Util.getDefaultUserAgentString());
+			mRequests.get(messageId).setUserAgent2(Util.buildUserAgent());
 		}
+
+		InAppMessageRequest request = this.mRequests.get(messageId);
+
 		Location location = null;
 
 		if (this.mIncludeLocation) {
@@ -476,7 +468,7 @@ public class InAppMessageManager {
 			requestedHorizontalAd = false;
 		}
 
-		this.request.setAdspaceStrict(false);
+		request.setAdspaceStrict(false);
 
 		request.setConnectionType(Util.getConnectionType(getContext()));
 		request.setIpAddress(Util.getLocalIpAddress());
