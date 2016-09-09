@@ -214,7 +214,7 @@ public class InAppMessageResponse implements InAppMessage {
 		return messageIdRequested;
 	}
 
-	public void setMessageIdRequested(String messageIdRequested) {
+	public void setMessageId(String messageIdRequested) {
 		this.messageIdRequested = messageIdRequested;
 	}
 }

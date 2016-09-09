@@ -25,8 +25,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.InputStream;
-import java.io.StringReader;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -40,11 +38,9 @@ import android.location.Location;
 
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 
 import com.android.vending.billing.IInAppBillingService;
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.playseeds.android.sdk.DeviceId;
@@ -58,14 +54,13 @@ public class InAppMessageManager {
 	private static IInAppBillingService mBillingService;
 	private Thread mRequestThread;
 	private InAppMessageListener mListener;
-	private InAppMessageResponse mResponse;
+	private HashMap<String, InAppMessageResponse> mResponses;
 	private String interstitialRequestURL;
 	private String mDeviceID;
 	private DeviceId.Type mIdMode;
 	private boolean alreadyRequestedInterstitial;
 	private boolean requestedHorizontalAd;
 	private HashMap<String, String> segmentation;
-	private String requestedMessageId;
 	private Gender userGender;
 	private int userAge;
 	private List<String> keywords;
@@ -101,6 +96,7 @@ public class InAppMessageManager {
 		mDeviceID= deviceID;
 		mIdMode = idMode;
 		mContext = context;
+		mResponses = new HashMap<>();
 		sharedInstance().mRequestThread = null;
 	}
 
@@ -134,15 +130,16 @@ public class InAppMessageManager {
 
 		if (mRequestThread == null) {
 			Log.d("Requesting InAppMessage (v" + Const.VERSION + "-" + Const.PROTOCOL_VERSION + ")");
-			mResponse = null;
+			mResponses.remove(messageId);
 			mRequestThread = getRequestThread(messageId);
 			mRequestThread.setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
 
 				@Override
 				public void uncaughtException(Thread thread, Throwable ex) {
-					mResponse = new InAppMessageResponse();
+					InAppMessageResponse mResponse = new InAppMessageResponse();
 					mResponse.setType(Const.AD_FAILED);
-					mResponse.setMessageIdRequested(requestedMessageId);
+					mResponse.setMessageId(messageId);
+					mResponses.put(messageId, mResponse);
 					Log.e("Handling exception in ad request thread", ex);
 					mRequestThread = null;
 				}
@@ -172,57 +169,42 @@ public class InAppMessageManager {
 						alreadyRequestedInterstitial = true;
 					} else {
 						Log.d("Already requested interstitial");
-						notifyNoAdFound();
+						notifyNoAdFound(messageId);
 						mRequestThread = null;
 						return;
 					}
 
 					try {
-						mResponse = requestAd.obtainInAppMessage(request);
-						mResponse.setMessageIdRequested(requestedMessageId);
+						mResponses.put(messageId, requestAd.obtainInAppMessage(request));
+						mResponses.get(messageId).setMessageId(messageId);
 					} catch (Exception e) {
 						File cachedInAppMessageFile = new File(mContext.getCacheDir(),
 								URLEncoder.encode(request.countlyUriToString(), "UTF-8"));
 						if (cachedInAppMessageFile.exists()) {
 							BufferedReader cacheReader = new BufferedReader(new FileReader(cachedInAppMessageFile));
-							mResponse = new Gson().fromJson(cacheReader, InAppMessageResponse.class);
-							mResponse.setMessageIdRequested(requestedMessageId);
+							mResponses.put(messageId, new Gson().fromJson(cacheReader, InAppMessageResponse.class));
 							cacheReader.close();
 						}
 					}
-					if (mResponse.getType() == Const.NO_AD) {
+					if (mResponses.get(messageId).getType() == Const.NO_AD) {
 						if (!alreadyRequestedInterstitial) {
 							request = getInterstitialRequest(messageId);
 							alreadyRequestedInterstitial = true;
-							mResponse = requestAd.obtainInAppMessage(request);
-							mResponse.setMessageIdRequested(requestedMessageId);
+							mResponses.put(messageId, requestAd.obtainInAppMessage(request));
 						}
 					}
 
-					boolean fakeBillingService = false;
-
-					if (mResponse.getProductId() != null && (mBillingService != null || fakeBillingService)) {
+					if (mResponses.get(messageId).getProductId() != null && (mBillingService != null)) {
 						try {
 							ArrayList<String> productsList = new ArrayList<String>();
-							productsList.add(mResponse.getProductId());
+							productsList.add(mResponses.get(messageId).getProductId());
 							Bundle skuBundle = new Bundle();
 							skuBundle.putStringArrayList("ITEM_ID_LIST", productsList);
 
 							Bundle productsDetails;
-							if (fakeBillingService) {
-								productsDetails = new Bundle();
-								productsDetails.putInt("RESPONSE_CODE", 0);
-								ArrayList<String> detailsList = new ArrayList<String>();
-								detailsList.add("{" +
-										"\"productId\":\"" + mResponse.getProductId() + "\"," +
-										"\"price\":\"$9.99\"," +
-										"\"price_amount_micros\":\"9990000\"," +
-										"\"price_currency_code\":\"USD\"}");
-								productsDetails.putStringArrayList("DETAILS_LIST", detailsList);
-							} else {
-								productsDetails = mBillingService.getSkuDetails(3,
-										mContext.getPackageName(), "inapp", skuBundle);
-							}
+
+							productsDetails = mBillingService.getSkuDetails(3,
+									mContext.getPackageName(), "inapp", skuBundle);
 
 							if (productsDetails.getInt("RESPONSE_CODE", -1) == 0) {
 								ArrayList<String> productsDetailsCollection
@@ -233,17 +215,17 @@ public class InAppMessageManager {
 									JsonObject jsonProductDetails = new JsonParser().parse(productDetails).getAsJsonObject();
 
 									String productId = jsonProductDetails.get("productId").getAsString();
-									if (!mResponse.getProductId().equals(productId))
+									if (!mResponses.get(messageId).getProductId().equals(productId))
 										continue;
 
 									String formattedPrice = jsonProductDetails.get("price").getAsString();
-									mResponse.setFormattedPrice(formattedPrice);
+									mResponses.get(messageId).setFormattedPrice(formattedPrice);
 
 									String exactPrice = jsonProductDetails.get("price_amount_micros").getAsString();
-									mResponse.setExactPrice(exactPrice);
+									mResponses.get(messageId).setExactPrice(exactPrice);
 
 									String currencyCode = jsonProductDetails.get("price_currency_code").getAsString();
-									mResponse.setPriceCurrencyCode(currencyCode);
+									mResponses.get(messageId).setPriceCurrencyCode(currencyCode);
 
 									break;
 								}
@@ -252,25 +234,27 @@ public class InAppMessageManager {
 							Log.e("BillingService", e);
 						}
 					}
-					String text = mResponse.getText();
+					String text = mResponses.get(messageId).getText();
 					text = text.replace("%{LocalizedPrice}",
-							mResponse.getFormattedPrice() != null
-									? mResponse.getFormattedPrice()
+							mResponses.get(messageId).getFormattedPrice() != null
+									? mResponses.get(messageId).getFormattedPrice()
 									: "BUY");
-					mResponse.setText(text);
+					mResponses.get(messageId).setText(text);
 
 					//TODO: remove debug code
-					Log.i("mResponse is: " + mResponse);
+					Log.i("mResponse is: " + mResponses.get(messageId));
 
-					if (mResponse.getType() == Const.TEXT || mResponse.getType() == Const.IMAGE) {
-						notifyAdLoaded(mResponse);
+					if (mResponses.get(messageId).getType() == Const.TEXT ||
+							mResponses.get(messageId).getType() == Const.IMAGE) {
+
+						notifyAdLoaded(mResponses.get(messageId));
 
 						BufferedWriter cacheWriter = null;
 						try {
 							File cachedInAppMessageFile = new File(mContext.getCacheDir(),
 									URLEncoder.encode(request.countlyUriToString(), "UTF-8"));
 							cacheWriter = new BufferedWriter(new FileWriter(cachedInAppMessageFile));
-							cacheWriter.write(new Gson().toJson(mResponse));
+							cacheWriter.write(new Gson().toJson(mResponses.get(messageId)));
 						} catch (Exception e) {
 							Log.e("Cache", e);
 						} finally {
@@ -280,11 +264,11 @@ public class InAppMessageManager {
 							} catch (Exception e) {
 							}
 						}
-					} else if (mResponse.getType() == Const.NO_AD) {
+					} else if (mResponses.get(messageId).getType() == Const.NO_AD) {
 						Log.d("response NO AD received");
-						notifyNoAdFound();
+						notifyNoAdFound(messageId);
 					} else {
-						notifyNoAdFound();
+						notifyNoAdFound(messageId);
 					}
 				} catch (Throwable t) {
 					Log.e("ad request failed", t);
@@ -293,10 +277,10 @@ public class InAppMessageManager {
 						mRequestThread = null;
 						requestInAppMessageInternal(messageId, true);
 					} else {
-						mResponse = new InAppMessageResponse();
-						mResponse.setType(Const.AD_FAILED);
-						mResponse.setMessageIdRequested(requestedMessageId);
-						notifyNoAdFound();
+						mResponses.put(messageId, new InAppMessageResponse());
+						mResponses.get(messageId).setType(Const.AD_FAILED);
+						mResponses.get(messageId).setMessageId(messageId);
+						notifyNoAdFound(messageId);
 					}
 				}
 				Log.d("finishing ad request thread");
@@ -305,7 +289,27 @@ public class InAppMessageManager {
 		});
 	}
 
+	public void requestInAppMessageAndShow(final String messageId, long timeout) {
+		InAppMessageListener l = mListener;
+
+		mListener = null;
+		requestInAppMessage(messageId);
+		long now = System.currentTimeMillis();
+		long timeoutTime = now + timeout;
+		while ((!isInAppMessageLoaded(messageId)) && (now < timeoutTime)) {
+			try {
+				Thread.sleep(200);
+			} catch (InterruptedException e) {
+			}
+			now = System.currentTimeMillis();
+		}
+		mListener = l;
+		showInAppMessage(messageId, "");
+	}
+
 	public void showInAppMessage(String messageId, String messageContext) {
+		InAppMessageResponse mResponse = mResponses.get(messageId);
+
 		if (((mResponse == null)
 				|| (mResponse.getType() == Const.NO_AD)
 				|| (mResponse.getType() == Const.AD_FAILED))
@@ -314,7 +318,7 @@ public class InAppMessageManager {
 			return;
 		}
 
-		if (messageId != null && !messageId.equals(requestedMessageId)) {
+		if (messageId != null && !messageId.equals(mResponse.getMessageIdRequested())) {
 			notifyAdShown(mResponse, false);
 			return;
 		}
@@ -325,7 +329,7 @@ public class InAppMessageManager {
 			if (Util.isNetworkAvailable(getContext())) {
 				ad.setTimestamp(System.currentTimeMillis());
 				ad.setHorizontalOrientationRequested(requestedHorizontalAd);
-				ad.setMessageIdRequested(requestedMessageId);
+				ad.setMessageId(messageId);
 				Log.v("Showing InAppMessage:" + ad);
 
 				Intent intent = new Intent(getContext(), RichMediaActivity.class);
@@ -347,22 +351,25 @@ public class InAppMessageManager {
 	}
 
 	public boolean isInAppMessageLoaded(String messageId) {
+		InAppMessageResponse mResponse = mResponses.get(messageId);
+
 		if (mResponse == null)
 			return false;
+
 		return messageId == null || messageId.equals(mResponse.getMessageIdRequested());
 	}
 
-	private void notifyNoAdFound() {
+	private void notifyNoAdFound(final String messageId) {
 		if (mListener != null) {
-			Log.d("No ad found " + requestedMessageId);
+			Log.d("No ad found " + messageId);
 			sendNotification(new Runnable() {
 				@Override
 				public void run() {
-					mListener.noInAppMessageFound(requestedMessageId);
+					mListener.noInAppMessageFound(messageId);
 				}
 			});
 		}
-		this.mResponse = null;
+		this.mResponses.put(messageId, null);
 	}
 
 	private void notifyAdClicked(final InAppMessageResponse ad) {
@@ -415,7 +422,8 @@ public class InAppMessageManager {
 				}
 			});
 		}
-		this.mResponse = null;
+
+		// mResponses.remove(ad.getMessageIdRequested());
 
 		if (ok) {
 			setSegmentation();
@@ -467,7 +475,6 @@ public class InAppMessageManager {
 		} else {
 			requestedHorizontalAd = false;
 		}
-		requestedMessageId = messageId;
 
 		this.request.setAdspaceStrict(false);
 
@@ -484,7 +491,9 @@ public class InAppMessageManager {
 	}
 
 	public void showInAppMessage() {
+		InAppMessageResponse mResponse = mResponses.get(null);
 		InAppMessageResponse ad = mResponse;
+
 		boolean result = false;
 
 		if (((mResponse == null)
