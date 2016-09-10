@@ -96,9 +96,12 @@ public class InAppMessageManager {
 		mDeviceID= deviceID;
 		mIdMode = idMode;
 		mContext = context;
-		mResponses = new HashMap<>();
-		mRequestThreads = new HashMap<>();
-		mRequests = new HashMap<>();
+
+        // Handle smoothly the case where message manager is initialized multiple times
+        // (don't remove already preloaded interstitials or interfere with the ongoing requests)
+		if (mResponses == null) mResponses = new HashMap<>();
+        if (mRequestThreads == null) mRequestThreads = new HashMap<>();
+        if (mRequests == null) mRequests = new HashMap<>();
 	}
 
 	public static void closeRunningInAppMessage(InAppMessageResponse ad, boolean result, boolean wasClicked) {
@@ -565,7 +568,9 @@ public class InAppMessageManager {
 	public void setSegmentation() {
 		segmentation = new HashMap<>();
 		segmentation.put("message", Seeds.sharedInstance().getMessageVariantName());
-		segmentation.put("context", Seeds.sharedInstance().getMessageContext());
+        if (Seeds.sharedInstance().getMessageContext() != null) {
+            segmentation.put("context", Seeds.sharedInstance().getMessageContext());
+        }
 	}
 
 	public void doNotShow(boolean doNotShow) {
