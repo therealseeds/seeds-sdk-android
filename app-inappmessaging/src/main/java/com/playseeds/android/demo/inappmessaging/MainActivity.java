@@ -96,7 +96,7 @@ public class MainActivity extends Activity implements InAppMessageListener {
         // TODO: Separate button for running the user behaviour requests
         Seeds.sharedInstance().requestTotalInAppPurchaseCount(new IInAppPurchaseCountListener() {
             @Override
-            public void onInAppPurchaseCount(String errorMessage, int purchasesCount) {
+            public void onInAppPurchaseCount(String errorMessage, int purchasesCount, String _) {
                 if (errorMessage != null) return;
                 Toast.makeText(context, "requestTotalInAppPurchaseCount, purchaseCount = " + purchasesCount, Toast.LENGTH_SHORT).show();
             }
@@ -104,7 +104,7 @@ public class MainActivity extends Activity implements InAppMessageListener {
 
         Seeds.sharedInstance().requestInAppPurchaseCount(iapEventKey, new IInAppPurchaseCountListener() {
             @Override
-            public void onInAppPurchaseCount(String errorMessage, int purchasesCount) {
+            public void onInAppPurchaseCount(String errorMessage, int purchasesCount, String key) {
                 if (errorMessage != null) return;
                 String text = "requestInAppPurchaseCount(iapEventKey=" + iapEventKey + "), purchaseCount = " + purchasesCount;
                 Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
@@ -113,7 +113,7 @@ public class MainActivity extends Activity implements InAppMessageListener {
 
         Seeds.sharedInstance().requestTotalInAppMessageShowCount(new IInAppMessageShowCountListener() {
             @Override
-            public void onInAppMessageShowCount(String errorMessage, int showCount) {
+            public void onInAppMessageShowCount(String errorMessage, int showCount, String _) {
                 if (errorMessage != null) return;
                 Toast.makeText(context, "requestTotalInAppMessageShowCount, showCount = " + showCount, Toast.LENGTH_SHORT).show();
             }
@@ -121,7 +121,7 @@ public class MainActivity extends Activity implements InAppMessageListener {
 
         Seeds.sharedInstance().requestInAppMessageShowCount(messageId0, new IInAppMessageShowCountListener() {
             @Override
-            public void onInAppMessageShowCount(String errorMessage, int showCount) {
+            public void onInAppMessageShowCount(String errorMessage, int showCount, String message_id) {
                 if (errorMessage != null) return;
                 String text = "requestInAppMessageShowCount(iapEventKey=" + messageId0 + "), showCount = " + showCount;
                 Toast.makeText(context, text, Toast.LENGTH_SHORT).show();

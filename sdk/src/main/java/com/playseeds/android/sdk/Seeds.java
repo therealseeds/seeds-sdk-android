@@ -937,14 +937,14 @@ public class Seeds {
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 Log.e(TAG, "requestInAppPurchaseCount failed: " + responseString);
                 if (listener != null)
-                    listener.onInAppPurchaseCount(responseString, -1);
+                    listener.onInAppPurchaseCount(responseString, -1, null);
             }
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseString) {
                 JsonObject jsonResponse = new JsonParser().parse(responseString).getAsJsonObject();
                 if (listener != null)
-                    listener.onInAppPurchaseCount(null, jsonResponse.get("result").getAsInt());
+                    listener.onInAppPurchaseCount(null, jsonResponse.get("result").getAsInt(), key);
             }
         });
     }
@@ -980,14 +980,14 @@ public class Seeds {
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 Log.e(TAG, "requestInAppPurchaseCount failed: " + responseString);
                 if (listener != null)
-                    listener.onInAppMessageShowCount(responseString, -1);
+                    listener.onInAppMessageShowCount(responseString, -1, null);
             }
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseString) {
                 JsonObject jsonResponse = new JsonParser().parse(responseString).getAsJsonObject();
                 if (listener != null)
-                    listener.onInAppMessageShowCount(null, jsonResponse.get("result").getAsInt());
+                    listener.onInAppMessageShowCount(null, jsonResponse.get("result").getAsInt(), message_id);
             }
         });
     }
@@ -1010,14 +1010,14 @@ public class Seeds {
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 Log.e(TAG, "requestGenericUserBehaviourQuery failed: " + responseString);
                 if (listener != null)
-                    listener.onUserBehaviorResponse(responseString, null);
+                    listener.onUserBehaviorResponse(responseString, null, null);
             }
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseString) {
                 JsonObject jsonResponse = new JsonParser().parse(responseString).getAsJsonObject();
                 if (listener != null)
-                    listener.onUserBehaviorResponse(null, jsonResponse.get("result"));
+                    listener.onUserBehaviorResponse(null, jsonResponse.get("result"), queryPath);
             }
         });
     }
