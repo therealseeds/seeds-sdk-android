@@ -474,16 +474,7 @@ public class Seeds {
         recordEvent("IAP: " + key, segmentation, 1, price);
         Log.d(TAG, "IAP: " + key + " segment: " + segmentation);
     }
-
-    public void trackPurchase(String key, final double price) {
-        if (isAdClicked()) {
-            recordSeedsIAPEvent(key, price);
-            setAdClicked(false);
-        } else {
-            recordIAPEvent(key, price);
-        }
-    }
-
+    
     /**
      * Records a custom event with the specified segmentation values and count, and a sum of zero.
      * @param key name of the custom event, required, must not be the empty string
@@ -1008,7 +999,7 @@ public class Seeds {
      * @param listener Listener callback, first parameter is an error string and second parameter is
      *                 the result as a JsonObject. If the error string is null, the request was successful.
      */
-    public void requestGenericUserBehaviourInt(final String queryPath, final IUserBehaviorListener listener) {
+    public void requestGenericUserBehaviorQuery(final String queryPath, final IUserBehaviorListener listener) {
         String endpoint = connectionQueue_.getServerURL() + "/o/app-user/" + queryPath;
         Uri.Builder uri = Uri.parse(endpoint).buildUpon();
         uri.appendQueryParameter("app_key", connectionQueue_.getAppKey());
@@ -1017,7 +1008,7 @@ public class Seeds {
         asyncHttpClient.get(uri.build().toString(), new TextHttpResponseHandler() {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                Log.e(TAG, "requestGenericUserBehaviourInt failed: " + responseString);
+                Log.e(TAG, "requestGenericUserBehaviourQuery failed: " + responseString);
                 if (listener != null)
                     listener.onUserBehaviorResponse(responseString, null);
             }
