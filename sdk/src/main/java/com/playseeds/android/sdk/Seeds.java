@@ -944,7 +944,7 @@ public class Seeds {
         asyncHttpClient.get(uri.build().toString(), new TextHttpResponseHandler() {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                Log.e(TAG, "requestTotalInAppPurchaseCount failed: " + responseString);
+                Log.e(TAG, "requestInAppPurchaseCount failed: " + responseString);
                 if (listener != null)
                     listener.onInAppPurchaseCount(responseString, -1);
             }
@@ -987,7 +987,7 @@ public class Seeds {
         asyncHttpClient.get(uri.build().toString(), new TextHttpResponseHandler() {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                Log.e(TAG, "requestTotalInAppPurchaseCount failed: " + responseString);
+                Log.e(TAG, "requestInAppPurchaseCount failed: " + responseString);
                 if (listener != null)
                     listener.onInAppMessageShowCount(responseString, -1);
             }

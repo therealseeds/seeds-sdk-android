@@ -26,6 +26,7 @@ public class MainActivity extends Activity implements InAppMessageListener {
     private static String YOUR_APP_KEY = "71ac2900e9d31647d68d0ddc6f0aaf52611a612d";
     private static String messageId0 = "575f872a64bc1e5b0eca506f";
     private static String messageId1 = "5746851bb29ee753053a7c9a";
+    private static String iapEventKey = "test_iap_event";
 
     /** Called when the activity is first created. */
     @Override
@@ -87,21 +88,43 @@ public class MainActivity extends Activity implements InAppMessageListener {
     }
 
     public void purchaseEventButtonClicked(View view) {
+        final Context context = this;
+
         Log.d("Main", "purchase button clicked");
-        Seeds.sharedInstance().recordIAPEvent("item1", 0.99);
+        Seeds.sharedInstance().recordIAPEvent(iapEventKey, 0.99);
 
         // TODO: Separate button for running the user behaviour requests
         Seeds.sharedInstance().requestTotalInAppPurchaseCount(new IInAppPurchaseCountListener() {
             @Override
             public void onInAppPurchaseCount(String errorMessage, int purchasesCount) {
+                if (errorMessage != null) return;
+                Toast.makeText(context, "requestTotalInAppPurchaseCount, purchaseCount = " + purchasesCount, Toast.LENGTH_SHORT).show();
+            }
+        });
 
+        Seeds.sharedInstance().requestInAppPurchaseCount(iapEventKey, new IInAppPurchaseCountListener() {
+            @Override
+            public void onInAppPurchaseCount(String errorMessage, int purchasesCount) {
+                if (errorMessage != null) return;
+                String text = "requestInAppPurchaseCount(iapEventKey=" + iapEventKey + "), purchaseCount = " + purchasesCount;
+                Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
             }
         });
 
         Seeds.sharedInstance().requestTotalInAppMessageShowCount(new IInAppMessageShowCountListener() {
             @Override
-            public void onInAppMessageShowCount(String errorMessage, int shownCount) {
+            public void onInAppMessageShowCount(String errorMessage, int showCount) {
+                if (errorMessage != null) return;
+                Toast.makeText(context, "requestTotalInAppMessageShowCount, showCount = " + showCount, Toast.LENGTH_SHORT).show();
+            }
+        });
 
+        Seeds.sharedInstance().requestInAppMessageShowCount(messageId0, new IInAppMessageShowCountListener() {
+            @Override
+            public void onInAppMessageShowCount(String errorMessage, int showCount) {
+                if (errorMessage != null) return;
+                String text = "requestInAppMessageShowCount(iapEventKey=" + messageId0 + "), showCount = " + showCount;
+                Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
             }
         });
     }
