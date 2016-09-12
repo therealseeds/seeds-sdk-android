@@ -1000,4 +1000,35 @@ public class Seeds {
             }
         });
     }
+
+
+    /**
+     * Generalized user behaviour query
+     * @param queryPath The query path string for the query
+     * @param listener Listener callback, first parameter is an error string and second parameter is
+     *                 the result as a JsonObject. If the error string is null, the request was successful.
+     */
+    public void requestGenericUserBehaviourInt(final String queryPath, final IUserBehaviorListener listener) {
+        String endpoint = connectionQueue_.getServerURL() + "/o/app-user/" + queryPath;
+        Uri.Builder uri = Uri.parse(endpoint).buildUpon();
+        uri.appendQueryParameter("app_key", connectionQueue_.getAppKey());
+        uri.appendQueryParameter("device_id", connectionQueue_.getDeviceId().getId());
+
+        asyncHttpClient.get(uri.build().toString(), new TextHttpResponseHandler() {
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                Log.e(TAG, "requestGenericUserBehaviourInt failed: " + responseString);
+                if (listener != null)
+                    listener.onUserBehaviorResponse(responseString, null);
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, String responseString) {
+                JsonObject jsonResponse = new JsonParser().parse(responseString).getAsJsonObject();
+                if (listener != null)
+                    listener.onUserBehaviorResponse(null, jsonResponse.get("result"));
+            }
+        });
+    }
+
 }
