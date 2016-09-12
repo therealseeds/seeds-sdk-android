@@ -28,7 +28,6 @@ import com.android.vending.billing.IInAppBillingService;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.TextHttpResponseHandler;
 import com.playseeds.android.sdk.inappmessaging.InAppMessageListener;
 import com.playseeds.android.sdk.inappmessaging.InAppMessageManager;
@@ -456,38 +455,6 @@ public class Seeds {
         recordEvent(key, null, count, sum);
     }
 
-    /**
-     * Records an IAP event
-     * @param key name of the custom event, required, must not be the empty string
-     * @param price sum to associate with the event
-     * @throws IllegalStateException if Seeds SDK has not been initialized
-     * @throws IllegalArgumentException if key is null or empty
-     */
-    public void recordIAPEvent(String key, final double price) {
-        recordGenericIAPEvent(key, price, false);
-    }
-
-    /**
-     * Records an IAP event
-     * @param key name of the custom event, required, must not be the empty string
-     * @param price sum to associate with the event
-     * @throws IllegalStateException if Seeds SDK has not been initialized
-     * @throws IllegalArgumentException if key is null or empty
-     */
-    public void recordSeedsIAPEvent(String key, final double price) {
-        recordGenericIAPEvent(key, price, true);
-    }
-
-
-    public void trackPurchase(String key, final double price) {
-        if (isAdClicked()) {
-            recordSeedsIAPEvent(key, price);
-            setAdClicked(false);
-        } else {
-            recordIAPEvent(key, price);
-        }
-    }
-
     private void recordGenericIAPEvent(String key, final double price, boolean seedsEvent) {
 
         HashMap<String, String> segmentation = new HashMap<String, String>();
@@ -508,6 +475,14 @@ public class Seeds {
         Log.d(TAG, "IAP: " + key + " segment: " + segmentation);
     }
 
+    public void trackPurchase(String key, final double price) {
+        if (isAdClicked()) {
+            recordSeedsIAPEvent(key, price);
+            setAdClicked(false);
+        } else {
+            recordIAPEvent(key, price);
+        }
+    }
 
     /**
      * Records a custom event with the specified segmentation values and count, and a sum of zero.
@@ -890,22 +865,6 @@ public class Seeds {
         return messageContext;
     }
 
-    public void requestInAppMessage() {
-        InAppMessageManager.sharedInstance().requestInAppMessage(null);
-    }
-
-    public void requestInAppMessage(String messageId) {
-        InAppMessageManager.sharedInstance().requestInAppMessage(messageId);
-    }
-
-    public boolean isInAppMessageLoaded() {
-        return InAppMessageManager.sharedInstance().isInAppMessageLoaded(null);
-    }
-
-    public boolean isInAppMessageLoaded(String messageId) {
-        return InAppMessageManager.sharedInstance().isInAppMessageLoaded(messageId);
-    }
-
     public boolean isAdClicked() {
         return adClicked;
     }
@@ -922,27 +881,56 @@ public class Seeds {
         sharedInstance().eventQueue_ = null;
     }
 
-    public void showInAppMessage() {
-        InAppMessageManager.sharedInstance().showInAppMessage(null, null);
+    /**
+     * Records an IAP event
+     * @param key name of the custom event, required, must not be the empty string
+     * @param price sum to associate with the event
+     * @throws IllegalStateException if Seeds SDK has not been initialized
+     * @throws IllegalArgumentException if key is null or empty
+     */
+    public void recordIAPEvent(String key, final double price) {
+        recordGenericIAPEvent(key, price, false);
     }
 
-    public void showInAppMessage(String messageId) {
-        InAppMessageManager.sharedInstance().showInAppMessage(messageId, null);
+    /**
+     * Records an IAP event
+     * @param key name of the custom event, required, must not be the empty string
+     * @param price sum to associate with the event
+     * @throws IllegalStateException if Seeds SDK has not been initialized
+     * @throws IllegalArgumentException if key is null or empty
+     */
+    public void recordSeedsIAPEvent(String key, final double price) {
+        recordGenericIAPEvent(key, price, true);
     }
 
-    public void showInAppMessageWithContext(String messageContext) {
-        InAppMessageManager.sharedInstance().showInAppMessage(null, messageContext);
+    public void requestInAppMessage(String messageId) {
+        InAppMessageManager.sharedInstance().requestInAppMessage(messageId);
+    }
+
+    public boolean isInAppMessageLoaded(String messageId) {
+        return InAppMessageManager.sharedInstance().isInAppMessageLoaded(messageId);
     }
 
     public void showInAppMessage(String messageId, String messageContext) {
         InAppMessageManager.sharedInstance().showInAppMessage(messageId, messageContext);
     }
 
-    public void requestInAppPurchaseCount(IInAppPurchaseStatsListener listener) {
+    /**
+     * Query how many times in total a user has made IAP purchases which are tracked in Seeds
+     * @param listener Listener callback, first parameter is an error message and second parameter is
+     *                 the purchase count. If the error message is null, the request was successful.
+     */
+    public void requestTotalInAppPurchaseCount(IInAppPurchaseCountListener listener) {
         requestInAppPurchaseCount(null, listener);
     }
 
-    public void requestInAppPurchaseCount(final String key, final IInAppPurchaseStatsListener listener) {
+    /**
+     * Query how many times in total a user has made IAP purchases which are tracked in Seeds
+     * @param message_id The key of the IAP which you have used in recordSeedsIAPEvent or recordIAPEvent
+     * @param listener Listener callback, first parameter is an error string and second parameter is
+     *                 the show count. If the error string is null, the request was successful.
+     */
+    public void requestInAppPurchaseCount(final String key, final IInAppPurchaseCountListener listener) {
         String endpoint = connectionQueue_.getServerURL() + "/o/app-user/query-iap-purchase-count";
         Uri.Builder uri = Uri.parse(endpoint).buildUpon();
         uri.appendQueryParameter("app_key", connectionQueue_.getAppKey());
@@ -956,42 +944,59 @@ public class Seeds {
         asyncHttpClient.get(uri.build().toString(), new TextHttpResponseHandler() {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                Log.e(TAG, "requestInAppPurchaseCount failed: " + responseString);
+                Log.e(TAG, "requestTotalInAppPurchaseCount failed: " + responseString);
+                if (listener != null)
+                    listener.onInAppPurchaseCount(responseString, -1);
             }
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseString) {
                 JsonObject jsonResponse = new JsonParser().parse(responseString).getAsJsonObject();
                 if (listener != null)
-                    listener.onInAppPurchaseStats(key, jsonResponse.get("result").getAsInt());
+                    listener.onInAppPurchaseCount(null, jsonResponse.get("result").getAsInt());
             }
         });
     }
 
-    public void requestInAppMessageStats(IInAppMessageStatsListener listener) {
-        requestInAppMessageStats(null, listener);
+    /**
+     * Query how many times in total a user has seen interstitials
+     * @param listener Listener callback, first parameter is an error string and second parameter is
+     *                 the show count. If the error string is null, the request was successful.
+     */
+    public void requestTotalInAppMessageShowCount(IInAppMessageShowCountListener listener) {
+        requestInAppMessageShowCount(null, listener);
     }
 
-    public void requestInAppMessageStats(final String key, final IInAppMessageStatsListener listener) {
+    /**
+     * Query how many times user has seen a specific interstitial
+     * @param message_id The message_id of the interstitial
+     * @param listener Listener callback, first parameter is an error string and second parameter is
+     *                 the show count. If the error string is null, the request was successful.
+     */
+    public void requestInAppMessageShowCount(final String message_id, final IInAppMessageShowCountListener listener) {
         String endpoint = connectionQueue_.getServerURL() + "/o/app-user/query-interstitial-shown-count";
         Uri.Builder uri = Uri.parse(endpoint).buildUpon();
         uri.appendQueryParameter("app_key", connectionQueue_.getAppKey());
         uri.appendQueryParameter("device_id", connectionQueue_.getDeviceId().getId());
 
-        if (key != null)
-            uri.appendQueryParameter("interstitial_id", key);
+        if (message_id != null)
+            uri.appendQueryParameter("interstitial_id", message_id);
+        else
+            uri.appendPath("total");
 
         asyncHttpClient.get(uri.build().toString(), new TextHttpResponseHandler() {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                Log.e(TAG, "requestInAppPurchaseCount failed: " + responseString);
+                Log.e(TAG, "requestTotalInAppPurchaseCount failed: " + responseString);
+                if (listener != null)
+                    listener.onInAppMessageShowCount(responseString, -1);
             }
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseString) {
                 JsonObject jsonResponse = new JsonParser().parse(responseString).getAsJsonObject();
                 if (listener != null)
-                    listener.onInAppMessageStats(key, jsonResponse.get("result").getAsInt());
+                    listener.onInAppMessageShowCount(null, jsonResponse.get("result").getAsInt());
             }
         });
     }

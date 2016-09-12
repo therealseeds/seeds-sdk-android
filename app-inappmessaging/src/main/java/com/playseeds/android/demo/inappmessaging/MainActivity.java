@@ -5,25 +5,18 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.net.Uri;
-import android.os.Handler;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.vending.billing.IInAppBillingService;
-import com.playseeds.android.sdk.IInAppMessageStatsListener;
-import com.playseeds.android.sdk.IInAppPurchaseStatsListener;
+import com.playseeds.android.sdk.IInAppMessageShowCountListener;
+import com.playseeds.android.sdk.IInAppPurchaseCountListener;
 import com.playseeds.android.sdk.Seeds;
-import com.playseeds.android.sdk.DeviceId;
 
-import com.playseeds.android.sdk.inappmessaging.InAppMessage;
 import com.playseeds.android.sdk.inappmessaging.InAppMessageListener;
-import com.playseeds.android.sdk.inappmessaging.InAppMessageManager;
 import com.playseeds.demo.inappmessaging.R;
 
 
@@ -96,16 +89,19 @@ public class MainActivity extends Activity implements InAppMessageListener {
     public void purchaseEventButtonClicked(View view) {
         Log.d("Main", "purchase button clicked");
         Seeds.sharedInstance().recordIAPEvent("item1", 0.99);
-        Seeds.sharedInstance().requestInAppPurchaseCount(new IInAppPurchaseStatsListener() {
+
+        // TODO: Separate button for running the user behaviour requests
+        Seeds.sharedInstance().requestTotalInAppPurchaseCount(new IInAppPurchaseCountListener() {
             @Override
-            public void onInAppPurchaseStats(String key, int purchasesCount) {
-                int i = 5;
+            public void onInAppPurchaseCount(String errorMessage, int purchasesCount) {
+
             }
         });
-        Seeds.sharedInstance().requestInAppMessageStats(new IInAppMessageStatsListener() {
+
+        Seeds.sharedInstance().requestTotalInAppMessageShowCount(new IInAppMessageShowCountListener() {
             @Override
-            public void onInAppMessageStats(String key, int shownCount) {
-                int i = 5;
+            public void onInAppMessageShowCount(String errorMessage, int shownCount) {
+
             }
         });
     }
@@ -123,6 +119,7 @@ public class MainActivity extends Activity implements InAppMessageListener {
                         Seeds.sharedInstance().showInAppMessage(messageId, "in-store");
 
                     } else {
+                        // Skip the interstitial showing this time and try to reload the interstitial
                         Seeds.sharedInstance().requestInAppMessage(messageId);
                     }
                 }
