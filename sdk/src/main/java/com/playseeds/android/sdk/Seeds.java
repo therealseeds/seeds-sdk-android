@@ -917,7 +917,7 @@ public class Seeds {
 
     /**
      * Query how many times in total a user has made IAP purchases which are tracked in Seeds
-     * @param message_id The key of the IAP which you have used in recordSeedsIAPEvent or recordIAPEvent
+     * @param key The key of the IAP which you have used in recordSeedsIAPEvent or recordIAPEvent
      * @param listener Listener callback, first parameter is an error string and second parameter is
      *                 the show count. If the error string is null, the request was successful.
      */
@@ -999,7 +999,7 @@ public class Seeds {
      * @param listener Listener callback, first parameter is an error string and second parameter is
      *                 the result as a JsonObject. If the error string is null, the request was successful.
      */
-    public void requestGenericUserBehaviorQuery(final String queryPath, final IUserBehaviorListener listener) {
+    public void requestGenericUserBehaviorQuery(final String queryPath, final IUserBehaviorQueryListener listener) {
         String endpoint = connectionQueue_.getServerURL() + "/o/app-user/" + queryPath;
         Uri.Builder uri = Uri.parse(endpoint).buildUpon();
         uri.appendQueryParameter("app_key", connectionQueue_.getAppKey());
