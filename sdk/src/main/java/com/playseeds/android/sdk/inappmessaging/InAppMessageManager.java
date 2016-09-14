@@ -364,7 +364,14 @@ public class InAppMessageManager {
 						mListener.inAppMessageClickedWithDynamicPrice(ad.getMessageIdRequested(), price);
 					}
 				});
-			} else {
+			} else if (linkUrl != null && linkUrl.contains("/social-share")) {
+				final String shareUrl = "http://playseeds.com/" + linkUrl.substring(linkUrl.lastIndexOf('/') + 1);
+
+				Intent i = new Intent(Intent.ACTION_SEND);
+				i.setType("text/plain");
+				i.putExtra(Intent.EXTRA_TEXT, shareUrl);
+				mContext.startActivity(Intent.createChooser(i, "Share URL"));
+
 				sendNotification(new Runnable() {
 					@Override
 					public void run() {
