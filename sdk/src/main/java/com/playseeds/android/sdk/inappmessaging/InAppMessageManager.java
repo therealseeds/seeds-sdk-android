@@ -358,6 +358,12 @@ public class InAppMessageManager {
 		if (mListener != null) {
 			if (linkUrl != null && linkUrl.contains("/price/")) {
 				final Double price = Double.parseDouble(linkUrl.substring(linkUrl.lastIndexOf('/') + 1));
+
+				setSegmentation();
+				segmentation.put("price", price.toString());
+				Seeds.sharedInstance().recordEvent("dynamic price clicked", segmentation, 1);
+				Seeds.sharedInstance().setAdClicked(true);
+
 				sendNotification(new Runnable() {
 					@Override
 					public void run() {
@@ -372,6 +378,21 @@ public class InAppMessageManager {
 				i.putExtra(Intent.EXTRA_TEXT, shareUrl);
 				mContext.startActivity(Intent.createChooser(i, "Share URL"));
 
+				setSegmentation();
+				Seeds.sharedInstance().recordEvent("social share clicked", segmentation, 1);
+				Seeds.sharedInstance().setAdClicked(true);
+
+				sendNotification(new Runnable() {
+					@Override
+					public void run() {
+						mListener.inAppMessageClicked(ad.getMessageIdRequested());
+					}
+				});
+			} else {
+				setSegmentation();
+				Seeds.sharedInstance().recordEvent("message clicked", segmentation, 1);
+				Seeds.sharedInstance().setAdClicked(true);
+
 				sendNotification(new Runnable() {
 					@Override
 					public void run() {
@@ -381,9 +402,6 @@ public class InAppMessageManager {
 			}
 		}
 
-		setSegmentation();
-		Seeds.sharedInstance().recordEvent("message clicked", segmentation, 1);
-		Seeds.sharedInstance().setAdClicked(true);
 		android.util.Log.d("Main", "message shown: " + segmentation);
 	}
 

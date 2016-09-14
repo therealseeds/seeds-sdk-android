@@ -116,7 +116,6 @@ public class InAppMessageView extends RelativeLayout {
 	}
 
 	private void doOpenUrl(final String url) {
-
 		if (this.response.getClickUrl() != null && this.response.getSkipOverlay() == 1) {
 			makeTrackingRequest(this.response.getClickUrl());
 		}
@@ -140,8 +139,14 @@ public class InAppMessageView extends RelativeLayout {
 			this.response.setSeedsLinkUrl(url);
 			adListener.onClick();
 
-			final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-			startActivity(intent);
+			// TODO Atte Keinänen 9/14
+			// When implementing a more comprehensive interstitial link protocol,
+			// refactor this to a higher abstraction layer
+			final boolean linkClosesInAppMessage = !url.contains("social-share");
+			if (linkClosesInAppMessage) {
+				RichMediaActivity activity = (RichMediaActivity)getContext();
+				activity.close();
+			}
 		}
 	}
 

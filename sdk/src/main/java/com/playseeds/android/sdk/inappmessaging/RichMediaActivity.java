@@ -362,11 +362,6 @@ public class RichMediaActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 
-		if (wasClicked) {
-			// close after coming back from click.
-			close();
-		}
-
 		Log.d("RichMediaActivity onResume");
 		switch (this.mType) {
 			case TYPE_BROWSER:
