@@ -210,7 +210,7 @@ public class InAppMessageResponse implements InAppMessage {
 		return skipOverlay;
 	}
 
-	public String getMessageIdRequested() {
+	public String getMessageId() {
 		return messageIdRequested;
 	}
 

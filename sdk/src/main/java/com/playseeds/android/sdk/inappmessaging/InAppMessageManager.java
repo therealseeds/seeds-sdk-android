@@ -295,7 +295,7 @@ public class InAppMessageManager {
 			return;
 		}
 
-		if (messageId != null && !messageId.equals(mResponse.getMessageIdRequested())) {
+		if (messageId != null && !messageId.equals(mResponse.getMessageId())) {
 			notifyAdShown(mResponse, false);
 			return;
 		}
@@ -335,7 +335,7 @@ public class InAppMessageManager {
             || (mResponse.getType() == Const.AD_FAILED))
 			return false;
 
-		return messageId == null || messageId.equals(mResponse.getMessageIdRequested());
+		return messageId == null || messageId.equals(mResponse.getMessageId());
 	}
 
 	private void notifyNoAdFound(final String messageId) {
@@ -359,7 +359,7 @@ public class InAppMessageManager {
 			if (linkUrl != null && linkUrl.contains("/price/")) {
 				final Double price = Double.parseDouble(linkUrl.substring(linkUrl.lastIndexOf('/') + 1));
 
-				setSegmentation();
+				setSegmentation(ad);
 				segmentation.put("price", price.toString());
 				Seeds.sharedInstance().recordEvent("dynamic price clicked", segmentation, 1);
 				Seeds.sharedInstance().setAdClicked(true);
@@ -367,7 +367,7 @@ public class InAppMessageManager {
 				sendNotification(new Runnable() {
 					@Override
 					public void run() {
-						mListener.inAppMessageClickedWithDynamicPrice(ad.getMessageIdRequested(), price);
+						mListener.inAppMessageClickedWithDynamicPrice(ad.getMessageId(), price);
 					}
 				});
 			} else if (linkUrl != null && linkUrl.contains("/social-share")) {
@@ -378,25 +378,30 @@ public class InAppMessageManager {
 				i.putExtra(Intent.EXTRA_TEXT, shareUrl);
 				mContext.startActivity(Intent.createChooser(i, "Share URL"));
 
-				setSegmentation();
+				setSegmentation(ad);
 				Seeds.sharedInstance().recordEvent("social share clicked", segmentation, 1);
-				Seeds.sharedInstance().setAdClicked(true);
 
 				sendNotification(new Runnable() {
 					@Override
 					public void run() {
-						mListener.inAppMessageClicked(ad.getMessageIdRequested());
+						mListener.inAppMessageClicked(ad.getMessageId());
 					}
 				});
+			} else if (linkUrl != null && linkUrl.contains("show-more")) {
+				setSegmentation(ad);
+				Seeds.sharedInstance().recordEvent("show more clicked", segmentation, 1);
+			} else if (linkUrl != null && linkUrl.equals("about:close")) {
+				setSegmentation(ad);
+				Seeds.sharedInstance().recordEvent("message dismissed", segmentation, 1);
 			} else {
-				setSegmentation();
+				setSegmentation(ad);
 				Seeds.sharedInstance().recordEvent("message clicked", segmentation, 1);
 				Seeds.sharedInstance().setAdClicked(true);
 
 				sendNotification(new Runnable() {
 					@Override
 					public void run() {
-						mListener.inAppMessageClicked(ad.getMessageIdRequested());
+						mListener.inAppMessageClicked(ad.getMessageId());
 					}
 				});
 			}
@@ -410,7 +415,7 @@ public class InAppMessageManager {
 			sendNotification(new Runnable() {
 				@Override
 				public void run() {
-					mListener.inAppMessageLoadSucceeded(ad.getMessageIdRequested());
+					mListener.inAppMessageLoadSucceeded(ad.getMessageId());
 				}
 			});
 		}
@@ -422,15 +427,15 @@ public class InAppMessageManager {
 			sendNotification(new Runnable() {
 				@Override
 				public void run() {
-					mListener.inAppMessageShown(ad.getMessageIdRequested(), ok);
+					mListener.inAppMessageShown(ad.getMessageId(), ok);
 				}
 			});
 		}
 
-		// mResponses.remove(ad.getMessageIdRequested());
+		// mResponses.remove(ad.getMessageId());
 
 		if (ok) {
-			setSegmentation();
+			setSegmentation(ad);
 			Seeds.sharedInstance().recordEvent("message shown", segmentation, 1);
 			android.util.Log.d("Main", "message shown: " + segmentation);
 		}
@@ -445,7 +450,7 @@ public class InAppMessageManager {
 				@Override
 				public void run() {
 					// TODO: Trigger this only when the interstitial is being dismissed
-					mListener.inAppMessageDismissed(ad.getMessageIdRequested());
+					mListener.inAppMessageDismissed(ad.getMessageId());
 				}
 			});
 		}
@@ -590,9 +595,9 @@ public class InAppMessageManager {
 		this.keywords = keywords;
 	}
 
-	public void setSegmentation() {
+	public void setSegmentation(InAppMessageResponse ad) {
 		segmentation = new HashMap<>();
-		segmentation.put("message", Seeds.sharedInstance().getMessageVariantName());
+		segmentation.put("message", ad.getMessageId());
         if (Seeds.sharedInstance().getMessageContext() != null) {
             segmentation.put("context", Seeds.sharedInstance().getMessageContext());
         }

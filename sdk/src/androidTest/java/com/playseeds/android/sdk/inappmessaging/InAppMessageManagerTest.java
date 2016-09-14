@@ -30,7 +30,6 @@ public class InAppMessageManagerTest extends AndroidTestCase {
         InAppMessageManager.sharedInstance().setRunningAds(runningAds);
         InAppMessageManager.sharedInstance().setListener(inAppMessageListener);
         Seeds.sharedInstance().init(context, null, inAppMessageListener, serverUrl, "12345");
-        Seeds.sharedInstance().setMessageVariantName("Test message");
         InAppMessageManager.sharedInstance().init(context, null, serverUrl, "c30f02a55541cbe362449d29d83d777c125c8dd6", "Nexus-XLR", DeviceId.Type.ADVERTISING_ID);
     }
 

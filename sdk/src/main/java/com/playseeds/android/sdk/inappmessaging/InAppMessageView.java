@@ -130,11 +130,6 @@ public class InAppMessageView extends RelativeLayout {
 				intent.putExtra(Const.REDIRECT_URI, url);
 				startActivity(intent);
 			}
-		} else if (url.equals("about:close")) {
-			if (getContext() instanceof RichMediaActivity) {
-				RichMediaActivity activity = (RichMediaActivity)getContext();
-				activity.close();
-			}
 		} else {
 			this.response.setSeedsLinkUrl(url);
 			adListener.onClick();
@@ -142,7 +137,9 @@ public class InAppMessageView extends RelativeLayout {
 			// TODO Atte Keinänen 9/14
 			// When implementing a more comprehensive interstitial link protocol,
 			// refactor this to a higher abstraction layer
-			final boolean linkClosesInAppMessage = !url.contains("social-share");
+			final boolean linkClosesInAppMessage =
+					!(url.contains("social-share") || url.contains("show-more")) || url.equals("about:close");
+
 			if (linkClosesInAppMessage) {
 				RichMediaActivity activity = (RichMediaActivity)getContext();
 				activity.close();

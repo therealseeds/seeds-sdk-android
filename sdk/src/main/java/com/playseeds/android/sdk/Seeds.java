@@ -66,7 +66,6 @@ public class Seeds {
     private AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
 
     // Seeds message identification stuff
-    private String messageVariantName;
     private String messageContext;
 
     private boolean adClicked = false;
@@ -838,14 +837,6 @@ public class Seeds {
 
     boolean getDisableUpdateSessionRequests() {
         return disableUpdateSessionRequests_;
-    }
-
-    public void setMessageVariantName(String messageVariantName) {
-        this.messageVariantName = messageVariantName;
-    }
-
-    public String getMessageVariantName() {
-        return messageVariantName;
     }
 
     public void setMessageContext(String messageContext) {

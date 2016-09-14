@@ -80,11 +80,11 @@ public class MainActivity extends Activity implements InAppMessageListener {
     }
 
     public void iamButtonClicked0(View view) {
-        showInAppMessage(messageId0);
+        showInAppMessage(messageId0, "in-test-app");
     }
 
     public void iamButtonClicked1(View view) {
-        showInAppMessage(messageId1);
+        showInAppMessage(messageId1, "in-test-app");
     }
 
     public void purchaseEventButtonClicked(View view) {
@@ -134,12 +134,12 @@ public class MainActivity extends Activity implements InAppMessageListener {
         Seeds.sharedInstance().recordSeedsIAPEvent("item1", 0.99);
     }
 
-    public void showInAppMessage(final String messageId) {
+    public void showInAppMessage(final String messageId, final String context) {
         try {
             runOnUiThread(new Runnable() {
                 public void run() {
                     if (Seeds.sharedInstance().isInAppMessageLoaded(messageId)) {
-                        Seeds.sharedInstance().showInAppMessage(messageId, "in-store");
+                        Seeds.sharedInstance().showInAppMessage(messageId, context);
 
                     } else {
                         // Skip the interstitial showing this time and try to reload the interstitial
