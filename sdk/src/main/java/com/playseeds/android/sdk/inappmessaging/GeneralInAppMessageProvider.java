@@ -68,6 +68,12 @@ public class GeneralInAppMessageProvider extends InAppMessageProvider<InAppMessa
 				response.setProductId(((JsonString) jsonProductId).getString());
 			}
 
+			JsonValue jsonMessageVariant = jsonObject.get("messageVariant");
+			if (jsonMessageVariant != null && !jsonMessageVariant.equals(JsonValue.NULL) &&
+					(jsonMessageVariant instanceof JsonString)) {
+				response.setMessageVariant(((JsonString) jsonMessageVariant).getString());
+			}
+
 			// result of policies such as do not show to paying users
 			if (jsonObject.containsKey("doNotShow")) {
 				boolean doNotShow = jsonObject.getBoolean("doNotShow");

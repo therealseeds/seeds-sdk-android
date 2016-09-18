@@ -56,9 +56,7 @@ public class RichMediaActivity extends Activity {
 	private FrameLayout mRootLayout;
 	private ImageView mSkipButton;
 	private InAppMessageResponse mAd;
-	private boolean mCanClose;
 	private int mType;
-	private boolean wasClicked;
 	private boolean mResult;
 
 	int skipButtonSizeLand = 40;
@@ -114,7 +112,7 @@ public class RichMediaActivity extends Activity {
 
 		if (this.mAd != null) {
 			Log.d("Finish Activity type:" + this.mType + " ad Type:" + this.mAd.getType());
-			InAppMessageManager.closeRunningInAppMessage(this.mAd, this.mResult, this.wasClicked);
+			InAppMessageManager.closeRunningInAppMessage(this.mAd);
 		}
 	}
 
@@ -193,7 +191,6 @@ public class RichMediaActivity extends Activity {
 
 			this.mSkipButton.setOnClickListener(this.mOnInterstitialSkipListener);
 
-			this.mCanClose = true;
 			this.mSkipButton.setVisibility(View.VISIBLE);
 
 			layout.addView(this.mSkipButton, params);
@@ -211,7 +208,7 @@ public class RichMediaActivity extends Activity {
 
 			@Override
 			public void onClick() {
-				notifyAdClicked();
+				InAppMessageManager.notifyInAppMessageClick(mAd);
 			}
 
 			@Override
@@ -219,12 +216,6 @@ public class RichMediaActivity extends Activity {
 				finish();
 			}
 		};
-	}
-
-
-	private void notifyAdClicked() {
-		wasClicked = true;
-		InAppMessageManager.notifyInAppMessageClick(mAd);
 	}
 
 	private void initRootLayout() {
@@ -286,7 +277,6 @@ public class RichMediaActivity extends Activity {
 
 				this.mAd = (InAppMessageResponse) extras.getSerializable(Const.AD_EXTRA);
 
-				this.mCanClose = false;
 				this.mType = extras.getInt(Const.AD_TYPE_EXTRA, -1);
 				if (this.mType == -1) {
 					switch (this.mAd.getType()) {

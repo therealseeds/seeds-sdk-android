@@ -65,11 +65,6 @@ public class Seeds {
     private IInAppBillingService billingService;
     private AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
 
-    // Seeds message identification stuff
-    private String messageContext;
-
-    private boolean adClicked = false;
-
     /**
      * Current version of the Count.ly Android SDK as a displayable string.
      */
@@ -460,10 +455,6 @@ public class Seeds {
 
         if (seedsEvent) {
             segmentation.put("IAP type", "Seeds");
-
-            if (getMessageContext() != null) {
-                segmentation.put("context", getMessageContext());
-            }
         } else {
             segmentation.put("IAP type", "Non-Seeds");
         }
@@ -837,22 +828,6 @@ public class Seeds {
 
     boolean getDisableUpdateSessionRequests() {
         return disableUpdateSessionRequests_;
-    }
-
-    public void setMessageContext(String messageContext) {
-        this.messageContext = messageContext;
-    }
-
-    public String getMessageContext() {
-        return messageContext;
-    }
-
-    public boolean isAdClicked() {
-        return adClicked;
-    }
-
-    public void setAdClicked(boolean adClicked) {
-        this.adClicked = adClicked;
     }
 
     /**

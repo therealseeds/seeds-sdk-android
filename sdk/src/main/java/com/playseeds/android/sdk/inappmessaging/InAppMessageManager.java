@@ -60,7 +60,6 @@ public class InAppMessageManager {
 	private DeviceId.Type mIdMode;
 	private boolean alreadyRequestedInterstitial;
 	private boolean requestedHorizontalAd;
-	private HashMap<String, String> segmentation;
 	private Gender userGender;
 	private int userAge;
 	private List<String> keywords;
@@ -104,17 +103,12 @@ public class InAppMessageManager {
         if (mRequests == null) mRequests = new HashMap<>();
 	}
 
-	public static void closeRunningInAppMessage(InAppMessageResponse ad, boolean result, boolean wasClicked) {
+	public static void closeRunningInAppMessage(InAppMessageResponse ad) {
 		InAppMessageManager inAppMessageManager = sRunningAds.remove(ad.getTimestamp());
 
 		if (inAppMessageManager == null) {
 			Log.d("Cannot find InAppMessageManager with running ad:" + ad.getTimestamp());
 			return;
-		}
-
-		if (!wasClicked) {
-			Log.d("Notify dismissal event to InAppMessageManager with running ad:" + ad.getTimestamp());
-			inAppMessageManager.notifyAdDismiss(ad, result);
 		}
 	}
 
@@ -216,12 +210,6 @@ public class InAppMessageManager {
 									String formattedPrice = jsonProductDetails.get("price").getAsString();
 									mResponses.get(messageId).setFormattedPrice(formattedPrice);
 
-									String exactPrice = jsonProductDetails.get("price_amount_micros").getAsString();
-									mResponses.get(messageId).setExactPrice(exactPrice);
-
-									String currencyCode = jsonProductDetails.get("price_currency_code").getAsString();
-									mResponses.get(messageId).setPriceCurrencyCode(currencyCode);
-
 									break;
 								}
 							}
@@ -303,26 +291,22 @@ public class InAppMessageManager {
 		InAppMessageResponse ad = mResponse;
 		boolean result = false;
 		try {
-			if (Util.isNetworkAvailable(getContext())) {
-				ad.setTimestamp(System.currentTimeMillis());
-				ad.setHorizontalOrientationRequested(requestedHorizontalAd);
-				ad.setMessageId(messageId);
-				Log.v("Showing InAppMessage:" + ad);
+			ad.setTimestamp(System.currentTimeMillis());
+			ad.setHorizontalOrientationRequested(requestedHorizontalAd);
+			ad.setMessageId(messageId);
+			ad.setMessageContext(messageContext);
 
-				Intent intent = new Intent(getContext(), RichMediaActivity.class);
-				intent.putExtra(AD_EXTRA, ad);
-				getContext().startActivity(intent);
+			Log.v("Showing InAppMessage:" + ad);
 
-				result = true;
-				sRunningAds.put(ad.getTimestamp(), this);
-			} else {
-				Log.d("No network available. Cannot show InAppMessage.");
-			}
+			Intent intent = new Intent(getContext(), RichMediaActivity.class);
+			intent.putExtra(AD_EXTRA, ad);
+			getContext().startActivity(intent);
+
+			result = true;
+			sRunningAds.put(ad.getTimestamp(), this);
 		} catch (Exception e) {
 			Log.e("Unknown exception when showing InAppMessage", e);
 		} finally {
-			if (result)
-				Seeds.sharedInstance().setMessageContext(messageContext);
 			notifyAdShown(ad, result);
 		}
 	}
@@ -358,11 +342,9 @@ public class InAppMessageManager {
 		if (mListener != null) {
 			if (linkUrl != null && linkUrl.contains("/price/")) {
 				final Double price = Double.parseDouble(linkUrl.substring(linkUrl.lastIndexOf('/') + 1));
-
-				setSegmentation(ad);
-				segmentation.put("price", price.toString());
-				Seeds.sharedInstance().recordEvent("dynamic price clicked", segmentation, 1);
-				Seeds.sharedInstance().setAdClicked(true);
+				HashMap<String, String> customSegments = new HashMap<>();
+				customSegments.put("price", price.toString());
+				recordInterstitialEvent("dynamic price clicked", ad, customSegments);
 
 				sendNotification(new Runnable() {
 					@Override
@@ -378,8 +360,7 @@ public class InAppMessageManager {
 				i.putExtra(Intent.EXTRA_TEXT, shareUrl);
 				mContext.startActivity(Intent.createChooser(i, "Share URL"));
 
-				setSegmentation(ad);
-				Seeds.sharedInstance().recordEvent("social share clicked", segmentation, 1);
+				recordInterstitialEvent("social share clicked", ad);
 
 				sendNotification(new Runnable() {
 					@Override
@@ -388,16 +369,17 @@ public class InAppMessageManager {
 					}
 				});
 			} else if (linkUrl != null && linkUrl.contains("show-more")) {
-				setSegmentation(ad);
-				Seeds.sharedInstance().recordEvent("show more clicked", segmentation, 1);
+				recordInterstitialEvent("show more clicked", ad);
 			} else if (linkUrl != null && linkUrl.equals("about:close")) {
-				setSegmentation(ad);
-				Seeds.sharedInstance().recordEvent("message dismissed", segmentation, 1);
+				recordInterstitialEvent("message dismissed", ad);
+				sendNotification(new Runnable() {
+					@Override
+					public void run() {
+						mListener.inAppMessageDismissed(ad.getMessageId());
+					}
+				});
 			} else {
-				setSegmentation(ad);
-				Seeds.sharedInstance().recordEvent("message clicked", segmentation, 1);
-				Seeds.sharedInstance().setAdClicked(true);
-
+				recordInterstitialEvent("message clicked", ad);
 				sendNotification(new Runnable() {
 					@Override
 					public void run() {
@@ -406,8 +388,6 @@ public class InAppMessageManager {
 				});
 			}
 		}
-
-		android.util.Log.d("Main", "message shown: " + segmentation);
 	}
 
 	private void notifyAdLoaded(final InAppMessageResponse ad) {
@@ -432,15 +412,9 @@ public class InAppMessageManager {
 			});
 		}
 
-		// mResponses.remove(ad.getMessageId());
-
 		if (ok) {
-			setSegmentation(ad);
-			Seeds.sharedInstance().recordEvent("message shown", segmentation, 1);
-			android.util.Log.d("Main", "message shown: " + segmentation);
+			recordInterstitialEvent("message shown", ad);
 		}
-		// sanity check
-		Seeds.sharedInstance().setAdClicked(false);
 	}
 
 	private void notifyAdDismiss(final InAppMessageResponse ad, final boolean ok) {
@@ -450,7 +424,7 @@ public class InAppMessageManager {
 				@Override
 				public void run() {
 					// TODO: Trigger this only when the interstitial is being dismissed
-					mListener.inAppMessageDismissed(ad.getMessageId());
+
 				}
 			});
 		}
@@ -595,12 +569,18 @@ public class InAppMessageManager {
 		this.keywords = keywords;
 	}
 
-	public void setSegmentation(InAppMessageResponse ad) {
-		segmentation = new HashMap<>();
+	public void recordInterstitialEvent(String key, InAppMessageResponse ad) {
+		recordInterstitialEvent(key, ad, null);
+	}
+
+	public void recordInterstitialEvent(String key, InAppMessageResponse ad, HashMap<String,String> customSegments) {
+		HashMap<String, String> segmentation = new HashMap<>();
 		segmentation.put("message", ad.getMessageId());
-        if (Seeds.sharedInstance().getMessageContext() != null) {
-            segmentation.put("context", Seeds.sharedInstance().getMessageContext());
-        }
+		if (ad.getMessageContext().length() > 0) segmentation.put("context", ad.getMessageContext());
+		if (ad.getMessageVariant().length() > 0) segmentation.put("variant", ad.getMessageVariant());
+		if (customSegments != null) segmentation.putAll(customSegments);
+
+		Seeds.sharedInstance().recordEvent(key, segmentation, 1);
 	}
 
 	public void doNotShow(boolean doNotShow) {

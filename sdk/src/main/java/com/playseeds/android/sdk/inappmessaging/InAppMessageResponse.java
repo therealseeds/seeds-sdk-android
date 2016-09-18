@@ -18,7 +18,7 @@
 
 package com.playseeds.android.sdk.inappmessaging;
 
-public class InAppMessageResponse implements InAppMessage {
+public class  InAppMessageResponse implements InAppMessage {
 	public static final String OTHER = "other";
 	private static final long serialVersionUID = 3271938798582141269L;
 	private int type;
@@ -29,16 +29,6 @@ public class InAppMessageResponse implements InAppMessage {
 	private String imageUrl;
 	private String productId;
 	private String formattedPrice;
-	private String exactPrice;
-
-	public String getPriceCurrencyCode() {
-		return priceCurrencyCode;
-	}
-
-	public InAppMessageResponse setPriceCurrencyCode(String priceCurrencyCode) {
-		this.priceCurrencyCode = priceCurrencyCode;
-		return this;
-	}
 
 	public String getFormattedPrice() {
 		return formattedPrice;
@@ -49,16 +39,6 @@ public class InAppMessageResponse implements InAppMessage {
 		return this;
 	}
 
-	public String getExactPrice() {
-		return exactPrice;
-	}
-
-	public InAppMessageResponse setExactPrice(String exactPrice) {
-		this.exactPrice = exactPrice;
-		return this;
-	}
-
-	private String priceCurrencyCode;
 	private ClickType clickType;
 	private String clickUrl;
 	private String urlType;
@@ -68,7 +48,9 @@ public class InAppMessageResponse implements InAppMessage {
 	private boolean skipPreflight;
 	private long timestamp;
 	private boolean horizontalOrientationRequested;
-	private String messageIdRequested;
+	private String messageId;
+	private String messageVariant;
+	private String messageContext;
 
 	public String getProductId() {
 		return this.productId;
@@ -211,10 +193,27 @@ public class InAppMessageResponse implements InAppMessage {
 	}
 
 	public String getMessageId() {
-		return messageIdRequested;
+		return messageId;
 	}
 
 	public void setMessageId(String messageIdRequested) {
-		this.messageIdRequested = messageIdRequested;
+		this.messageId = messageIdRequested;
 	}
+
+	public String getMessageVariant() {
+		return messageVariant != null ? messageVariant : "";
+	}
+
+	public void setMessageVariant(String messageVariant) {
+		this.messageVariant = messageVariant;
+	}
+
+	public String getMessageContext() {
+		return messageContext != null ? messageContext : "";
+	}
+
+	public void setMessageContext(String messageContext) {
+		this.messageContext = messageContext;
+	}
+
 }
