@@ -167,19 +167,16 @@ public class InAppMessageManager {
 						mResponses.put(messageId, requestAd.obtainInAppMessage(mRequests.get(messageId)));
 						mResponses.get(messageId).setMessageId(messageId);
 					} catch (Exception e) {
+						alreadyRequestedInterstitial = true;
+
 						File cachedInAppMessageFile = new File(mContext.getCacheDir(),
 								URLEncoder.encode(mRequests.get(messageId).countlyUriToString(), "UTF-8"));
 						if (cachedInAppMessageFile.exists()) {
 							BufferedReader cacheReader = new BufferedReader(new FileReader(cachedInAppMessageFile));
 							mResponses.put(messageId, new Gson().fromJson(cacheReader, InAppMessageResponse.class));
 							cacheReader.close();
-						}
-					}
-					if (mResponses.get(messageId).getType() == Const.NO_AD) {
-						if (!alreadyRequestedInterstitial) {
-							mRequests.put(messageId, getInterstitialRequest(messageId));
-							alreadyRequestedInterstitial = true;
-							mResponses.put(messageId, requestAd.obtainInAppMessage(mRequests.get(messageId)));
+						} else {
+							throw e;
 						}
 					}
 
