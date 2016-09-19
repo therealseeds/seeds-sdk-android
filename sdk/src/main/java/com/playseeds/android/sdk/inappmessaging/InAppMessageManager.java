@@ -58,7 +58,6 @@ public class InAppMessageManager {
 	private String interstitialRequestURL;
 	private String mDeviceID;
 	private DeviceId.Type mIdMode;
-	private boolean alreadyRequestedInterstitial;
 	private boolean requestedHorizontalAd;
 	private Gender userGender;
 	private int userAge;
@@ -167,8 +166,6 @@ public class InAppMessageManager {
 						mResponses.put(messageId, requestAd.obtainInAppMessage(mRequests.get(messageId)));
 						mResponses.get(messageId).setMessageId(messageId);
 					} catch (Exception e) {
-						alreadyRequestedInterstitial = true;
-
 						File cachedInAppMessageFile = new File(mContext.getCacheDir(),
 								URLEncoder.encode(mRequests.get(messageId).countlyUriToString(), "UTF-8"));
 						if (cachedInAppMessageFile.exists()) {
@@ -224,8 +221,9 @@ public class InAppMessageManager {
 					//TODO: remove debug code
 					Log.i("mResponse is: " + mResponses.get(messageId));
 
-					if (mResponses.get(messageId).getType() == Const.TEXT ||
-							mResponses.get(messageId).getType() == Const.IMAGE) {
+					if ((mResponses.get(messageId).getType() == Const.TEXT ||
+							mResponses.get(messageId).getType() == Const.IMAGE) &&
+							messageId.equals(mResponses.get(messageId).getMessageId())) {
 
 						notifyAdLoaded(mResponses.get(messageId));
 
@@ -253,15 +251,10 @@ public class InAppMessageManager {
 				} catch (Throwable t) {
 					Log.e("ad request failed", t);
 
-					if (!alreadyRequestedInterstitial) {
-						mRequestThreads.remove(messageId);
-						requestInAppMessageInternal(messageId);
-					} else {
-						mResponses.put(messageId, new InAppMessageResponse());
-						mResponses.get(messageId).setType(Const.AD_FAILED);
-						mResponses.get(messageId).setMessageId(messageId);
-						notifyNoAdFound(messageId);
-					}
+					mResponses.put(messageId, new InAppMessageResponse());
+					mResponses.get(messageId).setType(Const.AD_FAILED);
+					mResponses.get(messageId).setMessageId(messageId);
+					notifyNoAdFound(messageId);
 				}
 				Log.d("finishing ad request thread");
 				mRequestThreads.remove(messageId);
