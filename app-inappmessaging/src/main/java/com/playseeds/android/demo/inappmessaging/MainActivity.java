@@ -2,6 +2,7 @@ package com.playseeds.android.demo.inappmessaging;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
@@ -47,11 +48,14 @@ public class MainActivity extends Activity implements InAppMessageListener {
     }
 
     public void startNormalPurchase(View view) {
+        final Context context = this;
         triggerPayment(new Runnable() {
             @Override
             public void run() {
                 // Use recordIAPEvent instead of recordSeedsIAPEvent
                 Seeds.sharedInstance().recordIAPEvent(NORMAL_IAP_EVENT_KEY, 4.99);
+                Toast.makeText(context, "Event " + NORMAL_IAP_EVENT_KEY + " tracked as a non-Seeds purchase",
+                        Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -103,16 +107,21 @@ public class MainActivity extends Activity implements InAppMessageListener {
     public void inAppMessageClicked(String messageId) {
         // Called when a user clicks the buy button. Handle the purchase here!
         // The interstitial is specified by messageId parameter
-
+        final Context context = this;
         if (messageId.equals(PURCHASE_INTERSTITIAL_ID)) {
             triggerPayment(new Runnable() {
                 @Override
                 public void run() {
                     // Use recordSeedsIAPEvent instead of recordIAPEvent
                     Seeds.sharedInstance().recordSeedsIAPEvent(SEEDS_IAP_EVENT_KEY, 0.99);
+                    Toast.makeText(context, "Event " + SEEDS_IAP_EVENT_KEY + " tracked as a Seeds purchase",
+                            Toast.LENGTH_SHORT).show();
+
                     showInterstitial(SHARING_INTERSTITIAL_ID, "after-purchase");
                 }
             });
+        } else if (messageId.equals(APP_LAUNCH_INTERSTITIAL_ID)) {
+            Toast.makeText(context, "App launch interstitial button clicked", Toast.LENGTH_SHORT).show();
         }
 
         Toast.makeText(this, "inAppMessageClicked(messageId = " + messageId + ")", Toast.LENGTH_SHORT).show();
