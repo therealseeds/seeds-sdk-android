@@ -160,6 +160,6 @@ public class MainActivity extends Activity implements InAppMessageListener {
     }
 
     /*
-     * InAppMessageListener implementation starts
+     * InAppMessageListener implementation ends
      */
 }
