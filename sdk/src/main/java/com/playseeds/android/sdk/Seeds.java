@@ -21,6 +21,7 @@ package com.playseeds.android.sdk;
 import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
+import android.os.Build;
 import android.util.Log;
 
 import com.android.vending.billing.IInAppBillingService;
@@ -64,6 +65,7 @@ public class Seeds {
     protected static List<String> publicKeyPinCertificates;
     private IInAppBillingService billingService;
     private AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
+    private MainActivityEventListener mainActivityEventListener;
 
     /**
      * Current version of the Count.ly Android SDK as a displayable string.
@@ -131,10 +133,48 @@ public class Seeds {
     }
 
     /**
+     * Initializes the Seeds SDK in a simplified fashion. Call from your main Activity's onCreate() method.
+     * Must be called before other SDK methods can be used.
+     * This version integrates to activity lifecycle hooks and isn't supported in Android v. 13 or lower.
+     * The use of lifecycle hook removes the need for adding code to onStart, onStop and onDestroy manually.
+     * Device ID is supplied by OpenUDID service if available, otherwise Advertising ID is used.
+     * Be cautious: If neither OpenUDID, nor Advertising ID is available, Seeds will ignore this user.
+     * @param activity preferably the main activity of the app
+     * @param listener callbacks listener
+     * @param serverURL URL of the Seeds server to submit data to; use "https://cloud.count.ly" for Seeds Cloud
+     * @param appKey app key for the application being tracked; find in the Seeds Dashboard under Management &gt; Applications
+     * @return Seeds instance for easy method chaining
+     * @throws java.lang.IllegalArgumentException if context, serverURL, appKey, or deviceID are invalid
+     * @throws java.lang.IllegalStateException if the Seeds SDK has already been initialized or Android SDK is too old
+     */
+    public Seeds simpleInit(final Activity activity, final InAppMessageListener listener, final String serverURL, final String appKey) {
+        final boolean apiSupportsLifecycleCallbacks =
+                                Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH;
+
+        if (apiSupportsLifecycleCallbacks) {
+            DeviceId.Type idMode = OpenUDIDAdapter.isOpenUDIDAvailable() ? DeviceId.Type.OPEN_UDID : DeviceId.Type.ADVERTISING_ID;
+
+            // Pre-initialize SDK without the billing service
+            Seeds sdk = Seeds.sharedInstance()
+                    .init(activity, null, listener, serverURL, appKey, null, idMode);
+
+            // MainActivityEventListener takes care of the creation of the billing service
+            // and binds to the main activity lifecycle hooks
+            mainActivityEventListener =
+                    new MainActivityEventListener(activity, listener, serverURL, appKey, null, idMode);
+            mainActivityEventListener.resolve();
+
+            return sdk;
+        } else {
+            throw new IllegalStateException("You can't use automatedInit with Android SDK version <= 13");
+        }
+    }
+
+    /**
      * Initializes the Seeds SDK. Call from your main Activity's onCreate() method.
      * Must be called before other SDK methods can be used.
      * Device ID is supplied by OpenUDID service if available, otherwise Advertising ID is used.
-     * BE CAUTIOUS!!!! If neither OpenUDID, nor Advertising ID is available, Seeds will ignore this user.
+     * Be cautious: If neither OpenUDID, nor Advertising ID is available, Seeds will ignore this user.
      * @param context application context
      * @param billingService billing service or null
      * @param listener callbacks listener
