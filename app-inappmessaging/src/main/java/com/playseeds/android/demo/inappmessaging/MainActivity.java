@@ -1,19 +1,12 @@
 package com.playseeds.android.demo.inappmessaging;
 
 import android.app.Activity;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.android.vending.billing.IInAppBillingService;
-import com.playseeds.android.sdk.IInAppMessageShowCountListener;
-import com.playseeds.android.sdk.IInAppPurchaseCountListener;
 import com.playseeds.android.sdk.Seeds;
 
 import com.playseeds.android.sdk.inappmessaging.InAppMessageListener;
@@ -22,11 +15,15 @@ import com.playseeds.demo.inappmessaging.R;
 
 
 public class MainActivity extends Activity implements InAppMessageListener {
-    private static String YOUR_SERVER = "http://staging.playseeds.com";
-    private static String YOUR_APP_KEY = "71ac2900e9d31647d68d0ddc6f0aaf52611a612d";
-    private static String messageId0 = "575f872a64bc1e5b0eca506f";
-    private static String messageId1 = "5746851bb29ee753053a7c9a";
-    private static String iapEventKey = "test_iap_event";
+    private static String SEEDS_SERVER = "https://dash.playseeds.com";
+    private static String SEEDS_APP_KEY = "2db64b49085be463cade71ce22e6341d7f6bd901";
+
+    private static String SEEDS_IAP_EVENT_KEY = "TestSeedsPurchase";
+    private static String NORMAL_IAP_EVENT_KEY = "TestNormalPurchase";
+
+    private static String APP_LAUNCH_INTERSTITIAL_ID = "57e362bead5957420e12083f";
+    private static String PURCHASE_INTERSTITIAL_ID = "57e36337ad5957420e120842";
+    private static String SHARING_INTERSTITIAL_ID = "57e36365ad5957420e120845";
 
     /** Called when the activity is first created. */
     @Override
@@ -35,70 +32,31 @@ public class MainActivity extends Activity implements InAppMessageListener {
         setContentView(R.layout.activity_main);
 
         Seeds.sharedInstance()
-                .simpleInit(this, this, YOUR_SERVER, YOUR_APP_KEY)
+                .simpleInit(this, this, SEEDS_SERVER, SEEDS_APP_KEY)
                 .setLoggingEnabled(true);
 
-        // Currently not possible to do in parallel!
-        Seeds.sharedInstance().requestInAppMessage(messageId0);
-        Seeds.sharedInstance().requestInAppMessage(messageId1);
+        // Preload all interstitials at once
+        Seeds.sharedInstance().requestInAppMessage(APP_LAUNCH_INTERSTITIAL_ID);
+        Seeds.sharedInstance().requestInAppMessage(PURCHASE_INTERSTITIAL_ID);
+        Seeds.sharedInstance().requestInAppMessage(SHARING_INTERSTITIAL_ID);
     }
 
-    public void iamButtonClicked0(View view) {
-        showInAppMessage(messageId0, "in-test-app");
+
+    public void startSocialGoodPurchase(View view) {
+        showInterstitial(PURCHASE_INTERSTITIAL_ID, "in-store");
     }
 
-    public void iamButtonClicked1(View view) {
-        showInAppMessage(messageId1, "in-test-app");
-    }
-
-    public void purchaseEventButtonClicked(View view) {
-        final Context context = this;
-
-        Log.d("Main", "purchase button clicked");
-        Seeds.sharedInstance().recordIAPEvent(iapEventKey, 0.99);
-
-        // TODO: Separate button for running the user behaviour requests
-        Seeds.sharedInstance().requestTotalInAppPurchaseCount(new IInAppPurchaseCountListener() {
+    public void startNormalPurchase(View view) {
+        triggerPayment(new Runnable() {
             @Override
-            public void onInAppPurchaseCount(String errorMessage, int purchasesCount, String _) {
-                if (errorMessage != null) return;
-                Toast.makeText(context, "requestTotalInAppPurchaseCount, purchaseCount = " + purchasesCount, Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        Seeds.sharedInstance().requestInAppPurchaseCount(iapEventKey, new IInAppPurchaseCountListener() {
-            @Override
-            public void onInAppPurchaseCount(String errorMessage, int purchasesCount, String key) {
-                if (errorMessage != null) return;
-                String text = "requestInAppPurchaseCount(iapEventKey=" + iapEventKey + "), purchaseCount = " + purchasesCount;
-                Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        Seeds.sharedInstance().requestTotalInAppMessageShowCount(new IInAppMessageShowCountListener() {
-            @Override
-            public void onInAppMessageShowCount(String errorMessage, int showCount, String _) {
-                if (errorMessage != null) return;
-                Toast.makeText(context, "requestTotalInAppMessageShowCount, showCount = " + showCount, Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        Seeds.sharedInstance().requestInAppMessageShowCount(messageId0, new IInAppMessageShowCountListener() {
-            @Override
-            public void onInAppMessageShowCount(String errorMessage, int showCount, String message_id) {
-                if (errorMessage != null) return;
-                String text = "requestInAppMessageShowCount(iapEventKey=" + messageId0 + "), showCount = " + showCount;
-                Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
+            public void run() {
+                // Use recordIAPEvent instead of recordSeedsIAPEvent
+                Seeds.sharedInstance().recordIAPEvent(NORMAL_IAP_EVENT_KEY, 4.99);
             }
         });
     }
 
-    public void seedsPurchaseEventButtonClicked(View view) {
-        Log.d("Main", "purchase button clicked");
-        Seeds.sharedInstance().recordSeedsIAPEvent("item1", 0.99);
-    }
-
-    public void showInAppMessage(final String messageId, final String context) {
+    public void showInterstitial(final String messageId, final String context) {
         try {
             runOnUiThread(new Runnable() {
                 public void run() {
@@ -116,10 +74,47 @@ public class MainActivity extends Activity implements InAppMessageListener {
         }
     }
 
+    public void triggerPayment(final Runnable paymentCompleted) {
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which){
+                    case DialogInterface.BUTTON_POSITIVE:
+                        paymentCompleted.run();
+                        break;
+
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        break;
+                }
+            }
+        };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Do you want to confirm the in-app purchase? (Simulated payment)")
+                .setPositiveButton("Yes", dialogClickListener)
+                .setNegativeButton("No", dialogClickListener).show();
+    }
+
+    /*
+     * InAppMessageListener implementation starts
+     */
+
     @Override
     public void inAppMessageClicked(String messageId) {
         // Called when a user clicks the buy button. Handle the purchase here!
         // The interstitial is specified by messageId parameter
+
+        if (messageId.equals(PURCHASE_INTERSTITIAL_ID)) {
+            triggerPayment(new Runnable() {
+                @Override
+                public void run() {
+                    // Use recordSeedsIAPEvent instead of recordIAPEvent
+                    Seeds.sharedInstance().recordSeedsIAPEvent(SEEDS_IAP_EVENT_KEY, 0.99);
+                    showInterstitial(SHARING_INTERSTITIAL_ID, "after-purchase");
+                }
+            });
+        }
+
         Toast.makeText(this, "inAppMessageClicked(messageId = " + messageId + ")", Toast.LENGTH_SHORT).show();
     }
 
@@ -134,6 +129,12 @@ public class MainActivity extends Activity implements InAppMessageListener {
     public void inAppMessageLoadSucceeded(String messageId) {
         // Called when an interstitial is loaded
         // The interstitial is specified by messageId parameter
+
+        // Show the app launch interstitial immediately after it's preloaded
+        if (messageId.equals(APP_LAUNCH_INTERSTITIAL_ID)) {
+            showInterstitial(APP_LAUNCH_INTERSTITIAL_ID, "app startup");
+        }
+
         Toast.makeText(getBaseContext(), "inAppMessageLoadSucceeded(messageId = " + messageId + ")", Toast.LENGTH_SHORT).show();
     }
 
@@ -146,7 +147,7 @@ public class MainActivity extends Activity implements InAppMessageListener {
 
     @Override
     public void noInAppMessageFound(String messageId) {
-        // Called when an interstitial couldn't be found or there is an error with loading it
+        // Called when an interstitial couldn't be found or the preloading resulted in an error
         Toast.makeText(this, "noInAppMessageFound(messageId = " + messageId + ")", Toast.LENGTH_SHORT).show();
     }
 
@@ -157,4 +158,8 @@ public class MainActivity extends Activity implements InAppMessageListener {
         Toast.makeText(this, "inAppMessageClickedWithDynamicPrice(messageId = " +
                 messageId + ", price = " + price + ")", Toast.LENGTH_SHORT).show();
     }
+
+    /*
+     * InAppMessageListener implementation starts
+     */
 }
