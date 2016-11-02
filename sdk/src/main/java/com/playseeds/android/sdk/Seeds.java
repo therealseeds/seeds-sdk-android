@@ -901,7 +901,11 @@ public class Seeds {
     }
 
     public void requestInAppMessage(String messageId) {
-        InAppMessageManager.sharedInstance().requestInAppMessage(messageId);
+        InAppMessageManager.sharedInstance().requestInAppMessage(messageId, null);
+    }
+
+    public void requestInAppMessage(String messageId, String manualLocalizedPrice) {
+        InAppMessageManager.sharedInstance().requestInAppMessage(messageId, manualLocalizedPrice);
     }
 
     public boolean isInAppMessageLoaded(String messageId) {

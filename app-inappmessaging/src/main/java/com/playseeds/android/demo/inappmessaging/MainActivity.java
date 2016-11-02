@@ -42,7 +42,6 @@ public class MainActivity extends Activity implements InAppMessageListener {
         Seeds.sharedInstance().requestInAppMessage(SHARING_INTERSTITIAL_ID);
     }
 
-
     public void startSocialGoodPurchase(View view) {
         showInterstitial(PURCHASE_INTERSTITIAL_ID, "in-store");
     }
@@ -149,8 +148,9 @@ public class MainActivity extends Activity implements InAppMessageListener {
 
     @Override
     public void inAppMessageShown(String messageId, boolean succeeded) {
-        // Called when an interstitial is successfully opened
+        // Called when showing an interstitial has been tried
         // The interstitial is specified by messageId parameter
+        // Was showing successful or not is defined in succeeded parameter
         Toast.makeText(this, "inAppMessageShown(succeeded = " + succeeded + ", messageId = " + messageId + ")", Toast.LENGTH_SHORT).show();
     }
 

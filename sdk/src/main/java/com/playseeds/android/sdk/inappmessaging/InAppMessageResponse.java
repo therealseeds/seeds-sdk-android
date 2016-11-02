@@ -29,9 +29,16 @@ public class  InAppMessageResponse implements InAppMessage {
 	private String imageUrl;
 	private String productId;
 	private String formattedPrice;
+	private String manualLocalizedPrice;
 
 	public String getFormattedPrice() {
-		return formattedPrice;
+		boolean overrideWithManuallyEnteredPrice = manualLocalizedPrice != null;
+
+		if (overrideWithManuallyEnteredPrice) {
+			return manualLocalizedPrice;
+		} else {
+			return formattedPrice;
+		}
 	}
 
 	public InAppMessageResponse setFormattedPrice(String formattedPrice) {
@@ -216,4 +223,8 @@ public class  InAppMessageResponse implements InAppMessage {
 		this.messageContext = messageContext;
 	}
 
+
+	public void setManualLocalizedPrice(String manualLocalizedPrice) {
+		this.manualLocalizedPrice = manualLocalizedPrice;
+	}
 }

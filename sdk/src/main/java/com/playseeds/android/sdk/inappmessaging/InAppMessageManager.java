@@ -118,16 +118,16 @@ public class InAppMessageManager {
 		}
 	}
 
-	public void requestInAppMessage(String messageId) {
-		requestInAppMessageInternal(messageId);
+	public void requestInAppMessage(String messageId, String manualLocalizedPrice) {
+		requestInAppMessageInternal(messageId, manualLocalizedPrice);
 	}
 
 
-	private void requestInAppMessageInternal(final String messageId) {
+	private void requestInAppMessageInternal(final String messageId, final String manualLocalizedPrice) {
 		if (mRequestThreads.get(messageId) == null) {
 			Log.d("Requesting InAppMessage (v" + Const.VERSION + "-" + Const.PROTOCOL_VERSION + ")");
 			mResponses.remove(messageId);
-			mRequestThreads.put(messageId, getRequestThread(messageId));
+			mRequestThreads.put(messageId, getRequestThread(messageId, manualLocalizedPrice));
 			mRequestThreads.get(messageId).setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
 
 				@Override
@@ -147,7 +147,7 @@ public class InAppMessageManager {
 		}
 	}
 
-	private Thread getRequestThread(final String messageId) {
+	private Thread getRequestThread(final String messageId, final String manualLocalizedPrice) {
 		return new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -165,6 +165,7 @@ public class InAppMessageManager {
 					try {
 						mResponses.put(messageId, requestAd.obtainInAppMessage(mRequests.get(messageId)));
 						mResponses.get(messageId).setMessageId(messageId);
+						mResponses.get(messageId).setManualLocalizedPrice(manualLocalizedPrice);
 					} catch (Exception e) {
 						File cachedInAppMessageFile = new File(mContext.getCacheDir(),
 								URLEncoder.encode(mRequests.get(messageId).countlyUriToString(), "UTF-8"));
