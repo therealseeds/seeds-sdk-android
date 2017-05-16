@@ -117,10 +117,13 @@ public class InAppMessageManager {
 		}
 	}
 
+	public void requestInAppMessage(String messageId) {
+		requestInAppMessageInternal(messageId, null);
+	}
+
 	public void requestInAppMessage(String messageId, String manualLocalizedPrice) {
 		requestInAppMessageInternal(messageId, manualLocalizedPrice);
 	}
-
 
 	private void requestInAppMessageInternal(final String messageId, final String manualLocalizedPrice) {
 		if (mRequestThreads.get(messageId) == null) {

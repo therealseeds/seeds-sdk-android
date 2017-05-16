@@ -74,28 +74,33 @@ public class InAppMessageManagerTest extends AndroidTestCase {
         boolean notFound = false;
 
         @Override
-        public void inAppMessageClicked(String messageId, InAppMessage inAppMessage) {
+        public void inAppMessageClicked(String messageId) {
             isClicked = true;
         }
 
         @Override
-        public void inAppMessageClosed(String messageId, InAppMessage inAppmessage, boolean completed) {
+        public void inAppMessageDismissed(String messageId) {
             isClosed = true;
         }
 
         @Override
-        public void inAppMessageShown(String messageId, InAppMessage inAppMessage, boolean succeeded) {
-            isShown = true;
+        public void inAppMessageLoadSucceeded(String messageId) {
+            isLoadSucceeded = true;
         }
 
         @Override
-        public void inAppMessageLoadSucceeded(String messageId, InAppMessage inAppMessage) {
-            isLoadSucceeded = true;
+        public void inAppMessageShown(String messageId, boolean succeeded) {
+            isShown = succeeded;
         }
 
         @Override
         public void noInAppMessageFound(String messageId) {
             notFound = true;
+        }
+
+        @Override
+        public void inAppMessageClickedWithDynamicPrice(String messageId, Double price) {
+
         }
     }
 }
