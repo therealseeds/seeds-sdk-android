@@ -65,13 +65,17 @@ public class SeedsTests {
         }
 
         @Override
-        public void inAppMessageClicked(String messageId, InAppMessage inAppMessage) {}
+        public void inAppMessageClicked(String messageId) {
+
+        }
 
         @Override
-        public void inAppMessageClosed(String messageId, InAppMessage inAppMessage, boolean completed) {}
+        public void inAppMessageDismissed(String messageId) {
+
+        }
 
         @Override
-        public void inAppMessageLoadSucceeded(String messageId, InAppMessage inAppMessage) {
+        public void inAppMessageLoadSucceeded(String messageId) {
             synchronized (this) {
                 wasLoaded = true;
                 notifyAll();
@@ -79,7 +83,9 @@ public class SeedsTests {
         }
 
         @Override
-        public void inAppMessageShown(String messageId, InAppMessage inAppMessage, boolean succeeded) {}
+        public void inAppMessageShown(String messageId, boolean succeeded) {
+
+        }
 
         @Override
         public void noInAppMessageFound(String messageId) {
@@ -88,6 +94,11 @@ public class SeedsTests {
                 notifyAll();
             }
         }
+
+        @Override
+        public void inAppMessageClickedWithDynamicPrice(String messageId, Double price) {
+
+        }
     }
 
     @Test
@@ -95,7 +106,7 @@ public class SeedsTests {
         InAppMessageLoadListener listener = new InAppMessageLoadListener();
 
         seeds.init(context, null, listener, SERVER, UNLIMITED_ADS_APP_KEY);
-        seeds.requestInAppMessage();
+        seeds.requestInAppMessage(null);
         synchronized (listener) {
             listener.wait(50000);
         }
@@ -107,7 +118,7 @@ public class SeedsTests {
         InAppMessageLoadListener listener = new InAppMessageLoadListener();
 
         seeds.init(context, null, listener, SERVER, NO_ADS_APP_KEY);
-        seeds.requestInAppMessage();
+        seeds.requestInAppMessage(null);
         synchronized (listener) {
             listener.wait(50000);
         }

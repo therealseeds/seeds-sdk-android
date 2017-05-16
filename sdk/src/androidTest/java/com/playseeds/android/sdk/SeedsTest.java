@@ -62,15 +62,6 @@ public class SeedsTest extends AndroidTestCase {
         verify(seedsSpy).onRegistrationId("fake id");
     }
 
-    public void testTrackPurchase() throws Exception {
-        seedsSpy.init(context, null, mock(InAppMessageListener.class), "https://devdash.com", "fake key", "Nexus");
-        doCallRealMethod().when(seedsSpy).trackPurchase("fake key", 1.00);
-        seedsSpy.trackPurchase("fake key", 1.00);
-
-        verify(seedsSpy).trackPurchase("fake key", 1.00);
-        verify(seedsSpy).recordIAPEvent("fake key", 1.00);
-    }
-
     public void testSetUserData() throws Exception {
         Map<String, String> data = new HashMap<>();
         doCallRealMethod().when(seedsSpy).setUserData(data, data);

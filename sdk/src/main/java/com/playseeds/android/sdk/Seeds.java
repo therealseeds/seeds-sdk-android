@@ -489,7 +489,7 @@ public class Seeds {
         recordEvent(key, null, count, sum);
     }
 
-    private void recordGenericIAPEvent(String key, final double price, boolean seedsEvent) {
+    private void recordGenericIAPEvent(String key, final double price, final String transactionId, boolean seedsEvent) {
 
         HashMap<String, String> segmentation = new HashMap<String, String>();
 
@@ -497,6 +497,10 @@ public class Seeds {
             segmentation.put("IAP type", "Seeds");
         } else {
             segmentation.put("IAP type", "Non-Seeds");
+        }
+
+        if (transactionId != null) {
+            segmentation.put("transaction_id", transactionId);
         }
 
         segmentation.put("item", key);
@@ -886,7 +890,19 @@ public class Seeds {
      * @throws IllegalArgumentException if key is null or empty
      */
     public void recordIAPEvent(String key, final double price) {
-        recordGenericIAPEvent(key, price, false);
+        recordGenericIAPEvent(key, price, null, false);
+    }
+
+    /**
+     * Records an IAP event
+     * @param key name of the custom event, required, must not be the empty string
+     * @param price sum to associate with the event
+     * @param transactionId order identifier
+     * @throws IllegalStateException if Seeds SDK has not been initialized
+     * @throws IllegalArgumentException if key is null or empty
+     */
+    public void recordIAPEvent(String key, final double price, final String transactionId) {
+        recordGenericIAPEvent(key, price, transactionId, false);
     }
 
     /**
@@ -897,7 +913,19 @@ public class Seeds {
      * @throws IllegalArgumentException if key is null or empty
      */
     public void recordSeedsIAPEvent(String key, final double price) {
-        recordGenericIAPEvent(key, price, true);
+        recordGenericIAPEvent(key, price, null, true);
+    }
+
+    /**
+     * Records an IAP event
+     * @param key name of the custom event, required, must not be the empty string
+     * @param price sum to associate with the event
+     * @param transactionId order identifier
+     * @throws IllegalStateException if Seeds SDK has not been initialized
+     * @throws IllegalArgumentException if key is null or empty
+     */
+    public void recordSeedsIAPEvent(String key, final double price, final String transactionId) {
+        recordGenericIAPEvent(key, price, transactionId, true);
     }
 
     public void requestInAppMessage(String messageId) {
