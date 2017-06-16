@@ -155,44 +155,44 @@ public class Util {
 		return null;
 	}
 
-	public static Location getLocation(Context context) {
-		boolean HasFineLocationPermission = false;
-		boolean HasCoarseLocationPermission = false;
-
-		if (context.checkCallingOrSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-			HasFineLocationPermission = true;
-			HasCoarseLocationPermission = true;
-		} else if (context.checkCallingOrSelfPermission(android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-			HasCoarseLocationPermission = true;
-		}
-
-		LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-
-		if (locationManager != null && HasFineLocationPermission && locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-			Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-
-			if (location == null) {
-				return null;
-			}
-
-			long timeFromFix = Math.abs(System.currentTimeMillis() - location.getTime());
-			if (location.hasAccuracy() && location.getAccuracy() < MINIMAL_ACCURACY && timeFromFix < MINIMAL_TIME_FROM_FIX) {
-				return location;
-			}
-		}
-		if (locationManager != null && HasCoarseLocationPermission && locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-			Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-
-			if (location == null) {
-				return null;
-			}
-			long timeFromFix = Math.abs(System.currentTimeMillis() - location.getTime());
-			if (location.hasAccuracy() && location.getAccuracy() < MINIMAL_ACCURACY && timeFromFix < MINIMAL_TIME_FROM_FIX) {
-				return location;
-			}
-		}
-		return null;
-	}
+//	public static Location getLocation(Context context) {
+//		boolean HasFineLocationPermission = false;
+//		boolean HasCoarseLocationPermission = false;
+//
+//		if (context.checkCallingOrSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+//			HasFineLocationPermission = true;
+//			HasCoarseLocationPermission = true;
+//		} else if (context.checkCallingOrSelfPermission(android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+//			HasCoarseLocationPermission = true;
+//		}
+//
+//		LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+//
+//		if (locationManager != null && HasFineLocationPermission && locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+//			Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+//
+//			if (location == null) {
+//				return null;
+//			}
+//
+//			long timeFromFix = Math.abs(System.currentTimeMillis() - location.getTime());
+//			if (location.hasAccuracy() && location.getAccuracy() < MINIMAL_ACCURACY && timeFromFix < MINIMAL_TIME_FROM_FIX) {
+//				return location;
+//			}
+//		}
+//		if (locationManager != null && HasCoarseLocationPermission && locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+//			Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+//
+//			if (location == null) {
+//				return null;
+//			}
+//			long timeFromFix = Math.abs(System.currentTimeMillis() - location.getTime());
+//			if (location.hasAccuracy() && location.getAccuracy() < MINIMAL_ACCURACY && timeFromFix < MINIMAL_TIME_FROM_FIX) {
+//				return location;
+//			}
+//		}
+//		return null;
+//	}
 
 	public static String getDefaultUserAgentString() {
 		String userAgent = System.getProperty("http.agent");

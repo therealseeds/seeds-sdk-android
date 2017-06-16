@@ -28,10 +28,10 @@ public class UtilTest extends AndroidTestCase {
         assertNotNull(localIpAddress);
     }
 
-    public void testGetLocation() throws Exception {
-        Location location = Util.getLocation(context);
-        assertNull(location);
-    }
+//    public void testGetLocation() throws Exception {
+//        Location location = Util.getLocation(context);
+//        assertNull(location);
+//    }
 
     public void testGetDefaultUserAgentString() throws Exception{
         String userAgent = Util.getDefaultUserAgentString();
