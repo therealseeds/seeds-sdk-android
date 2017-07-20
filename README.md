@@ -24,7 +24,7 @@ repositories {
   jcenter()
 }
 dependencies {
-  compile 'com.playseeds.android-sdk:0.5.0'
+  compile 'com.playseeds:android-sdk:0.5.0'
 }
 ```
 Or Maven:
