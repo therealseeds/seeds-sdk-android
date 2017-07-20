@@ -27,7 +27,7 @@ public class InAppMessageRequestTest  extends AndroidTestCase {
         request.setListAds("fake list ads");
         request.setLongitude(34.34);
         request.setProtocolVersion("fake protocol version");
-        request.setAppKey("fake app key");
+        request.setAppKey("fake app eventName");
         request.setTimestamp(timeStamp);
         request.setUserAgent("fake user agent");
         request.setUserAgent2("fake user agent 2");
@@ -51,7 +51,7 @@ public class InAppMessageRequestTest  extends AndroidTestCase {
         assertSame("fake list ads", request.getListAds());
         assertEquals(34.34, request.getLongitude());
         assertSame("fake protocol version", request.getProtocolVersion());
-        assertSame("fake app key", request.getAppKey());
+        assertSame("fake app eventName", request.getAppKey());
         assertEquals(timeStamp, request.getTimestamp());
         assertSame("fake user agent", request.getUserAgent());
         assertSame("fake user agent 2", request.getUserAgent2());

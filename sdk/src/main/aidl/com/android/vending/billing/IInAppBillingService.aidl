@@ -61,8 +61,8 @@ interface IInAppBillingService {
      * This API can be called with a maximum of 20 SKUs.
      * @param apiVersion billing API version that the Third-party is using
      * @param packageName the package name of the calling app
-     * @param skusBundle bundle containing a StringArrayList of SKUs with key "ITEM_ID_LIST"
-     * @return Bundle containing the following key-value pairs
+     * @param skusBundle bundle containing a StringArrayList of SKUs with eventName "ITEM_ID_LIST"
+     * @return Bundle containing the following eventName-value pairs
      *         "RESPONSE_CODE" with int value, RESULT_OK(0) if success, other response codes on
      *              failure as listed above.
      *         "DETAILS_LIST" with a StringArrayList containing purchase information
@@ -81,14 +81,14 @@ interface IInAppBillingService {
      * @param type the type of the in-app item ("inapp" for one-time purchases
      *        and "subs" for subscription).
      * @param developerPayload optional argument to be sent back with the purchase information
-     * @return Bundle containing the following key-value pairs
+     * @return Bundle containing the following eventName-value pairs
      *         "RESPONSE_CODE" with int value, RESULT_OK(0) if success, other response codes on
      *              failure as listed above.
      *         "BUY_INTENT" - PendingIntent to start the purchase flow
      *
      * The Pending intent should be launched with startIntentSenderForResult. When purchase flow
      * has completed, the onActivityResult() will give a resultCode of OK or CANCELED.
-     * If the purchase is successful, the result data will contain the following key-value pairs
+     * If the purchase is successful, the result data will contain the following eventName-value pairs
      *         "RESPONSE_CODE" with int value, RESULT_OK(0) if success, other response codes on
      *              failure as listed above.
      *         "INAPP_PURCHASE_DATA" - String in JSON format similar to
@@ -99,8 +99,7 @@ interface IInAppBillingService {
      *                "purchaseToken" : "122333444455555",
      *                "developerPayload":"example developer payload" }'
      *         "INAPP_DATA_SIGNATURE" - String containing the signature of the purchase data that
-     *                                  was signed with the private key of the developer
-     *                                  TODO: change this to app-specific keys.
+     *                                  was signed with the private eventName of the developer
      */
     Bundle getBuyIntent(int apiVersion, String packageName, String sku, String type,
         String developerPayload);
@@ -118,7 +117,7 @@ interface IInAppBillingService {
      *        skus are too many, a continuationToken is returned in the response bundle.
      *        This method can be called again with the continuation token to get the next set of
      *        owned skus.
-     * @return Bundle containing the following key-value pairs
+     * @return Bundle containing the following eventName-value pairs
      *         "RESPONSE_CODE" with int value, RESULT_OK(0) if success, other response codes on
      *              failure as listed above.
      *         "INAPP_PURCHASE_ITEM_LIST" - StringArrayList containing the list of SKUs

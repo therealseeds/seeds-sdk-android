@@ -30,7 +30,7 @@ public class SeedsTest extends AndroidTestCase {
         ExecutorService mockService = mock(ExecutorService.class);
 
         mockQueue.setContext(context);
-        mockQueue.setAppKey("fake key");
+        mockQueue.setAppKey("fake eventName");
         mockQueue.setServerURL("https://devdash.com");
         mockQueue.setCountlyStore(mock(CountlyStore.class));
         mockQueue.setExecutor(mockService);

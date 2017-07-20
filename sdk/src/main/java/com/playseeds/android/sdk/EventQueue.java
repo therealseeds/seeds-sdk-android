@@ -88,18 +88,10 @@ public class EventQueue {
         return result;
     }
 
-    /**
-     * Records a custom Count.ly event to the local event queue.
-     * @param key name of the custom event, required, must not be the empty string
-     * @param segmentation segmentation values for the custom event, may be null
-     * @param count count associated with the custom event, should be more than zero
-     * @param sum sum associated with the custom event, if not used, pass zero.
-     *            NaN and infinity values will be quietly ignored.
-     * @throws IllegalArgumentException if key is null or empty
-     */
-    void recordEvent(final String key, final Map<String, String> segmentation, final int count, final double sum) {
-        final int timestamp = Seeds.currentTimestamp();
-        countlyStore_.addEvent(key, segmentation, timestamp, count, sum);
+    void recordEvent(Event event) {
+        event.timestamp = Seeds.currentTimestamp();
+
+        countlyStore_.addEvent(event);
     }
 
     // for unit tests

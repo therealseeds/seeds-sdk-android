@@ -13,7 +13,8 @@ import org.json.JSONObject;
 
 import android.util.Log;
 
-public class UserData {
+@Deprecated
+class UserData {
     public static final String NAME_KEY = "name";
     public static final String USERNAME_KEY = "username";
     public static final String EMAIL_KEY = "email";
@@ -83,7 +84,7 @@ public class UserData {
 
     /**
      * Sets user custom properties and values.
-     * @param data Map with user custom key/values
+     * @param data Map with user custom eventName/values
      */
     static void setCustomData(Map<String, String> data){
         custom = new HashMap<>();

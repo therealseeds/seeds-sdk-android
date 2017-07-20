@@ -159,7 +159,6 @@ public class InAppMessageRequest {
 		return this.toCountlyUri().toString();
 	}
 
-	//TODO: make sure "deviceCategory" gets to server code
 	public Uri toCountlyUri() {
 		String countlyURL = requestURL;
 		String path = "/o/messages";

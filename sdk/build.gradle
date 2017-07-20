@@ -5,19 +5,27 @@ buildscript {
     repositories {
         jcenter()
     }
+
     dependencies {
-        classpath 'com.novoda:bintray-release:0.3.4'
+        classpath 'com.novoda:bintray-release:0.5.0'
     }
 }
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion '25.0.3'
+    final TARGET_SDK_VERSION = 25
+    final MIN_SDK_VERSION = 16
+    final BUILD_TOOLS_VERSION = "25.0.3"
+    final VERSION_NAME = "0.5.0"
+
+    buildToolsVersion BUILD_TOOLS_VERSION
+    compileSdkVersion TARGET_SDK_VERSION
 
     defaultConfig {
-        minSdkVersion 12
+        minSdkVersion MIN_SDK_VERSION
+        targetSdkVersion TARGET_SDK_VERSION
+
         versionCode 1
-        versionName "1.0"
+        versionName VERSION_NAME
 
         testInstrumentationRunner 'com.playseeds.android.sdk.test.InstrumentationTestRunner'
         testHandleProfiling true
@@ -44,25 +52,33 @@ android {
 }
 
 dependencies {
+    final PLAY_SERVICES = "11.0.2"
+
     compile fileTree(dir: 'libs', include: ['*.jar'])
+
+    compile "com.google.android.gms:play-services-base:$PLAY_SERVICES"
+    compile "com.google.android.gms:play-services-ads:$PLAY_SERVICES"
+    compile "com.google.android.gms:play-services-gcm:$PLAY_SERVICES"
+
     compile 'org.glassfish:javax.json:1.0.4'
-    compile 'com.google.android.gms:play-services:9.2.0'
-    compile 'com.google.code.gson:gson:2.4'
-    compile 'com.android.support:multidex:1.0.1'
+    compile 'com.google.code.gson:gson:2.7'
     compile 'com.loopj.android:android-async-http:1.4.9'
+
     androidTestCompile 'org.mockito:mockito-core:1.9.5'
     androidTestCompile 'com.google.dexmaker:dexmaker:1.0'
     androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.0'
+
     testCompile 'junit:junit:4.12'
     testCompile "org.robolectric:robolectric:3.0"
     testCompile "org.robolectric:shadows-multidex:3.0"
+    testCompile "com.google.android.gms:play-services-wallet:$PLAY_SERVICES"
 }
 
 publish {
     userOrg = 'seedsinc'
     groupId = 'com.playseeds'
     artifactId = 'android-sdk'
-    version = '0.4.3'
+    version = '0.5.0'
     description = 'Android SDK for Seeds mobile analytics'
     website = 'https://github.com/therealseeds/seeds-sdk-android'
 }
