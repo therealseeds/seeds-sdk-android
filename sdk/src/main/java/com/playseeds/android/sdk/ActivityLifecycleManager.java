@@ -82,6 +82,11 @@ public class ActivityLifecycleManager implements Application.ActivityLifecycleCa
     @Override
     public void onActivitySaveInstanceState(Activity activity, Bundle outState) {}
 
+    public Activity getValidViewContext(){
+
+        return currentActivityWeakReference.get();
+    }
+
     private void bindService(){
 
         mServiceConn = new ServiceConnection() {

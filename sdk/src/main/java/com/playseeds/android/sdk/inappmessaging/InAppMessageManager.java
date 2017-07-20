@@ -43,6 +43,7 @@ import com.android.vending.billing.IInAppBillingService;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.playseeds.android.sdk.ActivityLifecycleManager;
 import com.playseeds.android.sdk.DeviceId;
 import com.playseeds.android.sdk.Event;
 import com.playseeds.android.sdk.Seeds;
@@ -67,6 +68,8 @@ public class InAppMessageManager {
 	private HashMap<String, InAppMessageRequest> mRequests = null;
 	private static HashMap<Long, InAppMessageManager> sRunningAds = new HashMap<>();
 
+	private ActivityLifecycleManager lifecycleManager;
+
 	/**
 	 * Private Constructor
 	 */
@@ -85,7 +88,7 @@ public class InAppMessageManager {
 		static final InAppMessageManager instance = new InAppMessageManager();
 	}
 
-	public void init(Context context, IInAppBillingService billingService, final String interstitialRequestURL, final String appKey, final String deviceID, final DeviceId.Type idMode) {
+	public void init(ActivityLifecycleManager lifecycleManager, Context context, IInAppBillingService billingService, final String interstitialRequestURL, final String appKey, final String deviceID, final DeviceId.Type idMode) {
 		Util.prepareAndroidAdId(context);
 		InAppMessageManager.setmContext(context);
 		InAppMessageManager.setmBillingService(billingService);
@@ -93,7 +96,8 @@ public class InAppMessageManager {
 		mAppKey = appKey;
 		mDeviceID= deviceID;
 		mIdMode = idMode;
-		mContext = context;
+
+		this.lifecycleManager = lifecycleManager;
 
         // Handle smoothly the case where message manager is initialized multiple times
         // (don't remove already preloaded interstitials or interfere with the ongoing requests)
@@ -291,7 +295,7 @@ public class InAppMessageManager {
 
 			Intent intent = new Intent(getContext(), RichMediaActivity.class);
 			intent.putExtra(AD_EXTRA, ad);
-			getContext().startActivity(intent);
+			lifecycleManager.getValidViewContext().startActivity(intent);
 
 			result = true;
 			sRunningAds.put(ad.getTimestamp(), this);
@@ -349,7 +353,7 @@ public class InAppMessageManager {
 				Intent i = new Intent(Intent.ACTION_SEND);
 				i.setType("text/plain");
 				i.putExtra(Intent.EXTRA_TEXT, shareUrl);
-				mContext.startActivity(Intent.createChooser(i, "Share URL"));
+				lifecycleManager.getValidViewContext().startActivity(Intent.createChooser(i, "Share URL"));
 
 				recordInterstitialEvent("social share clicked", ad);
 
@@ -480,7 +484,7 @@ public class InAppMessageManager {
 
 				Intent intent = new Intent(getContext(), RichMediaActivity.class);
 				intent.putExtra(AD_EXTRA, ad);
-				getContext().startActivity(intent);
+				lifecycleManager.getValidViewContext().startActivity(intent);
 
 				result = true;
 				sRunningAds.put(ad.getTimestamp(), this);

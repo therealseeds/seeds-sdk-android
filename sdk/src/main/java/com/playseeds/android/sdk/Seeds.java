@@ -504,7 +504,7 @@ public class Seeds implements Interstitials, Events {
         Log.d(Seeds.TAG, "deviceId: " + connectionQueue_.getDeviceId() +
                 connectionQueue_.getDeviceId().getId() + connectionQueue_.getDeviceId().getType());
 
-        InAppMessageManager.sharedInstance().init(connectionQueue_.getContext(), billingService,
+        InAppMessageManager.sharedInstance().init(activityLifecycleManager, connectionQueue_.getContext(), billingService,
                 connectionQueue_.getServerURL(), connectionQueue_.getAppKey(),
                 connectionQueue_.getDeviceId().getId(), connectionQueue_.getDeviceId().getType());
 
