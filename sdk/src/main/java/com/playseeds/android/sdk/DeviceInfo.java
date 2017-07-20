@@ -232,7 +232,7 @@ class DeviceInfo {
 
     /**
      * Utility method to fill JSONObject with supplied objects for supplied keys.
-     * Fills json only with non-null and non-empty key/value pairs.
+     * Fills json only with non-null and non-empty eventName/value pairs.
      * @param json JSONObject to fill
      * @param objects varargs of this kind: key1, value1, key2, value2, ...
      */

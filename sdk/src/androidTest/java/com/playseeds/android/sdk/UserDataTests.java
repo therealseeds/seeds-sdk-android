@@ -69,7 +69,7 @@ public class UserDataTests extends AndroidTestCase {
 
     public void testSetCustomData() throws Exception {
         Map<String, String> data = new HashMap<>();
-        data.put("key", "data");
+        data.put("eventName", "data");
         UserData.setCustomData(data);
 
         assertNotNull(UserData.custom);

@@ -23,12 +23,15 @@ package com.playseeds.android.sdk;
 
 import android.util.Log;
 
+import com.playseeds.android.sdk.new_api.events.Events;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This class holds the data for a single Count.ly custom event instance.
@@ -36,18 +39,35 @@ import java.util.Map;
  * See the following link for more info:
  * https://count.ly/resources/reference/custom-events
  */
-class Event {
-    private static final String SEGMENTATION_KEY = "segmentation";
-    private static final String KEY_KEY = "key";
-    private static final String COUNT_KEY = "count";
-    private static final String SUM_KEY = "sum";
-    private static final String TIMESTAMP_KEY = "timestamp";
+public class Event {
+    private static final String KEY_SEGMENTATION = "attributes";
+    private static final String KEY_EVENT_NAME = "eventName";
+    private static final String KEY_COUNT = "count";
+    private static final String KEY_SUM = "sum";
+    private static final String KEY_TIMESTAMP = "timestamp";
 
-    public String key;
-    public Map<String, String> segmentation;
+    public String eventName;
+    public Map<String, String> attributes;
     public int count;
     public double sum;
     public int timestamp;
+
+    public Event(String eventName, Map<String, String> attributes, int count) {
+        this.eventName = eventName;
+        this.attributes = attributes;
+        this.count = count;
+    }
+
+    public Event(String eventName, Map<String, String> attributes, int count, double sum) {
+        this.eventName = eventName;
+        this.attributes = attributes;
+        this.count = count;
+        this.sum = sum;
+    }
+
+    public Event(){
+        attributes = new ConcurrentHashMap<>();
+    }
 
     /**
      * Creates and returns a JSONObject containing the event data from this object.
@@ -57,18 +77,18 @@ class Event {
         final JSONObject json = new JSONObject();
 
         try {
-            json.put(KEY_KEY, key);
-            json.put(COUNT_KEY, count);
-            json.put(TIMESTAMP_KEY, timestamp);
+            json.put(KEY_EVENT_NAME, eventName);
+            json.put(KEY_COUNT, count);
+            json.put(KEY_TIMESTAMP, timestamp);
 
-            if (segmentation != null) {
-                json.put(SEGMENTATION_KEY, new JSONObject(segmentation));
+            if (attributes != null) {
+                json.put(KEY_SEGMENTATION, new JSONObject(attributes));
             }
 
             // we put in the sum last, the only reason that a JSONException would be thrown
             // would be if sum is NaN or infinite, so in that case, at least we will return
             // a JSON object with the rest of the fields populated
-            json.put(SUM_KEY, sum);
+            json.put(KEY_SUM, sum);
         }
         catch (JSONException e) {
             if (Seeds.sharedInstance().isLoggingEnabled()) {
@@ -82,7 +102,7 @@ class Event {
     /**
      * Factory method to create an Event from its JSON representation.
      * @param json JSON object to extract event data from
-     * @return Event object built from the data in the JSON or null if the "key" value is not
+     * @return Event object built from the data in the JSON or null if the "eventName" value is not
      *         present or the empty string, or if a JSON exception occurs
      * @throws NullPointerException if JSONObject is null
      */
@@ -90,15 +110,15 @@ class Event {
         Event event = new Event();
 
         try {
-            if (!json.isNull(KEY_KEY)) {
-                event.key = json.getString(KEY_KEY);
+            if (!json.isNull(KEY_EVENT_NAME)) {
+                event.eventName = json.getString(KEY_EVENT_NAME);
             }
-            event.count = json.optInt(COUNT_KEY);
-            event.sum = json.optDouble(SUM_KEY, 0.0d);
-            event.timestamp = json.optInt(TIMESTAMP_KEY);
+            event.count = json.optInt(KEY_COUNT);
+            event.sum = json.optDouble(KEY_SUM, 0.0d);
+            event.timestamp = json.optInt(KEY_TIMESTAMP);
 
-            if (!json.isNull(SEGMENTATION_KEY)) {
-                final JSONObject segm = json.getJSONObject(SEGMENTATION_KEY);
+            if (!json.isNull(KEY_SEGMENTATION)) {
+                final JSONObject segm = json.getJSONObject(KEY_SEGMENTATION);
                 final HashMap<String, String> segmentation = new HashMap<>(segm.length());
                 final Iterator nameItr = segm.keys();
                 while (nameItr.hasNext()) {
@@ -107,7 +127,7 @@ class Event {
                         segmentation.put(key, segm.getString(key));
                     }
                 }
-                event.segmentation = segmentation;
+                event.attributes = segmentation;
             }
         }
         catch (JSONException e) {
@@ -117,7 +137,11 @@ class Event {
             event = null;
         }
 
-        return (event != null && event.key != null && event.key.length() > 0) ? event : null;
+        return (event != null && event.eventName != null && event.eventName.length() > 0) ? event : null;
+    }
+
+    public void putAttribute(String key, String value){
+        attributes.put(key, value);
     }
 
     @Override
@@ -128,15 +152,15 @@ class Event {
 
         final Event e = (Event) o;
 
-        return (key == null ? e.key == null : key.equals(e.key)) &&
+        return (eventName == null ? e.eventName == null : eventName.equals(e.eventName)) &&
                timestamp == e.timestamp &&
-               (segmentation == null ? e.segmentation == null : segmentation.equals(e.segmentation));
+               (attributes == null ? e.attributes == null : attributes.equals(e.attributes));
     }
 
     @Override
     public int hashCode() {
-        return (key != null ? key.hashCode() : 1) ^
-               (segmentation != null ? segmentation.hashCode() : 1) ^
+        return (eventName != null ? eventName.hashCode() : 1) ^
+               (attributes != null ? attributes.hashCode() : 1) ^
                (timestamp != 0 ? timestamp : 1);
     }
 }

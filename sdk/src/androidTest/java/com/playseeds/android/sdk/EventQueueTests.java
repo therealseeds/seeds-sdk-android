@@ -89,10 +89,10 @@ public class EventQueueTests extends AndroidTestCase {
     public void testEvents_nonEmptyList() throws UnsupportedEncodingException {
         final List<Event> eventsList = new ArrayList<>();
         final Event event1 = new Event();
-        event1.key = "event1Key";
+        event1.eventName = "event1Key";
         eventsList.add(event1);
         final Event event2 = new Event();
-        event2.key = "event2Key";
+        event2.eventName = "event2Key";
         eventsList.add(event2);
         when(mMockCountlyStore.eventsList()).thenReturn(eventsList);
 

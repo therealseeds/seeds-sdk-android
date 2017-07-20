@@ -111,7 +111,7 @@ public class CountlyStoreTests extends AndroidTestCase {
         store.addEvent(eventKey, null, Seeds.currentTimestamp(), 1, 0.0d);
         final String[] eventJSONStrs = store.events();
         final JSONObject eventJSONObj = new JSONObject(eventJSONStrs[0]);
-        assertEquals(eventKey, eventJSONObj.getString("key"));
+        assertEquals(eventKey, eventJSONObj.getString("eventName"));
         // this is good enough, we verify the entire JSON content is written in later unit tests
     }
 
@@ -122,9 +122,9 @@ public class CountlyStoreTests extends AndroidTestCase {
         store.addEvent(eventKey2, null, Seeds.currentTimestamp(), 1, 0.0d);
         final String[] eventJSONStrs = store.events();
         final JSONObject eventJSONObj1 = new JSONObject(eventJSONStrs[0]);
-        assertEquals(eventKey1, eventJSONObj1.getString("key"));
+        assertEquals(eventKey1, eventJSONObj1.getString("eventName"));
         final JSONObject eventJSONObj2 = new JSONObject(eventJSONStrs[1]);
-        assertEquals(eventKey2, eventJSONObj2.getString("key"));
+        assertEquals(eventKey2, eventJSONObj2.getString("eventName"));
         // this is good enough, we verify the entire JSON content is written in later unit tests
     }
 
@@ -134,10 +134,10 @@ public class CountlyStoreTests extends AndroidTestCase {
 
     public void testEventsList_singleEvent() {
         final Event event1 = new Event();
-        event1.key = "eventKey1";
+        event1.eventName = "eventKey1";
         event1.timestamp = Seeds.currentTimestamp();
         event1.count = 1;
-        store.addEvent(event1.key, event1.segmentation, event1.timestamp, event1.count, event1.sum);
+        store.addEvent(event1.eventName, event1.attributes, event1.timestamp, event1.count, event1.sum);
         final List<Event> expected = new ArrayList<Event>(1);
         expected.add(event1);
         final List<Event> actual = store.eventsList();
@@ -146,20 +146,20 @@ public class CountlyStoreTests extends AndroidTestCase {
 
     public void testEventsList_sortingOfMultipleEvents() {
         final Event event1 = new Event();
-        event1.key = "eventKey1";
+        event1.eventName = "eventKey1";
         event1.timestamp = Seeds.currentTimestamp();
         event1.count = 1;
         final Event event2 = new Event();
-        event2.key = "eventKey2";
+        event2.eventName = "eventKey2";
         event2.timestamp = Seeds.currentTimestamp() - 60;
         event2.count = 1;
         final Event event3 = new Event();
-        event3.key = "eventKey3";
+        event3.eventName = "eventKey3";
         event3.timestamp = Seeds.currentTimestamp() - 30;
         event3.count = 1;
-        store.addEvent(event1.key, event1.segmentation, event1.timestamp, event1.count, event1.sum);
-        store.addEvent(event2.key, event2.segmentation, event2.timestamp, event2.count, event2.sum);
-        store.addEvent(event3.key, event3.segmentation, event3.timestamp, event3.count, event3.sum);
+        store.addEvent(event1.eventName, event1.attributes, event1.timestamp, event1.count, event1.sum);
+        store.addEvent(event2.eventName, event2.attributes, event2.timestamp, event2.count, event2.sum);
+        store.addEvent(event3.eventName, event3.attributes, event3.timestamp, event3.count, event3.sum);
         final List<Event> expected = new ArrayList<Event>(3);
         expected.add(event2);
         expected.add(event3);
@@ -170,11 +170,11 @@ public class CountlyStoreTests extends AndroidTestCase {
 
     public void testEventsList_badJSON() {
         final Event event1 = new Event();
-        event1.key = "eventKey1";
+        event1.eventName = "eventKey1";
         event1.timestamp = Seeds.currentTimestamp() - 60;
         event1.count = 1;
         final Event event2 = new Event();
-        event2.key = "eventKey2";
+        event2.eventName = "eventKey2";
         event2.timestamp = Seeds.currentTimestamp();
         event2.count = 1;
 
@@ -191,15 +191,15 @@ public class CountlyStoreTests extends AndroidTestCase {
 
     public void testEventsList_EventFromJSONReturnsNull() {
         final Event event1 = new Event();
-        event1.key = "eventKey1";
+        event1.eventName = "eventKey1";
         event1.timestamp = Seeds.currentTimestamp() - 60;
         event1.count = 1;
         final Event event2 = new Event();
-        event2.key = "eventKey2";
+        event2.eventName = "eventKey2";
         event2.timestamp = Seeds.currentTimestamp();
         event2.count = 1;
 
-        final String joinedEventsWithBadJSON = event1.toJSON().toString() + "==={\"key\":null}==" + event2.toJSON().toString();
+        final String joinedEventsWithBadJSON = event1.toJSON().toString() + "==={\"eventName\":null}==" + event2.toJSON().toString();
         final SharedPreferences prefs = getContext().getSharedPreferences("COUNTLY_STORE", Context.MODE_PRIVATE);
         prefs.edit().putString("EVENTS", joinedEventsWithBadJSON).commit();
 
@@ -277,15 +277,15 @@ public class CountlyStoreTests extends AndroidTestCase {
 
     public void testAddEvent() {
         final Event event1 = new Event();
-        event1.key = "eventKey1";
+        event1.eventName = "eventKey1";
         event1.timestamp = Seeds.currentTimestamp() - 60;
         event1.count = 42;
         event1.sum = 3.2;
-        event1.segmentation = new HashMap<String, String>(2);
-        event1.segmentation.put("segKey1", "segValue1");
-        event1.segmentation.put("segKey2", "segValue2");
+        event1.attributes = new HashMap<String, String>(2);
+        event1.attributes.put("segKey1", "segValue1");
+        event1.attributes.put("segKey2", "segValue2");
 
-        store.addEvent(event1.key, event1.segmentation, event1.timestamp, event1.count, event1.sum);
+        store.addEvent(event1.eventName, event1.attributes, event1.timestamp, event1.count, event1.sum);
 
         final List<Event> addedEvents = store.eventsList();
         assertEquals(1, addedEvents.size());
@@ -297,24 +297,24 @@ public class CountlyStoreTests extends AndroidTestCase {
 
     public void testRemoveEvents() {
         final Event event1 = new Event();
-        event1.key = "eventKey1";
+        event1.eventName = "eventKey1";
         event1.timestamp = Seeds.currentTimestamp() - 60;
         event1.count = 1;
         final Event event2 = new Event();
-        event2.key = "eventKey2";
+        event2.eventName = "eventKey2";
         event2.timestamp = Seeds.currentTimestamp() - 30;
         event2.count = 1;
         final Event event3 = new Event();
-        event3.key = "eventKey2";
+        event3.eventName = "eventKey2";
         event3.timestamp = Seeds.currentTimestamp();
         event3.count = 1;
 
-        store.addEvent(event1.key, event1.segmentation, event1.timestamp, event1.count, event1.sum);
-        store.addEvent(event2.key, event2.segmentation, event2.timestamp, event2.count, event2.sum);
+        store.addEvent(event1.eventName, event1.attributes, event1.timestamp, event1.count, event1.sum);
+        store.addEvent(event2.eventName, event2.attributes, event2.timestamp, event2.count, event2.sum);
 
         final List<Event> eventsToRemove = store.eventsList();
 
-        store.addEvent(event3.key, event3.segmentation, event3.timestamp, event3.count, event3.sum);
+        store.addEvent(event3.eventName, event3.attributes, event3.timestamp, event3.count, event3.sum);
 
         store.removeEvents(eventsToRemove);
 

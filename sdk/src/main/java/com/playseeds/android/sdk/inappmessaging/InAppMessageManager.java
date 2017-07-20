@@ -44,6 +44,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.playseeds.android.sdk.DeviceId;
+import com.playseeds.android.sdk.Event;
 import com.playseeds.android.sdk.Seeds;
 
 public class InAppMessageManager {
@@ -220,9 +221,6 @@ public class InAppMessageManager {
 									? mResponses.get(messageId).getFormattedPrice()
 									: "BUY");
 					mResponses.get(messageId).setText(text);
-
-					//TODO: remove debug code
-					Log.i("mResponse is: " + mResponses.get(messageId));
 
 					if ((mResponses.get(messageId).getType() == Const.TEXT ||
 							mResponses.get(messageId).getType() == Const.IMAGE) &&
@@ -416,7 +414,6 @@ public class InAppMessageManager {
 			sendNotification(new Runnable() {
 				@Override
 				public void run() {
-					// TODO: Trigger this only when the interstitial is being dismissed
 
 				}
 			});
@@ -554,21 +551,21 @@ public class InAppMessageManager {
 		this.keywords = keywords;
 	}
 
-	public void recordInterstitialEvent(String key, InAppMessageResponse ad) {
+	private void recordInterstitialEvent(String key, InAppMessageResponse ad) {
 		recordInterstitialEvent(key, ad, null);
 	}
 
-	public void recordInterstitialEvent(String key, InAppMessageResponse ad, HashMap<String,String> customSegments) {
+	private void recordInterstitialEvent(String key, InAppMessageResponse ad, HashMap<String, String> customSegments) {
 		HashMap<String, String> segmentation = new HashMap<>();
 		segmentation.put("message", ad.getMessageId());
 		if (ad.getMessageContext().length() > 0) segmentation.put("context", ad.getMessageContext());
 		if (ad.getMessageVariant().length() > 0) segmentation.put("variant", ad.getMessageVariant());
 		if (customSegments != null) segmentation.putAll(customSegments);
 
-		Seeds.sharedInstance().recordEvent(key, segmentation, 1);
+		Seeds.sharedInstance().recordEvent(new Event(key, segmentation, 1));
 	}
 
-	public void doNotShow(boolean doNotShow) {
+	void doNotShow(boolean doNotShow) {
 		this.doNotShow = doNotShow;
 	}
 }
