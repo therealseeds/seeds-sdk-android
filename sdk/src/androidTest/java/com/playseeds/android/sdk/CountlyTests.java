@@ -134,7 +134,7 @@ public class CountlyTests extends AndroidTestCase {
     public void testInit_nullAppKey() {
         try {
             mUninitedSeeds.init(context, null, null, serverUrl, null, deviceId);
-            fail("expected null app key to throw IllegalArgumentException");
+            fail("expected null app eventName to throw IllegalArgumentException");
         } catch (IllegalArgumentException ignored) {
             // success!
         }
@@ -143,7 +143,7 @@ public class CountlyTests extends AndroidTestCase {
     public void testInit_emptyAppKey() {
         try {
             mUninitedSeeds.init(context, null, null, serverUrl, "", deviceId);
-            fail("expected empty app key to throw IllegalArgumentException");
+            fail("expected empty app eventName to throw IllegalArgumentException");
         } catch (IllegalArgumentException ignored) {
             // success!
         }
@@ -414,7 +414,7 @@ public class CountlyTests extends AndroidTestCase {
         try {
             //noinspection ConstantConditions
             mSeeds.recordEvent(eventKey, segmentation, count, sum);
-            fail("expected IllegalArgumentException when recordEvent called with null key");
+            fail("expected IllegalArgumentException when recordEvent called with null eventName");
         } catch (IllegalArgumentException ignored) {
             // success
         }
@@ -429,7 +429,7 @@ public class CountlyTests extends AndroidTestCase {
 
         try {
             mSeeds.recordEvent(eventKey, segmentation, count, sum);
-            fail("expected IllegalArgumentException when recordEvent called with empty key");
+            fail("expected IllegalArgumentException when recordEvent called with empty eventName");
         } catch (IllegalArgumentException ignored) {
             // success
         }
@@ -474,7 +474,7 @@ public class CountlyTests extends AndroidTestCase {
 
         try {
             mSeeds.recordEvent(eventKey, segmentation, count, sum);
-            fail("expected IllegalArgumentException when recordEvent called with segmentation with null key");
+            fail("expected IllegalArgumentException when recordEvent called with attributes with null eventName");
         } catch (IllegalArgumentException ignored) {
             // success
         }
@@ -489,7 +489,7 @@ public class CountlyTests extends AndroidTestCase {
 
         try {
             mSeeds.recordEvent(eventKey, segmentation, count, sum);
-            fail("expected IllegalArgumentException when recordEvent called with segmentation with empty key");
+            fail("expected IllegalArgumentException when recordEvent called with attributes with empty eventName");
         } catch (IllegalArgumentException ignored) {
             // success
         }
@@ -504,7 +504,7 @@ public class CountlyTests extends AndroidTestCase {
 
         try {
             mSeeds.recordEvent(eventKey, segmentation, count, sum);
-            fail("expected IllegalArgumentException when recordEvent called with segmentation with null value");
+            fail("expected IllegalArgumentException when recordEvent called with attributes with null value");
         } catch (IllegalArgumentException ignored) {
             // success
         }
@@ -519,7 +519,7 @@ public class CountlyTests extends AndroidTestCase {
 
         try {
             mSeeds.recordEvent(eventKey, segmentation, count, sum);
-            fail("expected IllegalArgumentException when recordEvent called with segmentation with empty value");
+            fail("expected IllegalArgumentException when recordEvent called with attributes with empty value");
         } catch (IllegalArgumentException ignored) {
             // success
         }

@@ -23,6 +23,8 @@ package com.playseeds.android.sdk;
 
 import android.content.Context;
 
+import com.playseeds.android.sdk.new_api.events.UserInfo;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -105,14 +107,14 @@ public class ConnectionQueue {
 
     /**
      * Checks internal state and throws IllegalStateException if state is invalid to begin use.
-     * @throws IllegalStateException if context, app key, store, or server URL have not been set
+     * @throws IllegalStateException if context, app eventName, store, or server URL have not been set
      */
     void checkInternalState() {
         if (context_ == null) {
             throw new IllegalStateException("context has not been set");
         }
         if (appKey_ == null || appKey_.length() == 0) {
-            throw new IllegalStateException("app key has not been set");
+            throw new IllegalStateException("app eventName has not been set");
         }
         if (store_ == null) {
             throw new IllegalStateException("countly store has not been set");
@@ -127,7 +129,7 @@ public class ConnectionQueue {
 
     /**
      * Records a session start event for the app and sends it to the server.
-     * @throws IllegalStateException if context, app key, store, or server URL have not been set
+     * @throws IllegalStateException if context, app eventName, store, or server URL have not been set
      */
     void beginSession() {
         checkInternalState();
@@ -146,7 +148,7 @@ public class ConnectionQueue {
      * Records a session duration event for the app and sends it to the server. This method does nothing
      * if passed a negative or zero duration.
      * @param duration duration in seconds to extend the current app session, should be more than zero
-     * @throws IllegalStateException if context, app key, store, or server URL have not been set
+     * @throws IllegalStateException if context, app eventName, store, or server URL have not been set
      */
     void updateSession(final int duration) {
         checkInternalState();
@@ -187,7 +189,7 @@ public class ConnectionQueue {
      * Records a session end event for the app and sends it to the server. Duration is only included in
      * the session end event if it is more than zero.
      * @param duration duration in seconds to extend the current app session
-     * @throws IllegalStateException if context, app key, store, or server URL have not been set
+     * @throws IllegalStateException if context, app eventName, store, or server URL have not been set
      */
     void endSession(final int duration) {
         checkInternalState();
@@ -205,11 +207,11 @@ public class ConnectionQueue {
 
     /**
      * Send user data to the server.
-     * @throws java.lang.IllegalStateException if context, app key, store, or server URL have not been set
+     * @throws java.lang.IllegalStateException if context, app eventName, store, or server URL have not been set
      */
-    void sendUserData() {
+    void sendUserInfo(UserInfo userInfo) {
         checkInternalState();
-        String userdata = UserData.getDataForRequest();
+        String userdata = userInfo.getDataForRequest();
 
         if(!userdata.equals("")){
             String data = "app_key=" + appKey_
@@ -224,7 +226,7 @@ public class ConnectionQueue {
     /**
      * Attribute installation to Seeds server.
      * @param referrer query parameters
-     * @throws java.lang.IllegalStateException if context, app key, store, or server URL have not been set
+     * @throws java.lang.IllegalStateException if context, app eventName, store, or server URL have not been set
      */
     void sendReferrerData(String referrer) {
         checkInternalState();
@@ -241,7 +243,7 @@ public class ConnectionQueue {
 
     /**
      * Reports a crash with device data to the server.
-     * @throws IllegalStateException if context, app key, store, or server URL have not been set
+     * @throws IllegalStateException if context, app eventName, store, or server URL have not been set
      */
     void sendCrashReport(String error, boolean nonfatal) {
         checkInternalState();
@@ -258,7 +260,7 @@ public class ConnectionQueue {
     /**
      * Records the specified events and sends them to the server.
      * @param events URL-encoded JSON string of event data
-     * @throws IllegalStateException if context, app key, store, or server URL have not been set
+     * @throws IllegalStateException if context, app eventName, store, or server URL have not been set
      */
     void recordEvents(final String events) {
         checkInternalState();
@@ -274,7 +276,7 @@ public class ConnectionQueue {
     /**
      * Records the specified events and sends them to the server.
      * @param events URL-encoded JSON string of event data
-     * @throws IllegalStateException if context, app key, store, or server URL have not been set
+     * @throws IllegalStateException if context, app eventName, store, or server URL have not been set
      */
     void recordLocation(final String events) {
         checkInternalState();

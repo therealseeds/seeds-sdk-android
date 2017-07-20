@@ -29,5 +29,6 @@ public interface InAppMessageListener {
 
 	void noInAppMessageFound(String messageId);
 
+	@Deprecated
     void inAppMessageClickedWithDynamicPrice(String messageId, Double price);
 }

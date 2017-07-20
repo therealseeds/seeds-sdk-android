@@ -40,7 +40,7 @@ import java.util.Map;
  *
  * The "read" methods in this class are not synchronized, because the underlying data store
  * provides thread-safe reads.  The "write" methods in this class are synchronized, because
- * 1) they often read a list of items, modify the list, and then commit it back to the underlying
+ * 1) they often read a list of items, modify the list, and then apply it back to the underlying
  * data store, and 2) while the Seeds singleton is synchronized to ensure only a single writer
  * at a time from the public API side, the internal implementation has a background thread that
  * submits data to a Seeds server, and it writes to this store as well.
@@ -127,7 +127,7 @@ public class CountlyStore {
         if (str != null && str.length() > 0) {
             final List<String> connections = new ArrayList<>(Arrays.asList(connections()));
             connections.add(str);
-            preferences_.edit().putString(CONNECTIONS_PREFERENCE, join(connections, DELIMITER)).commit();
+            preferences_.edit().putString(CONNECTIONS_PREFERENCE, join(connections, DELIMITER)).apply();
         }
     }
 
@@ -140,7 +140,7 @@ public class CountlyStore {
         if (str != null && str.length() > 0) {
             final List<String> connections = new ArrayList<>(Arrays.asList(connections()));
             if (connections.remove(str)) {
-                preferences_.edit().putString(CONNECTIONS_PREFERENCE, join(connections, DELIMITER)).commit();
+                preferences_.edit().putString(CONNECTIONS_PREFERENCE, join(connections, DELIMITER)).apply();
             }
         }
     }
@@ -152,7 +152,7 @@ public class CountlyStore {
     void addEvent(final Event event) {
         final List<Event> events = eventsList();
         events.add(event);
-        preferences_.edit().putString(EVENTS_PREFERENCE, joinEvents(events, DELIMITER)).commit();
+        preferences_.edit().putString(EVENTS_PREFERENCE, joinEvents(events, DELIMITER)).apply();
     }
 
     /**
@@ -160,7 +160,7 @@ public class CountlyStore {
      */
     void setLocation(final double lat, final double lon) {
         if (preferences_ != null) {
-            preferences_.edit().putString(LOCATION_PREFERENCE, lat + "," + lon).commit();
+            preferences_.edit().putString(LOCATION_PREFERENCE, lat + "," + lon).apply();
         }
     }
 
@@ -172,30 +172,10 @@ public class CountlyStore {
         if (preferences_ != null) {
             location = preferences_.getString(LOCATION_PREFERENCE, "");
             if (!location.equals("")) {
-                preferences_.edit().remove(LOCATION_PREFERENCE).commit();
+                preferences_.edit().remove(LOCATION_PREFERENCE).apply();
             }
         }
         return location;
-    }
-
-    /**
-     * Adds a custom event to the local store.
-     * @param key name of the custom event, required, must not be the empty string
-     * @param segmentation segmentation values for the custom event, may be null
-     * @param timestamp timestamp (seconds since 1970) in GMT when the event occurred
-     * @param count count associated with the custom event, should be more than zero
-     * @param sum sum associated with the custom event, if not used, pass zero.
-     *            NaN and infinity values will be quietly ignored.
-     */
-    public synchronized void addEvent(final String key, final Map<String, String> segmentation, final int timestamp, final int count, final double sum) {
-        final Event event = new Event();
-        event.key = key;
-        event.segmentation = segmentation;
-        event.timestamp = timestamp;
-        event.count = count;
-        event.sum = sum;
-
-        addEvent(event);
     }
 
     /**
@@ -207,7 +187,7 @@ public class CountlyStore {
         if (eventsToRemove != null && eventsToRemove.size() > 0) {
             final List<Event> events = eventsList();
             if (events.removeAll(eventsToRemove)) {
-                preferences_.edit().putString(EVENTS_PREFERENCE, joinEvents(events, DELIMITER)).commit();
+                preferences_.edit().putString(EVENTS_PREFERENCE, joinEvents(events, DELIMITER)).apply();
             }
         }
     }
@@ -245,7 +225,7 @@ public class CountlyStore {
 
     /**
      * Retrieves a preference from local store.
-     * @param key the preference key
+     * @param key the preference eventName
      */
     public synchronized String getPreference(final String key) {
         return preferences_.getString(key, null);
@@ -253,14 +233,14 @@ public class CountlyStore {
 
     /**
      * Adds a preference to local store.
-     * @param key the preference key
+     * @param key the preference eventName
      * @param value the preference value, supply null value to remove preference
      */
     public synchronized void setPreference(final String key, final String value) {
         if (value == null) {
-            preferences_.edit().remove(key).commit();
+            preferences_.edit().remove(key).apply();
         } else {
-            preferences_.edit().putString(key, value).commit();
+            preferences_.edit().putString(key, value).apply();
         }
     }
 
@@ -270,7 +250,7 @@ public class CountlyStore {
             SharedPreferences.Editor prefsEditor = preferences_.edit();
             prefsEditor.remove(EVENTS_PREFERENCE);
             prefsEditor.remove(CONNECTIONS_PREFERENCE);
-            prefsEditor.commit();
+            prefsEditor.apply();
         }
     }
 }

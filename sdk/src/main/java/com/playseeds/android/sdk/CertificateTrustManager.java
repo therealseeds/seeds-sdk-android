@@ -26,7 +26,7 @@ import javax.net.ssl.X509TrustManager;
 // http://www.thoughtcrime.org/blog/authenticity-is-broken-in-ssl-but-your-app-ha/
 public final class CertificateTrustManager implements X509TrustManager {
 
-    // DER encoded public key
+    // DER encoded public eventName
     private final List<byte[]> keys;
 
     public CertificateTrustManager(List<String> certificates) throws CertificateException {

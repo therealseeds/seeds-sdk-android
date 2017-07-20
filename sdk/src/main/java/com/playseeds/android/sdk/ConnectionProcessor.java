@@ -63,11 +63,6 @@ public class ConnectionProcessor implements Runnable {
         store_ = store;
         deviceId_ = deviceId;
         sslContext_ = sslContext;
-
-        // HTTP connection reuse which was buggy pre-froyo
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.FROYO) {
-            System.setProperty("http.keepAlive", "false");
-        }
     }
 
     public URLConnection urlConnectionForEventData(final String eventData) throws IOException {
@@ -87,44 +82,44 @@ public class ConnectionProcessor implements Runnable {
         conn.setReadTimeout(READ_TIMEOUT_IN_MILLISECONDS);
         conn.setUseCaches(false);
         conn.setDoInput(true);
-        String picturePath = UserData.getPicturePathFromQuery(url);
-        if (Seeds.sharedInstance().isLoggingEnabled()) {
-            Log.d(Seeds.TAG, "Got picturePath: " + picturePath);
-        }
-        if(!picturePath.equals("")){
-        	//Uploading files:
-        	//http://stackoverflow.com/questions/2793150/how-to-use-java-net-urlconnection-to-fire-and-handle-http-requests
-        	
-        	File binaryFile = new File(picturePath);
-        	conn.setDoOutput(true);
-        	// Just generate some unique random value.
-        	String boundary = Long.toHexString(System.currentTimeMillis());
-        	// Line separator required by multipart/form-data.
-        	String CRLF = "\r\n";
-        	String charset = "UTF-8";
-        	conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
-        	OutputStream output = conn.getOutputStream();
-        	PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, charset), true);
-        	// Send binary file.
-            writer.append("--" + boundary).append(CRLF);
-            writer.append("Content-Disposition: form-data; name=\"binaryFile\"; filename=\"" + binaryFile.getName() + "\"").append(CRLF);
-            writer.append("Content-Type: " + URLConnection.guessContentTypeFromName(binaryFile.getName())).append(CRLF);
-            writer.append("Content-Transfer-Encoding: binary").append(CRLF);
-            writer.append(CRLF).flush();
-            FileInputStream fileInputStream = new FileInputStream(binaryFile);
-            byte[] buffer = new byte[1024];
-            int len;
-            while ((len = fileInputStream.read(buffer)) != -1) {
-                output.write(buffer, 0, len);
-            }
-            output.flush(); // Important before continuing with writer!
-            writer.append(CRLF).flush(); // CRLF is important! It indicates end of boundary.
-            fileInputStream.close();
-
-            // End of multipart/form-data.
-            writer.append("--" + boundary + "--").append(CRLF).flush();
-        }
-        else if(eventData.contains("&crash=")){
+//        String picturePath = UserData.getPicturePathFromQuery(url);
+//        if (Seeds.sharedInstance().isLoggingEnabled()) {
+//            Log.d(Seeds.TAG, "Got picturePath: " + picturePath);
+//        }
+//        if(!picturePath.equals("")){
+//        	//Uploading files:
+//        	//http://stackoverflow.com/questions/2793150/how-to-use-java-net-urlconnection-to-fire-and-handle-http-requests
+//
+//        	File binaryFile = new File(picturePath);
+//        	conn.setDoOutput(true);
+//        	// Just generate some unique random value.
+//        	String boundary = Long.toHexString(System.currentTimeMillis());
+//        	// Line separator required by multipart/form-data.
+//        	String CRLF = "\r\n";
+//        	String charset = "UTF-8";
+//        	conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
+//        	OutputStream output = conn.getOutputStream();
+//        	PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, charset), true);
+//        	// Send binary file.
+//            writer.append("--" + boundary).append(CRLF);
+//            writer.append("Content-Disposition: form-data; name=\"binaryFile\"; filename=\"" + binaryFile.getName() + "\"").append(CRLF);
+//            writer.append("Content-Type: " + URLConnection.guessContentTypeFromName(binaryFile.getName())).append(CRLF);
+//            writer.append("Content-Transfer-Encoding: binary").append(CRLF);
+//            writer.append(CRLF).flush();
+//            FileInputStream fileInputStream = new FileInputStream(binaryFile);
+//            byte[] buffer = new byte[1024];
+//            int len;
+//            while ((len = fileInputStream.read(buffer)) != -1) {
+//                output.write(buffer, 0, len);
+//            }
+//            output.flush(); // Important before continuing with writer!
+//            writer.append(CRLF).flush(); // CRLF is important! It indicates end of boundary.
+//            fileInputStream.close();
+//
+//            // End of multipart/form-data.
+//            writer.append("--" + boundary + "--").append(CRLF).flush();
+//        }
+        if(eventData.contains("&crash=")){
             if (Seeds.sharedInstance().isLoggingEnabled()) {
                 Log.d(Seeds.TAG, "Using post because of crash");
             }

@@ -53,7 +53,7 @@ public class AdvertisingIdAdapter {
         final Method getAdvertisingIdInfo = cls.getMethod("getAdvertisingIdInfo", Context.class);
         Object info = getAdvertisingIdInfo.invoke(null, context);
         if (info != null) {
-            final Method getId = info.getClass().getMethod("getId");
+            final Method getId = info.getClass().getMethod("getInterstitialId");
             Object id = getId.invoke(info);
             return (String)id;
         }

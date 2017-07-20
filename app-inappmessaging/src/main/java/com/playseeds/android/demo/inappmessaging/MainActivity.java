@@ -5,26 +5,29 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.playseeds.android.sdk.IInAppMessageShowCountListener;
 import com.playseeds.android.sdk.Seeds;
 
 import com.playseeds.android.sdk.inappmessaging.InAppMessageListener;
+import com.playseeds.android.sdk.new_api.interstitials.InterstitialListener;
+import com.playseeds.android.sdk.new_api.interstitials.SeedsInterstitial;
 import com.playseeds.demo.inappmessaging.R;
 
 
 
-public class MainActivity extends Activity implements InAppMessageListener {
-    private static String SEEDS_SERVER = "https://dash.playseeds.com";
-    private static String SEEDS_APP_KEY = "2db64b49085be463cade71ce22e6341d7f6bd901";
+public class MainActivity extends Activity implements InterstitialListener {
 
     private static String SEEDS_IAP_EVENT_KEY = "TestSeedsPurchase";
     private static String NORMAL_IAP_EVENT_KEY = "TestNormalPurchase";
 
-    private static String APP_LAUNCH_INTERSTITIAL_ID = "57e362bead5957420e12083f";
-    private static String PURCHASE_INTERSTITIAL_ID = "57e36337ad5957420e120842";
-    private static String SHARING_INTERSTITIAL_ID = "57e36365ad5957420e120845";
+    private static String APP_LAUNCH_INTERSTITIAL_ID = "example-interstitial";
+    private static String PURCHASE_INTERSTITIAL_ID = "example-interstitial";
+    private static String SHARING_INTERSTITIAL_ID = "example-interstitial";
 
     /** Called when the activity is first created. */
     @Override
@@ -32,14 +35,12 @@ public class MainActivity extends Activity implements InAppMessageListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Seeds.sharedInstance()
-                .simpleInit(this, this, SEEDS_SERVER, SEEDS_APP_KEY)
-                .setLoggingEnabled(true);
+        Seeds.interstitials().setListener(this);
 
         // Preload all interstitials at once
-        Seeds.sharedInstance().requestInAppMessage(APP_LAUNCH_INTERSTITIAL_ID);
-        Seeds.sharedInstance().requestInAppMessage(PURCHASE_INTERSTITIAL_ID);
-        Seeds.sharedInstance().requestInAppMessage(SHARING_INTERSTITIAL_ID);
+        Seeds.interstitials().fetch(APP_LAUNCH_INTERSTITIAL_ID);
+        Seeds.interstitials().fetch(PURCHASE_INTERSTITIAL_ID);
+        Seeds.interstitials().fetch(SHARING_INTERSTITIAL_ID);
     }
 
     public void startSocialGoodPurchase(View view) {
@@ -52,7 +53,7 @@ public class MainActivity extends Activity implements InAppMessageListener {
             @Override
             public void run() {
                 // Use recordIAPEvent instead of recordSeedsIAPEvent
-                Seeds.sharedInstance().recordIAPEvent(NORMAL_IAP_EVENT_KEY, 4.99);
+                Seeds.events().logIAPPayment(NORMAL_IAP_EVENT_KEY, 4.99, null);
                 Toast.makeText(context, "Event " + NORMAL_IAP_EVENT_KEY + " tracked as a non-Seeds purchase",
                         Toast.LENGTH_SHORT).show();
             }
@@ -60,20 +61,13 @@ public class MainActivity extends Activity implements InAppMessageListener {
     }
 
     public void showInterstitial(final String messageId, final String context) {
-        try {
-            runOnUiThread(new Runnable() {
-                public void run() {
-                    if (Seeds.sharedInstance().isInAppMessageLoaded(messageId)) {
-                        Seeds.sharedInstance().showInAppMessage(messageId, context);
 
-                    } else {
-                        // Skip the interstitial showing this time and try to reload the interstitial
-                        Seeds.sharedInstance().requestInAppMessage(messageId);
-                    }
-                }
-            });
-        } catch (Exception e) {
-            System.out.println("Exception: " + e);
+        if (Seeds.interstitials().isLoaded(messageId)) {
+
+            Seeds.interstitials().show(messageId, context);
+        } else {
+
+            Seeds.interstitials().fetch(messageId);
         }
     }
 
@@ -98,77 +92,55 @@ public class MainActivity extends Activity implements InAppMessageListener {
                 .setNegativeButton("No", dialogClickListener).show();
     }
 
-    /*
-     * InAppMessageListener implementation starts
-     */
+    @Override
+    public void onLoaded(SeedsInterstitial seedsInterstitial) {
+
+        if (seedsInterstitial.getInterstitialId().equals(APP_LAUNCH_INTERSTITIAL_ID)) {
+            showInterstitial(APP_LAUNCH_INTERSTITIAL_ID, "app startup");
+        }
+
+        Toast.makeText(getBaseContext(), "inAppMessageLoadSucceeded(interstitialId = " + seedsInterstitial.getInterstitialId() + ")", Toast.LENGTH_SHORT).show();
+    }
 
     @Override
-    public void inAppMessageClicked(String messageId) {
-        // Called when a user clicks the buy button. Handle the purchase here!
-        // The interstitial is specified by messageId parameter
+    public void onClick(SeedsInterstitial seedsInterstitial) {
+
         final Context context = this;
-        if (messageId.equals(PURCHASE_INTERSTITIAL_ID)) {
+        if (seedsInterstitial.getInterstitialId().equals(PURCHASE_INTERSTITIAL_ID)) {
             triggerPayment(new Runnable() {
                 @Override
                 public void run() {
                     // Use recordSeedsIAPEvent instead of recordIAPEvent
-                    Seeds.sharedInstance().recordSeedsIAPEvent(SEEDS_IAP_EVENT_KEY, 0.99);
+                    Seeds.events().logSeedsIAPPayment(SEEDS_IAP_EVENT_KEY, 0.99, null);
                     Toast.makeText(context, "Event " + SEEDS_IAP_EVENT_KEY + " tracked as a Seeds purchase",
                             Toast.LENGTH_SHORT).show();
 
                     showInterstitial(SHARING_INTERSTITIAL_ID, "after-purchase");
                 }
             });
-        } else if (messageId.equals(APP_LAUNCH_INTERSTITIAL_ID)) {
+        } else if (seedsInterstitial.getInterstitialId().equals(APP_LAUNCH_INTERSTITIAL_ID)) {
             Toast.makeText(context, "App launch interstitial button clicked", Toast.LENGTH_SHORT).show();
         }
 
-        Toast.makeText(this, "inAppMessageClicked(messageId = " + messageId + ")", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "inAppMessageClicked(interstitialId = " + seedsInterstitial.getInterstitialId() + ")", Toast.LENGTH_SHORT).show();
+
     }
 
     @Override
-    public void inAppMessageDismissed(String messageId) {
-        // Called when a user dismisses the interstitial and no purchase is being made
-        // The interstitial is specified by messageId parameter
-        Toast.makeText(this, "inAppMessageDismissed(messageId = " + messageId + ")", Toast.LENGTH_SHORT).show();
+    public void onShown(SeedsInterstitial seedsInterstitial) {
+
+        Toast.makeText(this, "inAppMessageShown(interstitialId = " + seedsInterstitial.getInterstitialId() + ")", Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void inAppMessageLoadSucceeded(String messageId) {
-        // Called when an interstitial is loaded
-        // The interstitial is specified by messageId parameter
+    public void onDismissed(SeedsInterstitial seedsInterstitial) {
 
-        // Show the app launch interstitial immediately after it's preloaded
-        if (messageId.equals(APP_LAUNCH_INTERSTITIAL_ID)) {
-            showInterstitial(APP_LAUNCH_INTERSTITIAL_ID, "app startup");
-        }
-
-        Toast.makeText(getBaseContext(), "inAppMessageLoadSucceeded(messageId = " + messageId + ")", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "inAppMessageDismissed(interstitialId = " + seedsInterstitial.getInterstitialId() + ")", Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void inAppMessageShown(String messageId, boolean succeeded) {
-        // Called when showing an interstitial has been tried
-        // The interstitial is specified by messageId parameter
-        // Was showing successful or not is defined in succeeded parameter
-        Toast.makeText(this, "inAppMessageShown(succeeded = " + succeeded + ", messageId = " + messageId + ")", Toast.LENGTH_SHORT).show();
-    }
+    public void onError(String interstitialId, Exception exception) {
 
-    @Override
-    public void noInAppMessageFound(String messageId) {
-        // Called when an interstitial couldn't be found or the preloading resulted in an error
-        Toast.makeText(this, "noInAppMessageFound(messageId = " + messageId + ")", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, exception.getMessage() + " at interstitial with " + interstitialId + " id", Toast.LENGTH_SHORT).show();
     }
-
-    @Override
-    public void inAppMessageClickedWithDynamicPrice(String messageId, Double price) {
-        // Called when an interstitial has multiple price options, and a user chooses one of them
-        // Not needed in applications where the user can't choose the price in the Seeds interstitial
-        Toast.makeText(this, "inAppMessageClickedWithDynamicPrice(messageId = " +
-                messageId + ", price = " + price + ")", Toast.LENGTH_SHORT).show();
-    }
-
-    /*
-     * InAppMessageListener implementation ends
-     */
 }
