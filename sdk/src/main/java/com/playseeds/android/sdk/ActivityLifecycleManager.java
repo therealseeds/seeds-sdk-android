@@ -29,6 +29,8 @@ public class ActivityLifecycleManager implements Application.ActivityLifecycleCa
     private ServiceConnection mServiceConn;
     IInAppBillingService mService;
 
+    private boolean isBound;
+
     ActivityLifecycleManager(Context context) {
         this.context = context;
 
@@ -66,7 +68,11 @@ public class ActivityLifecycleManager implements Application.ActivityLifecycleCa
         if (currentActivityWeakReference.get() != null && mService != null) {
 
             Log.d(Seeds.TAG, "On Activity destroyed");
-            currentActivityWeakReference.get().unbindService(mServiceConn);
+            if (isBound) {
+
+                currentActivityWeakReference.get().unbindService(mServiceConn);
+                isBound = false;
+            }
         }
     }
 
@@ -110,5 +116,6 @@ public class ActivityLifecycleManager implements Application.ActivityLifecycleCa
         serviceIntent.setPackage("com.android.vending");
 
         currentActivityWeakReference.get().bindService(serviceIntent, mServiceConn, Context.BIND_AUTO_CREATE);
+        isBound = true;
     }
 }
