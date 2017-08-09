@@ -11,26 +11,26 @@ public class SeedsInterstitial {
 
     public static final String NO_CONTEXT = "";
 
-    /**
-     * Id of the interstitial
-     */
     private String interstitialId;
 
-    /**
-     * Context, that represent the current interstitial.
-     * This field is {@link SeedsInterstitial#NO_CONTEXT} by default.
-     */
     @Nullable
     private String context = NO_CONTEXT;
+
+    private String productId = "";
 
     public SeedsInterstitial(String interstitialId) {
         this.interstitialId = interstitialId;
     }
 
-    public SeedsInterstitial(String interstitialId, @Nullable String context) {
-
+    public SeedsInterstitial(String interstitialId, String productId) {
         this.interstitialId = interstitialId;
-        this.context = context == null ? NO_CONTEXT : context;
+        this.productId = productId == null ? "" : productId;
+    }
+
+    public SeedsInterstitial(String interstitialId, @Nullable String context, String productId) {
+        this.interstitialId = interstitialId;
+        this.context = context;
+        this.productId = productId;
     }
 
     /**
@@ -50,5 +50,15 @@ public class SeedsInterstitial {
     @Nullable
     public String getContext() {
         return context;
+    }
+
+    /**
+     * Returns the ID of the product that is clicked on the interstitial with {@link SeedsInterstitial#interstitialId}.
+     *
+     * @return the ID of the product that is supposed to be bought. May be empty when no product ID
+     * is assigned to the interstitial.
+     */
+    public String getProductId() {
+        return productId;
     }
 }

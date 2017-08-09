@@ -19,7 +19,7 @@
 package com.playseeds.android.sdk.inappmessaging;
 
 public interface InAppMessageListener {
-	void inAppMessageClicked(String messageId);
+	void inAppMessageClicked(String messageId, String productId);
 
     void inAppMessageDismissed(String messageId);
 

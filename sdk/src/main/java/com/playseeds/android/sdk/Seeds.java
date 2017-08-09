@@ -251,11 +251,11 @@ public class Seeds implements Interstitials, Events {
 
     private InAppMessageListener inAppMessageListener = new InAppMessageListener() {
         @Override
-        public void inAppMessageClicked(String messageId) {
+        public void inAppMessageClicked(String messageId, String productId) {
 
             if (interstitialListenerWeakReference.get() != null){
 
-                interstitialListenerWeakReference.get().onClick(new SeedsInterstitial(messageId));
+                interstitialListenerWeakReference.get().onClick(new SeedsInterstitial(messageId, productId));
             }
         }
 
