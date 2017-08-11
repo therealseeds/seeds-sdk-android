@@ -30,6 +30,9 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import android.content.Context;
 import android.content.Intent;
@@ -332,10 +335,10 @@ public class InAppMessageManager {
 
 	private void notifyAdClicked(final InAppMessageResponse ad) {
 		// Here the dynamic inAppMessageClickedWithDynamicPrice
-		String linkUrl = ad.getSeedsLinkUrl();
+		String linkUrl = ad.getSeedsLinkUrl() == null ? "" : ad.getSeedsLinkUrl();
 
 		if (mListener != null) {
-			if (linkUrl != null && linkUrl.contains("/price/")) {
+			if (linkUrl.contains("/price/")) {
 				final Double price = Double.parseDouble(linkUrl.substring(linkUrl.lastIndexOf('/') + 1));
 				HashMap<String, String> customSegments = new HashMap<>();
 				customSegments.put("price", price.toString());
@@ -347,7 +350,7 @@ public class InAppMessageManager {
 						mListener.inAppMessageClickedWithDynamicPrice(ad.getMessageId(), price);
 					}
 				});
-			} else if (linkUrl != null && linkUrl.contains("/social-share")) {
+			} else if (linkUrl.contains("/social-share")) {
 				final String shareUrl = "http://playseeds.com/" + linkUrl.substring(linkUrl.lastIndexOf('/') + 1);
 
 				Intent i = new Intent(Intent.ACTION_SEND);
@@ -360,12 +363,12 @@ public class InAppMessageManager {
 				sendNotification(new Runnable() {
 					@Override
 					public void run() {
-						mListener.inAppMessageClicked(ad.getMessageId());
+						mListener.inAppMessageClicked(ad.getMessageId(), ad.getProductId());
 					}
 				});
-			} else if (linkUrl != null && linkUrl.contains("show-more")) {
+			} else if (linkUrl.contains("show-more")) {
 				recordInterstitialEvent("show more clicked", ad);
-			} else if (linkUrl != null && linkUrl.equals("about:close")) {
+			} else if (linkUrl.equals("about:close")) {
 				recordInterstitialEvent("message dismissed", ad);
 				sendNotification(new Runnable() {
 					@Override
@@ -374,11 +377,25 @@ public class InAppMessageManager {
 					}
 				});
 			} else {
+
+				String productId = "";
+
+                if (linkUrl.contains("?")){
+
+					final Matcher matcher = Pattern.compile("productId=(.*)&?").matcher(linkUrl);
+					if (matcher.find()) productId = matcher.group(1);
+                }
+
 				recordInterstitialEvent("message clicked", ad);
+
+				final String finalProductId = productId.isEmpty()
+						? (ad.getProductId() == null ? "" : ad.getProductId())
+						: productId;
+
 				sendNotification(new Runnable() {
 					@Override
 					public void run() {
-						mListener.inAppMessageClicked(ad.getMessageId());
+						mListener.inAppMessageClicked(ad.getMessageId(), finalProductId);
 					}
 				});
 			}
