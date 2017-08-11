@@ -24,7 +24,7 @@ repositories {
   jcenter()
 }
 dependencies {
-  compile 'com.playseeds:android-sdk:0.5.0'
+  compile 'com.playseeds:android-sdk:0.5.1'
 }
 ```
 Or Maven:
@@ -32,7 +32,7 @@ Or Maven:
 <dependency>
   <groupId>com.playseeds</groupId>
   <artifactId>android-sdk</artifactId>
-  <version>0.5.0</version>
+  <version>0.5.1</version>
   <type>pom</type>
 </dependency>
 ```
@@ -88,7 +88,7 @@ public class YourMainActivity extends Activity {
 To receive callbacks about events from the SDK (e.g. notifications about clicks, dismissals, errors, and loading), please use the implementation of the [InterstitialListener](#interstitials_listener), or the InterstitialListenerAdapter (overriding only the methods you need). We suggest setting the listener at the place  that will be active at the time the interstitial is shown. For example:
 ```java
 public class SomeActivity extends Activity implements InterstitialListener {
-    
+
     @Override
     protected void onResume() {
         ...
@@ -105,7 +105,14 @@ public class SomeActivity extends Activity implements InterstitialListener {
     }
     @Override
     public void onClick(SeedsInterstitial seedsInterstitial) {
-        //Called when the interstitial "buy" button was clicked
+        /*
+          Called when the interstitial "buy" button is clicked.
+          Please note that the `seedsInterstitial` object contains the Product ID associated with   the purchase.
+
+          Sample usage is shown below.
+       */
+        String productId = seedsInterstitial.getProductId();
+        //Proceed the purchase with productId
     }
     @Override
     public void onShown(SeedsInterstitial seedsInterstitial) {
@@ -148,6 +155,7 @@ void onError(String interstitialId, Exception exception); //Called when error oc
 This is the object-wrapper used by in the listener by the Seeds SDK for sharing info about interstitials. As of the most recent release, it contains:
 * InterstitialId;
 * Context;
+* ProductId;
 ## <a name="events_header"></a>Events
 An event is the generalized mechanism for tracking all user actions taken in-app. **Seeds.Events** use two approaches for logging data: direct logging for purchases made, and an object-based approach for tracking all other data. Use `logSeedsIAPPayment()` or `logIAPPayment()` after any successful purchase, and `logUser()` with the provided wrapper to empower Seeds to make the targeted recommendations that will best convert your non-payers into paying customers. There is also an additional way to log your app’s custom data, `logEvent()`, which uses the object-based approach with custom attributes.
 ### After successful in-app purchase:
@@ -206,6 +214,9 @@ Now you’re all set to make as much as 30% more money while simultaneously help
 
 1. Check that the campaign name is correct at your [Dashboard](https://developers.playseeds.com/index.html).
 2. Confirm in `inAppMessageShown` that the interstitial pre-load was successful.
+
+### Why the `productId` in the interstitial listener callback method is empty?
+An error may have occurred on the server side. Please message the Seeds team via the chatbox in the bottom right corner, and we'll take care of this issue right away!
 
 ### Ahhh, I'm experiencing another problem.  Please help!
 
